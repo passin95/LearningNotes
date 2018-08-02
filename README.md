@@ -12,6 +12,8 @@
 
 ## Android :computer:
 
+- [源码解析](https://github.com/passin95/LearningNotes/blob/master/notes/源码解析.md)
+
 ## 网络 :cloud：
 
 - [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
@@ -19,6 +21,8 @@
 - [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
 
 ## 算法 :pencil2：
+
+- [Leetcode](https://github.com/passin95/LearningNotes/blob/master/notes/Leetcode.md)
 
 ## 工具 :hammer:
 
@@ -30,6 +34,7 @@
 **About**
 
 本项目基于[Interview-Notebook](https://github.com/CyC2018/Interview-Notebook)进行排版，并根据自己的实际情况和理解进行修改，作为个人的读书笔记使用。
+若有任何侵权之处，请告之笔者，笔者会第一时间删除。
 
 
 
