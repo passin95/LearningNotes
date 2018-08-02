@@ -4,23 +4,25 @@
 
 ## Java :coffee:
 
-> [Java 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
+- [Java 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
 
-> [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
+- [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
+
+参考 深入理解 Java 虚拟机。
 
 ## Android :computer:
 
 ## 网络 :cloud：
 
-> [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
+- [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
 
-> [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
+- [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
 
 ## 算法 :pencil2：
 
 ## 工具 :hammer:
 
-> [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
+- [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
 
 
 ## 后记 :memo:
