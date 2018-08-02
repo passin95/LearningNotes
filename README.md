@@ -1,12 +1,26 @@
-| Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | 
-| :--------: | :---------: | :---------: | :---------: | :---------: | :---------:| :---------: | 
-| Java [:coffee:](#java-coffee) | Android[:computer:](#Android-computer)|网络[:cloud:](#网络-cloud) | 算法[:pencil2:](#算法-pencil2) |  编码实践[:speak_no_evil:](#编码实践-speak_no_evil)| 工具[:hammer:](#工具-hammer)|后记[:memo:](#后记-memo) |
+| Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | 
+| :--------: | :---------: | :---------: | :---------: | :---------: | :---------:| 
+| Java [:coffee:](#java-coffee) | Android[:computer:](#Android-computer)|网络[:cloud:](#网络-cloud) | 算法[:pencil2:](#算法-pencil2) | 工具[:hammer:](#工具-hammer)|后记[:memo:](#后记-memo) |
 
 ## Java :coffee:
 
-> [Java](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
+> [Java 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
 
-参考 Effective Java、Java 编程思想，也有部分内容参考官方文档以及 StackOverflow。
+> [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
+
+## Android :computer:
+
+## 网络 :cloud：
+
+> [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
+
+> [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
+
+## 算法 :pencil2：
+
+## 工具 :hammer:
+
+> [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
 
 
 ## 后记 :memo:
