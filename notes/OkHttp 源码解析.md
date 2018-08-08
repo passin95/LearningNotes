@@ -64,16 +64,28 @@ public final class Request {
 ## OkHttpClient
 
 ### OkHttpClient的成员变量和 build 模式实例化
+
 ```java
 public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory {
+  // 网络请求调度器
   final Dispatcher dispatcher;
+  // 代理方式，分包有 DIRECT (直连)、HTTP 、SOCKS 三种。
   final @Nullable Proxy proxy;
+  // 具体使用的哪一版本的应用层协议，例如 http1.0、http1.1，http2.0。
   final List<Protocol> protocols;
+  // Http和Https的 TLS 版本和 密码套件的选择，okhttp默认优先使用 MODERN_TLS。
+  // MODERN_TLS是连接到最新的HTTPS服务器的安全配置。
+  // COMPATIBEL_TLS是连接到过时的HTTPS服务器的安全配置。
+  // CLEARTEXT是用于http://开头的URL的非安全配置。
   final List<ConnectionSpec> connectionSpecs;
+  // 
   final List<Interceptor> interceptors;
   final List<Interceptor> networkInterceptors;
+  // 网络请求时间监听工厂
   final EventListener.Factory eventListenerFactory;
+  // 针对存在使用多个代理时，选择下一次网络请求使用的代理方式。
   final ProxySelector proxySelector;
+  // CookieJar是一个接口方法，用于使用Cookie时存放List<Cookie>和根据HttpUrl去找到相应Cookie
   final CookieJar cookieJar;
   final @Nullable Cache cache;
   final @Nullable InternalCache internalCache;
@@ -108,11 +120,97 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory{
 
 }
 ```
+
 ## RealCall
+
+再说 execute() 和 enqueue() 前先简单看下Dispatcher类
+
+### Dispatcher
+
+Dispatcher 
+
+```java
+public final class Dispatcher {
+  // 所允许的同时进行的网络请求的最大数量
+  private int maxRequests = 64;
+  // 所允许的同时进行网络请求不同域名总和的最大数量
+  private int maxRequestsPerHost = 5;
+  private @Nullable Runnable idleCallback;
+
+  // 线程池
+  private @Nullable ExecutorService executorService;
+
+  // 准备执行的异步网络请求队列
+  private final Deque<AsyncCall> readyAsyncCalls = new ArrayDeque<>();
+
+  // 正在执行的异步网络请求队列
+  private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>();
+
+  // 正在执行的同步网络请求队列
+  private final Deque<RealCall> runningSyncCalls = new ArrayDeque<>();
+
+
+  public synchronized ExecutorService executorService() {
+    if (executorService == null) {
+      // 默认情况下，该默认线程数为0，所能最多线程数为Integer.MAX_VALUE，当空闲线程超过60秒没有新任务时销毁回收。
+      executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
+          new SynchronousQueue<Runnable>(), Util.threadFactory("OkHttp Dispatcher", false));
+    }
+    return executorService;
+  }
+
+  synchronized void enqueue(AsyncCall call) {
+  // 如果正在运行的网络请求数和不同域名总和满足条件
+    if (runningAsyncCalls.size() < maxRequests && runningCallsForHost(call) < maxRequestsPerHost) {
+      runningAsyncCalls.add(call);
+      //线程池执行网络请求（AsyncCall的父类是Runnable，在run中进行网络请求）
+      executorService().execute(call);
+    } else {
+      //不满足则加入等待队列
+      readyAsyncCalls.add(call);
+    }
+  }
+
+  // 同步请求，由于在当前线程堵塞等待请求，因此只用维护一个正在执行的同步网络请求队列。
+  synchronized void executed(RealCall call) {
+    runningSyncCalls.add(call);
+  }
+
+  // 异步请求完成
+  void finished(AsyncCall call) {
+    finished(runningAsyncCalls, call, true);
+  }
+
+  // 同步请求完成
+  void finished(RealCall call) {
+    finished(runningSyncCalls, call, false);
+  }
+
+  // 
+  private <T> void finished(Deque<T> calls, T call, boolean promoteCalls) {
+    int runningCallsCount;
+    Runnable idleCallback;
+    synchronized (this) {
+      // 移除队列 calls 中的 call
+      if (!calls.remove(call)) throw new AssertionError("Call wasn't in-flight!");
+      // 是否推进队列，即是否将等待执行的队列添加进正在执行的队列
+      if (promoteCalls) promoteCalls();
+      runningCallsCount = runningCallsCount();
+      idleCallback = this.idleCallback;
+    }
+
+    // 当该线程池没有Runnable可执行时回调。
+    if (runningCallsCount == 0 && idleCallback != null) {
+      idleCallback.run();
+    }
+  }
+
+}
+```
 
 我们先以RealCall中的execute()为例进行解读。
 
-### execute
+### execute()
 
 execute()为同步请求方式,即会在调用Call.execute()的当前线程直接进行网络请求。
 
@@ -127,10 +225,9 @@ execute()为同步请求方式,即会在调用Call.execute()的当前线程直�
     // 网络请求开始。
     eventListener.callStart(this);
     try {
-      //dispatcher为网络请求调度器，维护着一个线程池和三个队列（异步请求等待队列、异步请求进行时队列、同步请求队列）
-      
+      // dispatcher为网络请求调度器。
       client.dispatcher().executed(this);
-      //进行网络请求并得到响应
+      //进行网络请求并得到响应结果
       Response result = getResponseWithInterceptorChain();
       if (result == null) throw new IOException("Canceled");
       return result;
@@ -146,43 +243,7 @@ execute()为同步请求方式,即会在调用Call.execute()的当前线程直�
 ```
 下面将先对Dispatcher类的构造、变量以及涉及到同步请求的方法进行解读。
 
-### Dispatcher
 
-```java
-public final class Dispatcher {
-  // 所允许的同时进行的网络请求的最大数量
-  private int maxRequests = 64;
-  // 所允许的同时进行网络请求的最多域名数
-  private int maxRequestsPerHost = 5;
-  private @Nullable Runnable idleCallback;
-
-  /** Executes calls. Created lazily. */
-  private @Nullable ExecutorService executorService;
-
-  /** Ready async calls in the order they'll be run. */
-  private final Deque<AsyncCall> readyAsyncCalls = new ArrayDeque<>();
-
-  /** Running asynchronous calls. Includes canceled calls that haven't finished yet. */
-  private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>();
-
-  /** Running synchronous calls. Includes canceled calls that haven't finished yet. */
-  private final Deque<RealCall> runningSyncCalls = new ArrayDeque<>();
-
-  public Dispatcher(ExecutorService executorService) {
-    this.executorService = executorService;
-  }
-
-  public Dispatcher() {
-  }
-
-  public synchronized ExecutorService executorService() {
-    if (executorService == null) {
-      // 初始化线程池，该默认线程数为0，所能最多线程数为Integer.MAX_VALUE，当空闲线程超过60秒没有新任务时销毁回收。
-      executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
-          new SynchronousQueue<Runnable>(), Util.threadFactory("OkHttp Dispatcher", false));
-    }
-    return executorService;
-  }
 
 ### enqueue()
 
@@ -222,7 +283,9 @@ final class AsyncCall extends NamedRunnable {
     @Override protected void execute() {
       boolean signalledCallback = false;
       try {
+        // 进行网络请求并得到响应结果
         Response response = getResponseWithInterceptorChain();
+
         if (retryAndFollowUpInterceptor.isCanceled()) {
           signalledCallback = true;
           responseCallback.onFailure(RealCall.this, new IOException("Canceled"));
@@ -246,4 +309,7 @@ final class AsyncCall extends NamedRunnable {
 ```
 
 
-### Dispatcher
+### getResponseWithInterceptorChain()
+
+// RetryAndFollowUpInterceptor 拦截器，主要针对 3XX 重定向和
+// 部分特殊情况（401 认证处理，408 请求超时，503 服务器暂时不可用）进行处理（请求重试）
