@@ -2,7 +2,9 @@
 
 
 ## 说明
-本文针对 Http 基础知识不会过多于描述，若对Http基础不够了解请先移步 https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md 。
+
+本文对 Http 基础知识不会过多描述，若对 Http 基础不够了解请先移步 https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md 。
+本文源码为 OkHttp 3.10.0 版本。此外该版本 OkHttp 底层已不再使用HttpURLConnection，而是自己重写了 tcp/ip 层的实现。
 
 ## 一、OkHttp 的基本使用
 
@@ -63,7 +65,7 @@ public final class Request {
 
 ## OkHttpClient
 
-### OkHttpClient的成员变量和 build 模式实例化
+### OkHttpClient的成员变量
 
 ```java
 public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory {
@@ -85,25 +87,42 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   final EventListener.Factory eventListenerFactory;
   // 针对存在使用多个代理时，选择下一次网络请求使用的代理方式。
   final ProxySelector proxySelector;
-  // CookieJar是一个接口方法，用于使用Cookie时存放List<Cookie>和根据HttpUrl去找到相应Cookie
+  // CookieJar是一个接口方法，用于使用Cookie时存放List<Cookie>和根据HttpUrl去找到相应Cookie。
   final CookieJar cookieJar;
+  // OkHttp 提供的缓存类。
   final @Nullable Cache cache;
+  // CacheInterceptor为缓存操作应该具有的方法接口，构造函数的参数为InternalCache，即面向接口编程。
+  // 提供拓展给开发者实现自己的缓存算法。
   final @Nullable InternalCache internalCache;
+  // Socket工厂，网络层建立连接使用。
   final SocketFactory socketFactory;
+  // 用于 https 连接。
   final @Nullable SSLSocketFactory sslSocketFactory;
+  // 对发送过来的证书进行层级梳理。
   final @Nullable CertificateChainCleaner certificateChainCleaner;
+  // 用于验证对方发过来的证书中的 Hostname 和用户请求服务器的 Hostname 是否一致。
   final HostnameVerifier hostnameVerifier;
+  // Android 证书锁，即不全信任客户端证书库，还对服务器证书传过来的证书指纹和客户端应用中已写入的指纹进行匹配。
   final CertificatePinner certificatePinner;
+  // 当返回错误码 407 时，自动进行认证。区别在于第一个是向代理服务器进行认证，第二个是向目标服务器进行认证。
   final Authenticator proxyAuthenticator;
   final Authenticator authenticator;
+  // 连接池
   final ConnectionPool connectionPool;
   final Dns dns;
+  // 是否在https收到http请求时（反之亦然），是否自动请求重定向指向的网站。
   final boolean followSslRedirects;
+  // 是否自动请求重定向指向的网站。
   final boolean followRedirects;
+  // 请求失败后是否需要重试。
   final boolean retryOnConnectionFailure;
+  // 连接超时时间。
   final int connectTimeout;
+  // 发出request报文结束至收到的response报文所允许的最大时间。
   final int readTimeout;
+  // 发送request报文开始至发送结束所允许的最大时间。
   final int writeTimeout;
+  // webSocket使用 用于间隔向对方确认继续。
   final int pingInterval;
 ```
 
@@ -123,11 +142,11 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory{
 
 ## RealCall
 
-再说 execute() 和 enqueue() 前先简单看下Dispatcher类
+该类的核心方法有2个：execute() 和 enqueue() ，在看这两个方法前先简单看下Dispatcher类。
 
 ### Dispatcher
 
-Dispatcher 
+下面将先对Dispatcher类的构造、变量以及涉及到同步请求的方法进行解读。
 
 ```java
 public final class Dispatcher {
@@ -208,11 +227,10 @@ public final class Dispatcher {
 }
 ```
 
-我们先以RealCall中的execute()为例进行解读。
-
 ### execute()
 
-execute()为同步请求方式,即会在调用Call.execute()的当前线程直接进行网络请求。
+execute()为同步请求方式,即会在调用Call.execute()的当前线程进行网络请求。
+execute()和enqueue()的核心方法都在getResponseWithInterceptorChain()中。
 
 ```java
   @Override public Response execute() throws IOException {
@@ -241,9 +259,6 @@ execute()为同步请求方式,即会在调用Call.execute()的当前线程直�
     }
   }
 ```
-下面将先对Dispatcher类的构造、变量以及涉及到同步请求的方法进行解读。
-
-
 
 ### enqueue()
 
@@ -308,8 +323,36 @@ final class AsyncCall extends NamedRunnable {
   }
 ```
 
-
 ### getResponseWithInterceptorChain()
 
-// RetryAndFollowUpInterceptor 拦截器，主要针对 3XX 重定向和
-// 部分特殊情况（401 认证处理，408 请求超时，503 服务器暂时不可用）进行处理（请求重试）
+Interceptor 也叫拦截器，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求进行拆分。
+拦截器的原理类似于android的触摸事件分发机制，即先执行的拦截器，会拿到最后的response。在每一个拦截器Interceptor的intercept方法中，会在
+chain.proceed()方法中把组装完的Request发给下一个拦截器，直至最后一个拦截器的intercept方法 return 得到response，再依次返回给上一个拦截器，依次拿到ruturn
+的 response 直至第一个拦截器也return 后得到最终response。
+
+```java
+  Response getResponseWithInterceptorChain() throws IOException {
+    // Build a full stack of interceptors.
+    List<Interceptor> interceptors = new ArrayList<>();
+    // 用户
+    interceptors.addAll(client.interceptors());
+
+    // RetryAndFollowUpInterceptor 拦截器，主要针对 3XX 重定向和
+    // 部分特殊情况（401 认证处理，408 请求超时，503 服务器暂时不可用）进行处理（请求重试）
+    interceptors.add(retryAndFollowUpInterceptor);
+    interceptors.add(new BridgeInterceptor(client.cookieJar()));
+    interceptors.add(new CacheInterceptor(client.internalCache()));
+    interceptors.add(new ConnectInterceptor(client));
+    if (!forWebSocket) {
+      interceptors.addAll(client.networkInterceptors());
+    }
+    interceptors.add(new CallServerInterceptor(forWebSocket));
+    
+    // chain 内部维护了所有要执行的拦截器列表，在 proceed 内部会唤醒下一个 Interceptor ，调用 intercept 来进行下一步
+    Interceptor.Chain chain = new RealInterceptorChain(interceptors, null, null, null, 0,
+        originalRequest, this, eventListener, client.connectTimeoutMillis(),
+        client.readTimeoutMillis(), client.writeTimeoutMillis());
+
+    return chain.proceed(originalRequest);
+  }
+```
