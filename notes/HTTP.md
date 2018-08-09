@@ -151,7 +151,9 @@ URI 包含 URL 和 URN，目前 WEB 只有 URL 比较流行，所以见到的基
 
 -  **403 Forbidden** ：请求被拒绝，服务器端没有必要给出拒绝的详细理由。
 
--  **404 Not Found** 
+-  **404 Not Found** ：请求地址不存在。
+
+-  **407 Proxy Authentication Required** ：需要代理授权，和 401 类似，但指定请求者应当授权使用代理。
 
 ## 5XX 服务器错误
 
