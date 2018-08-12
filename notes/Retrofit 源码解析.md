@@ -1,20 +1,23 @@
+# Retrofit源码解析
+
 <!-- TOC -->
 
-- [一、Retrofit 的基本使用](#一retrofit-的基本使用)
-- [二、Retrofit 的构建](#二retrofit-的构建)
-    - [Retrofit 的成员变量](#retrofit-的成员变量)
-    - [Retrofit.Builder](#retrofitbuilder)
-- [Retrofit.create()](#retrofitcreate)
-- [CallAdapter](#calladapter)
-    - [RxJava2CallAdapterFactory](#rxjava2calladapterfactory)
-- [Converter](#converter)
-    - [BuiltInConverters](#builtinconverters)
-- [OkHttpCall](#okhttpcall)
-    - [createRawCall()](#createrawcall)
-        - [serviceMethod.toCall()](#servicemethodtocall)
-    - [parseResponse()](#parseresponse)
-- [serviceMethod.adapt(okHttpCall)](#servicemethodadaptokhttpcall)
-    - [BodyObservable](#bodyobservable)
+- [Retrofit源码解析](#retrofit源码解析)
+    - [一、Retrofit 的基本使用](#一retrofit-的基本使用)
+    - [二、Retrofit 的构建](#二retrofit-的构建)
+        - [Retrofit 的成员变量](#retrofit-的成员变量)
+        - [Retrofit.Builder](#retrofitbuilder)
+    - [Retrofit.create()](#retrofitcreate)
+    - [CallAdapter](#calladapter)
+        - [RxJava2CallAdapterFactory](#rxjava2calladapterfactory)
+    - [Converter](#converter)
+        - [BuiltInConverters](#builtinconverters)
+    - [OkHttpCall](#okhttpcall)
+        - [createRawCall()](#createrawcall)
+            - [serviceMethod.toCall()](#servicemethodtocall)
+        - [parseResponse()](#parseresponse)
+    - [serviceMethod.adapt(okHttpCall)](#servicemethodadaptokhttpcall)
+        - [BodyObservable](#bodyobservable)
 
 <!-- /TOC -->
 
@@ -826,7 +829,7 @@ okhttp3.Call toCall(@Nullable Object... args) throws IOException {
     throw new IllegalArgumentException("Argument count (" + argumentCount
         + ") doesn't match expected count (" + handlers.length + ")");
   }
-  //调用 ParameterHandler.apply() 为 RequestBuilder 赋值
+  // 调用 ParameterHandler.apply() 为 RequestBuilder 赋值
   for (int p = 0; p < argumentCount; p++) {
     handlers[p].apply(requestBuilder, args[p]);
   }
