@@ -1,22 +1,29 @@
-# Retrofit源码解析
+# Retrofit 源码解析
 
 <!-- TOC -->
 
-- [Retrofit源码解析](#retrofit源码解析)
+- [Retrofit 源码解析](#retrofit-源码解析)
     - [一、Retrofit 的基本使用](#一retrofit-的基本使用)
     - [二、Retrofit 的构建](#二retrofit-的构建)
         - [Retrofit 的成员变量](#retrofit-的成员变量)
         - [Retrofit.Builder](#retrofitbuilder)
-    - [Retrofit.create()](#retrofitcreate)
-    - [CallAdapter](#calladapter)
+    - [三、Retrofit.create()](#三retrofitcreate)
+        - [Retrofit.loadServiceMethod()](#retrofitloadservicemethod)
+    - [四、ServiceMethod 的构建](#四servicemethod-的构建)
+        - [ServiceMethod 的成员变量](#servicemethod-的成员变量)
+        - [ServiceMethod.Builder](#servicemethodbuilder)
+            - [createCallAdapter()](#createcalladapter)
+            - [createResponseConverter()](#createresponseconverter)
+            - [parseParameter()](#parseparameter)
+    - [五、CallAdapter](#五calladapter)
         - [RxJava2CallAdapterFactory](#rxjava2calladapterfactory)
-    - [Converter](#converter)
+    - [六、Converter](#六converter)
         - [BuiltInConverters](#builtinconverters)
-    - [OkHttpCall](#okhttpcall)
+    - [七、OkHttpCall](#七okhttpcall)
         - [createRawCall()](#createrawcall)
             - [serviceMethod.toCall()](#servicemethodtocall)
         - [parseResponse()](#parseresponse)
-    - [serviceMethod.adapt(okHttpCall)](#servicemethodadaptokhttpcall)
+    - [八、serviceMethod.adapt(okHttpCall)](#八servicemethodadaptokhttpcall)
         - [BodyObservable](#bodyobservable)
 
 <!-- /TOC -->
@@ -110,7 +117,7 @@ public Retrofit build() {
   }
 ```
 
-## Retrofit.create()
+## 三、Retrofit.create()
 
 ```java
 public <T> T create(final Class<T> service) {
@@ -144,35 +151,35 @@ public <T> T create(final Class<T> service) {
             return serviceMethod.adapt(okHttpCall);
           }
         });
-  }
-  ```
+}
+```
 
-  ### Retrofit.loadServiceMethod()
+### Retrofit.loadServiceMethod()
 
-  该方法比较简单，使用了懒加载的思想，并对 ServiceMethod 进行了缓存。代码如下：
+该方法比较简单，使用了懒加载的思想，并对 ServiceMethod 进行了缓存。
 
-  ```java
-  // Retrofit 的全局变量
-  private final Map<Method, ServiceMethod<?, ?>> serviceMethodCache = new ConcurrentHashMap<>();
+```java
+// Retrofit 的全局变量
+private final Map<Method, ServiceMethod<?, ?>> serviceMethodCache = new ConcurrentHashMap<>();
 
-  ServiceMethod<?, ?> loadServiceMethod(Method method) {
+ServiceMethod<?, ?> loadServiceMethod(Method method) {
 
-    ServiceMethod<?, ?> result = serviceMethodCache.get(method);
-    // 如果存在直接返回
-    if (result != null) return result;
-    // 对 serviceMethodCache 进行双重校验锁，防止多线程操作时可能重复构建
-    synchronized (serviceMethodCache) {
-      result = serviceMethodCache.get(method);
-      if (result == null) {
-        result = new ServiceMethod.Builder<>(this, method).build();
-        serviceMethodCache.put(method, result);
-      }
+  ServiceMethod<?, ?> result = serviceMethodCache.get(method);
+  // 如果存在直接返回
+  if (result != null) return result;
+  // 对 serviceMethodCache 进行双重校验锁，防止多线程操作时可能重复构建
+  synchronized (serviceMethodCache) {
+    result = serviceMethodCache.get(method);
+    if (result == null) {
+      result = new ServiceMethod.Builder<>(this, method).build();
+      serviceMethodCache.put(method, result);
     }
-    return result;
   }
-  ```
+  return result;
+}
+```
 
-## 三、ServiceMethod 的构建
+## 四、ServiceMethod 的构建
 
 ### ServiceMethod 的成员变量
 
@@ -421,7 +428,7 @@ private ParameterHandler<?> parseParameter(
     }
 ```
 
-这里抽取 parseParameterAnnotation() 方法中的一个注解解析过程解读
+这里抽取 parseParameterAnnotation() 方法中的一个注解解析过程解读。
 
 ```java
 private ParameterHandler<?> parseParameterAnnotation(
@@ -466,6 +473,7 @@ private ParameterHandler<?> parseParameterAnnotation(
 
       }
 }
+```
 
 ```java
 static final class FieldMap<T> extends ParameterHandler<Map<String, T>> {
@@ -509,9 +517,10 @@ static final class FieldMap<T> extends ParameterHandler<Map<String, T>> {
       builder.addFormField(entryKey, fieldEntry, encoded);
     }
   }
+}
 ```
 
-## CallAdapter
+## 五、CallAdapter
 
 ```java
 public interface CallAdapter<R, T> {
@@ -625,7 +634,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
 }
 ```
 
-## Converter
+## 六、Converter
 
 ```java
 public interface Converter<F, T> {
@@ -748,7 +757,7 @@ final class BuiltInConverters extends Converter.Factory {
 }
 ```
 
-## OkHttpCall
+## 七、OkHttpCall
 
 对于 OkHttpCall 的 enqueue()、execute() 不进行逐步分析，这两个方法最重要的是 createRawCall() 的调用，即 okhttp3.Call 的创建。
 
@@ -880,7 +889,7 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
 }
 ```
 
-## serviceMethod.adapt(okHttpCall)
+## 八、serviceMethod.adapt(okHttpCall)
 
 ```java
   T adapt(Call<R> call) {
@@ -965,7 +974,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
     try {
       Response<T> response = call.execute();
       if (!disposable.isDisposed()) {
-        // 请求后
+        //返回response给observer的实现类调用。
         observer.onNext(response);
       }
       if (!disposable.isDisposed()) {
