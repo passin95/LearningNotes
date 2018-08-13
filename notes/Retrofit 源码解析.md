@@ -106,8 +106,8 @@ public Retrofit build() {
     // 数据转换器工厂
     List<Converter.Factory> converterFactories =
         new ArrayList<>(1 + this.converterFactories.size());
+        
     // 数据转换器工厂集合存储的是：默认数据转换器工厂（ BuiltInConverters）、自定义 1 数据转换器工厂（GsonConverterFactory）、自定义 2 数据转换器工厂....
-
     converterFactories.add(new BuiltInConverters());
     converterFactories.addAll(this.converterFactories);
 
@@ -123,7 +123,8 @@ public Retrofit build() {
 public <T> T create(final Class<T> service) {
     // 检查该类是否是接口以及该类是否有 extends 其它接口
     Utils.validateServiceInterface(service);
-    // 是否在调用 create(Class) 时检测接口中所有方法是否符合规范，而不是在调用方法才检测。适合在开发、测试时使用 (ServiceMethod 对象构建的时候会进行一系列的检查)
+    // 是否在调用 create(Class) 时检测接口中所有方法是否符合规范，而不是在调用方法才检测
+    // 适合在开发、测试时使用 (ServiceMethod 对象构建的时候会进行一系列的检查)
     if (validateEagerly) {
       eagerlyValidateMethods(service);
     }
@@ -218,7 +219,8 @@ final class ServiceMethod<R, T> {
 public ServiceMethod build() {
   // 根据网络请求接口返回类型和方法注解（不一定用到，例如 RxjavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器
   callAdapter = createCallAdapter();
-  // responseType 为最终我们想要的结果，例如使用的 RxJava2CallAdapterFactory，假设接口方法返回值为 Observable<User>,则 responseType 为 User。
+  // responseType 为最终我们想要的结果，例如使用的 RxJava2CallAdapterFactory
+  // 假设接口方法返回值为 Observable<User>,则 responseType 为 User
   responseType = callAdapter.responseType();
   if (responseType == Response.class || responseType == okhttp3.Response.class) {
     throw methodError("'"
@@ -291,7 +293,7 @@ final class ServiceMethod<R, T> {
       if (returnType == void.class) {
         throw methodError("Service methods cannot return void.");
       }
-      //获取该方法上的所有注解
+      // 获取该方法上的所有注解
       Annotation[] annotations = method.getAnnotations();
       try {
         // 通过返回类型 Type 和方法所有注解 annotations 获取一个可用的的 CallAdapter
@@ -319,7 +321,7 @@ public final class Retrofit {
     // 从 skipPast 所在 callAdapterFactories 位置的下一个开始遍历，即跳过该 CallAdapter.Factory
     int start = callAdapterFactories.indexOf(skipPast) + 1;
     for (int i = start, count = callAdapterFactories.size(); i < count; i++) {
-      //遍历 CallAdapter.Factory 是否有可用的 CallAdapter
+      // 遍历 CallAdapter.Factory 是否有可用的 CallAdapter
       CallAdapter<?, ?> adapter = callAdapterFactories.get(i).get(returnType, annotations, this);
       if (adapter != null) {
         return adapter;
@@ -391,7 +393,7 @@ public final class Retrofit {
       }
     }
 
-    //如果没有合适的转换器则抛异常（没贴代码）。
+    // 如果没有合适的转换器则抛异常（没贴代码）。
   }
 }
 ```
@@ -532,7 +534,7 @@ public interface CallAdapter<R, T> {
   T adapt(Call<R> call);
 
 
-  //工厂模式，一是对外隐藏 CallAdapter 的实例化，二是制定构建 CallAdapter 的规范
+  // 工厂模式，一是对外隐藏 CallAdapter 的实例化，二是制定构建 CallAdapter 的规范
   abstract class Factory {
  
     // 提供 Type 和 Annotation 让 CallAdapter 去确定自己能够处理的 Type 或 Annotation，若返回 null 则表示无法处理
@@ -604,7 +606,8 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
 
     // 获取第一个泛型类型，以 Observable<User> 为例，则此处 observableType 为 User。
     Type observableType = getParameterUpperBound(0, (ParameterizedType) returnType);
-    // 此时 rawObservableType 也为 User，若假设 observableType 为 Observable<Response<User>> 则 rawObservableType 为 Response<User>
+    // 此时 rawObservableType 也为 User
+    // 若假设 observableType 为 Observable<Response<User>> 则 rawObservableType 为 Response<User>
     Class<?> rawObservableType = getRawType(observableType);
 
     if (rawObservableType == Response.class) {
@@ -627,7 +630,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
       responseType = observableType;
       isBody = true;
     }
-    //构建 RxJava2CallAdapter 并返回
+    // 构建 RxJava2CallAdapter 并返回
     return new RxJava2CallAdapter(responseType, scheduler, isAsync, isResult, isBody, isFlowable,
         isSingle, isMaybe, false);
   }
@@ -683,8 +686,8 @@ final class BuiltInConverters extends Converter.Factory {
     if (type == ResponseBody.class) {
       // 方法注解 annotations 是否包含@Streaming 注解
       // @Streaming 的一般用于大文件的传输
-      // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，并生了新的 ResponseBody，避免服务器再传输数据
-      // 使用 Streaming 则是边接收数据边处理
+      // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，并生成了新的 ResponseBody，避免服务器再次传输数据
+      // 使用 Streaming 则是用于边接收数据边处理（不断更新Response）
       return Utils.isAnnotationPresent(annotations, Streaming.class)
           ? StreamingResponseBodyConverter.INSTANCE
           : BufferingResponseBodyConverter.INSTANCE;
@@ -746,7 +749,7 @@ final class BuiltInConverters extends Converter.Factory {
   }
   
 
-  // 该转换器在 Retrofit 主要用于将网络接口方法的部分注解中的形参值转换为 String
+  // 该转换器在 Retrofit 主要用于将网络接口方法的变量转换为 String 类型
   static final class ToStringConverter implements Converter<Object, String> {
     static final ToStringConverter INSTANCE = new ToStringConverter();
 
@@ -1025,7 +1028,8 @@ final class BodyObservable<T> extends Observable<T> {
     }
 
     @Override public void onNext(Response<R> response) {
-      // 主要代码是这一行，对于 BodyObserver 来说，观察到的是 response，对于外部观察者 observer 来说，如果网络请求成功，得到的是 response.body()
+      // 主要代码是这一行，对于 BodyObserver 来说，观察到的是 response
+      // 对于外部观察者 observer 来说，如果网络请求成功，得到的是 response.body()
       if (response.isSuccessful()) {
         observer.onNext(response.body());
       } else {
