@@ -707,7 +707,7 @@ public final class CacheInterceptor implements Interceptor {
     }
 
     // 该种缓存策略叫 ETag，用于判断自从上次请求后，请求的链接内容是否已被更改
-    // 如果未更改，返回响应码 304 ，并不会返回内容。
+    // 如果未更改，返回响应码 304 ，并且不会返回响应体内容。
     if (cacheResponse != null) {
       if (networkResponse.code() == HTTP_NOT_MODIFIED) {
         // 符合 ETag 缓存策略，利用缓存的 response 构建 response 返回
