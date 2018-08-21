@@ -28,7 +28,8 @@
 ## 说明
 
 本文对 Http 基础知识不会过多描述，若对 Http 基础不够了解请先移步 https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md 。
-本文源码为 OkHttp 3.10.0 版本。此外该版本 OkHttp 底层已不再使用 HttpURLConnection，而是自己重写了 tcp/ip 层的实现。
+
+本文源码为 OkHttp 3.10.0 版本，该版本 OkHttp 底层已不再使用 HttpURLConnection，而是自己重写了 tcp/ip 层的实现。
 
 ## 一、OkHttp 的基本使用
 
@@ -805,18 +806,15 @@ public final class CallServerInterceptor implements Interceptor {
 
     long sentRequestMillis = System.currentTimeMillis();
 
-    // 向 sink(OutputStream) 中写请求头信息
+    // 向 BufferedSink(OutputStream) 中写请求头信息
     realChain.eventListener().requestHeadersStart(realChain.call());
     httpCodec.writeRequestHeaders(request);
     realChain.eventListener().requestHeadersEnd(realChain.call(), request);
 
     Response.Builder responseBuilder = null;
-    // 如果是可能包含请求体的方法并且请求体不为 null
+    // 如果该方法可能包含请求体并且该方法的请求体不为 null
     if (HttpMethod.permitsRequestBody(request.method()) && request.body() != null) {
-      // If there's a "Expect: 100-continue" header on the request, wait for a "HTTP/1.1 100
-      // Continue" response before transmitting the request body. If we don't get that, return
-      // what we did get (such as a 4xx response) without ever transmitting the request body.
-      //如果头部添加了"Expect:100-continue", 相对于一次握手操作，只有到服务的结果再继续
+      //请求头添加了"Expect:100-continue", 用于询问服务器是否愿意接受数据，只有等到服务器的应答后，再将数据发送给服务器
       if ("100-continue".equalsIgnoreCase(request.header("Expect"))) {
         httpCodec.flushRequest();
         realChain.eventListener().responseHeadersStart(realChain.call());
@@ -824,7 +822,7 @@ public final class CallServerInterceptor implements Interceptor {
       }
 
       if (responseBuilder == null) {
-        // 三次握手成功，开始写入正文
+        // 服务器同意接受数据，开始写入请求正文。
         // Write the request body if the "Expect: 100-continue" expectation was met.
         realChain.eventListener().requestBodyStart(realChain.call());
         long contentLength = request.body().contentLength();
@@ -837,7 +835,7 @@ public final class CallServerInterceptor implements Interceptor {
         realChain.eventListener()
             .requestBodyEnd(realChain.call(), requestBodyOut.successfulCount);
       } else if (!connection.isMultiplexed()) {
-        // 没有握手成功，则关闭此次连接。
+        // 服务器拒绝接受，则关闭此次连接，防止HTTP/1 连接被重用
         // If the "Expect: 100-continue" expectation wasn't met, prevent the HTTP/1 connection
         // from being reused. Otherwise we're still obligated to transmit the request body to
         // leave the connection in a consistent state.
@@ -861,7 +859,7 @@ public final class CallServerInterceptor implements Interceptor {
         .build();
 
     int code = response.code();
-    // 服务器返回此代码表示已收到请求的第一部分,正在等待其余部分
+    // 服务器返回此响应码 code 表示已收到请求的第一部分,正在等待其余部分
     if (code == 100) {
       // server sent a 100-continue even though we did not request one.
       // try again to read the actual response
@@ -893,13 +891,13 @@ public final class CallServerInterceptor implements Interceptor {
           .build();
     }
 
-    // 如果添加了请求头“Connection:close”，则关闭连接
+    // 如果添加了请求头“Connection:close”，则关闭连接，OkHttp默认使用长连接
     if ("close".equalsIgnoreCase(response.request().header("Connection"))
         || "close".equalsIgnoreCase(response.header("Connection"))) {
       streamAllocation.noNewStreams();
     }
 
-    // code 为 204 或者 205，一般不包含响应体，若返回了响应体，则抛 ProtocolException
+    // 响应码code 为 204 或者 205，一般不包含响应体，若返回了响应体，则抛 ProtocolException
     if ((code == 204 || code == 205) && response.body().contentLength() > 0) {
       throw new ProtocolException(
           "HTTP " + code + " had non-zero Content-Length: " + response.body().contentLength());
