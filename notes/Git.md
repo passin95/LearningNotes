@@ -12,20 +12,19 @@
             - [git clone](#git-clone)
             - [git push](#git-push)
             - [git fetch](#git-fetch)
-        - [git pull](#git-pull)
+            - [git pull](#git-pull)
         - [管理变动](#管理变动)
             - [git add](#git-add)
             - [git checkout (撤销文件修改)](#git-checkout-撤销文件修改)
             - [git rm](#git-rm)
             - [git commit](#git-commit)
-        - [git revert](#git-revert)
+            - [git revert](#git-revert)
         - [版本穿梭](#版本穿梭)
             - [git reset](#git-reset)
             - [git checkout](#git-checkout)
             - [git stash](#git-stash)
         - [分支操作](#分支操作)
             - [git branch](#git-branch)
-            - [git checkout](#git-checkout-1)
             - [git merge](#git-merge)
             - [git rebase](#git-rebase)
         - [标签管理](#标签管理)
@@ -63,7 +62,6 @@ origin/master：远程仓库 origin 的 master 分支镜像。
 origin/HEAD：远程仓库 origin 的 HEAD 镜像，它永远指向默认分支 origin/master。
 
 HEAD，master，origin/master，origin/HEAD 等概念都类似于内存中的指针，区别在于它们指向的是 commit。
-
 
 ## Git 常用命令
 
@@ -182,7 +180,7 @@ git fetch <仓库别名 origin>
 拉取远程仓库 origin 相对于本地新的 commit，并将 origin/master 指向最新的 commit。
 ```
 
-### git pull
+#### git pull
 
 ```
 git pull <远程仓库别名 origin> <分支名 feature>
@@ -238,7 +236,7 @@ git commit --amend
 修改当前的 commit 内容。
 ```
 
-### git revert
+#### git revert
 
 ```
 git revert HEAD 
@@ -280,13 +278,29 @@ git reset --soft HEAD^
 以下命令 HEAD 不会携带分支引用一起移动。
 
 ```
+git checkout <name>
+
+切换到分支 name。
+
+git checkout <commit id>
+
+切换到具体 commit。
+
+git checkout -b <name>
+
+创建新分支 name 并切换到新分支 name（实质为 HEAD 指向新分支 name）。
+
 git checkout HEAD^
 
-将 HEAD 指向上一个 commit，若工作区和暂存区存在修改需先处理
+将 HEAD 指向上一个 commit，若工作区和暂存区存在修改需先处理。
 
 git checkout <commid id>
 
-将 HEAD 指向指定 commit
+将 HEAD 指向指定 commit。
+
+git checkout --detach
+
+把 HEAD 和 当前所指向的分支脱离，直接指向当前 commit。
 ```
 
 #### git stash
@@ -302,7 +316,7 @@ git stash -u
 
 git stash pop
 
-恢复当前分支临时存放的变动
+恢复当前分支临时存放的变动。
 ```
 
 ### 分支操作
@@ -312,39 +326,19 @@ git stash pop
 ```
 git branch
 
-查看本地分支
+查看本地分支。
 
 git branch -r
 
-查看远程仓库镜像分支
+查看远程仓库镜像分支。
 
 git branch <name>
 
-创建一个名为 name 的分支
+创建一个名为 name 的分支。
 
 git branch -d <name>
 
-删除名为 name 的分支（只能删除已合并的分支，若要强制删除使用-D）
-```
-
-#### git checkout 
-
-```
-git checkout <name>
-
-切换到分支 name
-
-git checkout <commit id>
-
-切换到具体的 commit
-
-git checkout -b <name>
-
-创建新分支 name 并切换到新分支 name（实质为 HEAD 指向新分支 name）
-
-git checkout --detach
-
-把 HEAD 和 当前所指向的分支脱离，直接指向当前 commit
+删除名为 name 的分支（只能删除已合并的分支，若要强制删除使用-D）。
 ```
 
 #### git merge 
@@ -352,7 +346,7 @@ git checkout --detach
 ```
 git merge <name>
 
-合并分支 name 到当前 HEAD 所指向的分支
+合并分支 name 到当前 HEAD 所指向的分支。
 
 git merge --abort
 
@@ -368,7 +362,11 @@ git merge --continue
 ```
 git rebase <name>
 
-将 HEAD 所指向的分支上的所有新的 commit（两分支共同的 commit 分叉之后的 commit）“拷贝”一份新的 commit,并接上分支 name 所指向的 commit，
+将 HEAD 所指向的分支上的所有新的 commit（两分支共同的 commit 分叉之后的 commit）“拷贝”一份新的 commit,并接上分支 name 所指向的 commit。
+
+git rebase -i HEAD^^
+
+将HEAD所指向commit在内的最近两个2条commit重新进行“编辑”，若存在修改，则生成2条新的commit代替原来的两个commit。
 
 git rebase --abort
 
@@ -384,7 +382,7 @@ git rebase --continue
 ```
 git tag
 
-查看所有 tag
+查看所有 tag。
 
 git tag <tagname>
 
@@ -392,15 +390,15 @@ git tag <tagname>
 
 git tag <tagname> <commit id>
 
-对 commit id 所对应的 commit 打一个名为 name 的 tag
+对 commit id 所对应的 commit 打一个名为 name 的 tag。
 
 git tag -a <tagname> -m <描述> <commit id>
 
-对 commit id 所对应的 commit 打一个名为 name 且有描述的的 tag
+对 commit id 所对应的 commit 打一个名为 name 且有描述的的 tag。
 
 git show <tagname>
 
-查看名为 name 的标签信息
+查看名为 name 的标签信息。
 ```
 
 ## 本质解析
@@ -481,7 +479,6 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 使用 git add 命令时会忽略.gitignore 文件中的文件或目录。
 
 不需要全部自己编写，可以到 [https://github.com/github/gitignore](https://github.com/github/gitignore) 中进行查询。
-
 
 # 参考资料
 
