@@ -6,6 +6,10 @@
     - [基本概念](#基本概念)
     - [Git 常用命令](#git-常用命令)
         - [全局配置](#全局配置)
+            - [git config](#git-config)
+        - [查看信息](#查看信息)
+            - [git status](#git-status)
+            - [git log](#git-log)
             - [git diff](#git-diff)
         - [远程操作](#远程操作)
             - [git remote](#git-remote)
@@ -39,6 +43,7 @@
 
 <!-- /TOC -->
 
+
 ## 基本概念
 
 commit id：对提交的信息数据进行一个 SHA1 算法所得，该 id 几乎不会重复。
@@ -67,6 +72,8 @@ HEAD，master，origin/master，origin/HEAD 等概念都类似于内存中的指
 
 ### 全局配置
 
+#### git config 
+
 ```
 git config --global user.name "your name"
 
@@ -79,11 +86,13 @@ git config --global user.email "email@example.com"
 git config -l
 
 查看 git 所有配置信息。
+```
 
 ### 查看信息
 
 #### git status
 
+```
 git status 
 
 查看当前所有文件的状态。
@@ -91,9 +100,11 @@ git status
 git status 文件
 
 查看指定文件名的状态。
+```
 
 #### git log
 
+```
 git log
 
 查看所有的 commit 日志。
