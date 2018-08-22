@@ -6,22 +6,23 @@
     - [基本概念](#基本概念)
     - [Git 常用命令](#git-常用命令)
         - [全局配置](#全局配置)
-        - [查看信息](#查看信息)
-            - [git status](#git-status)
-            - [git log](#git-log)
             - [git diff](#git-diff)
         - [远程操作](#远程操作)
             - [git remote](#git-remote)
+            - [git clone](#git-clone)
+            - [git push](#git-push)
+            - [git fetch](#git-fetch)
+        - [git pull](#git-pull)
         - [管理变动](#管理变动)
             - [git add](#git-add)
             - [git checkout (撤销文件修改)](#git-checkout-撤销文件修改)
             - [git rm](#git-rm)
             - [git commit](#git-commit)
+        - [git revert](#git-revert)
         - [版本穿梭](#版本穿梭)
             - [git reset](#git-reset)
             - [git checkout](#git-checkout)
             - [git stash](#git-stash)
-        - [git revert](#git-revert)
         - [分支操作](#分支操作)
             - [git branch](#git-branch)
             - [git checkout](#git-checkout-1)
@@ -68,6 +69,7 @@ HEAD，master，origin/master，origin/HEAD 等概念都类似于内存中的指
 
 ### 全局配置
 
+```
 git config --global user.name "your name"
 
 告诉 git 你的名字。
@@ -125,9 +127,11 @@ git log --oneline
 git reflog
 
 查看所有引用的移动过程。
+```
 
 #### git diff 
 
+```
 git diff 文件
 
 查看工作区与暂存区的区别。
@@ -139,11 +143,13 @@ git diff --staged
 git diff HEAD
 
 查看工作目录和当前 commit 的区别。
+```
 
 ### 远程操作
 
 #### git remote 
 
+```
 git remote -v
 
 显示本地仓库所关联远程仓库地址名和对应的别名。
@@ -151,29 +157,46 @@ git remote -v
 git remote add <远程仓库别名 origin> <地址 url>
 
 将本地仓库和该地址的远程仓库地址 url 关联，并设置别名 origin。
+```
 
+#### git clone 
+
+```
 git clone url 
 
 将远程代码仓库克隆到本地。
+```
 
+#### git push
+
+```
 git push <仓库地址别名 origin> <分支名 feature>
 
 将本地代码仓库的 feature 分支的 commit 推送至远程仓库 origin。
+```
 
+#### git fetch
+```
 git fetch <仓库别名 origin>
 
 拉取远程仓库 origin 相对于本地新的 commit，并将 origin/master 指向最新的 commit。
+```
 
+### git pull
+
+```
 git pull <远程仓库别名 origin> <分支名 feature>
 
 将远程仓库 origin 的 feature 分支的 commit 合并到当前分支。
 
 git pull 等价于（git fetch + git merge feature）
+```
 
 ### 管理变动
 
 #### git add 
 
+```
 git add .
 
 将该工作区所有文件的修改添加到暂存区。
@@ -181,9 +204,11 @@ git add .
 git add 文件
 
 将该文件的修改添加到暂存区。
+```
 
 #### git checkout (撤销文件修改)
 
+```
 git checkout 文件
 
 把文件在工作区的修改全部撤销，这里有两种情况：
@@ -191,15 +216,19 @@ git checkout 文件
 一种是 readme.txt 自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
 
 一种是 readme.txt 已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+```
 
 #### git rm
 
+```
 git rm 文件
 
 从版本库中删除该文件。
+```
 
 #### git commit 
 
+```
 git commit -m "描述"
 
 将暂存区的更改进行提交，生成一个新的 commit，HEAD 指向该 commit。
@@ -207,6 +236,19 @@ git commit -m "描述"
 git commit --amend
 
 修改当前的 commit 内容。
+```
+
+### git revert
+
+```
+git revert HEAD 
+
+将 HEAD 指向的 commit 的操作生成一个相反操作的的 commit（用于对已经不能修改的内容进行修改 例如修改 master 分支上的旧 commit）。
+
+git revert <commit id>
+
+将该 commit 的操作生成一个相反操作的的 commit。
+```
 
 ### 版本穿梭
 
@@ -215,6 +257,7 @@ git commit --amend
 git reset 命令都会带着 HEAD 所指向的分支一起移动，例如 HEAD 此时指向 master，执行
 git reset HEAD^ 命令，则此时 master 指向该 commit，HEAD 指向 master。
 
+```
 git reset HEAD^(HEAD~1)
 
 将 HEAD 指向上一个 commit，若工作区和暂存区存在文件修改需先处理。reset 成功后，会保留工作目录，并清空暂存区。
@@ -230,11 +273,13 @@ git reset --hard HEAD^
 git reset --soft HEAD^
 
 将 HEAD 指向上一个 commit，保留工作目录，并把因为保留工作目录内容所带来的新的文件差异放进暂存区。
+```
 
 #### git checkout
 
 以下命令 HEAD 不会携带分支引用一起移动。
 
+```
 git checkout HEAD^
 
 将 HEAD 指向上一个 commit，若工作区和暂存区存在修改需先处理
@@ -242,9 +287,11 @@ git checkout HEAD^
 git checkout <commid id>
 
 将 HEAD 指向指定 commit
+```
 
 #### git stash
 
+```
 git stash
 
 临时存放当前分支 staged changes 和 unstaged changes 的变动。
@@ -256,17 +303,13 @@ git stash -u
 git stash pop
 
 恢复当前分支临时存放的变动
-
-### git revert
-
-git revert HEAD 
-
-将 HEAD 指向的 commit 的操作生成一个相反操作的的 commit（恢复，用于对已经不能修改的内容进行修改 例如修改 master 分支上的旧 commit）
+```
 
 ### 分支操作
 
 #### git branch 
 
+```
 git branch
 
 查看本地分支
@@ -282,9 +325,11 @@ git branch <name>
 git branch -d <name>
 
 删除名为 name 的分支（只能删除已合并的分支，若要强制删除使用-D）
+```
 
 #### git checkout 
 
+```
 git checkout <name>
 
 切换到分支 name
@@ -300,9 +345,11 @@ git checkout -b <name>
 git checkout --detach
 
 把 HEAD 和 当前所指向的分支脱离，直接指向当前 commit
+```
 
 #### git merge 
 
+```
 git merge <name>
 
 合并分支 name 到当前 HEAD 所指向的分支
@@ -314,9 +361,11 @@ git merge --abort
 git merge --continue 
 
 用于处理 merge 冲突，已修改完冲突文件，继续 merge。
+```
 
 #### git rebase 
 
+```
 git rebase <name>
 
 将 HEAD 所指向的分支上的所有新的 commit（两分支共同的 commit 分叉之后的 commit）“拷贝”一份新的 commit,并接上分支 name 所指向的 commit，
@@ -328,9 +377,11 @@ git rebase --abort
 git rebase --continue 
 
 特殊情况下，处理完之后，继续执行 rebase。例如 rebase 合并冲突，已修改完冲突文件，继续 rebase。
+```
 
 ### 标签管理
 
+```
 git tag
 
 查看所有 tag
@@ -350,12 +401,13 @@ git tag -a <tagname> -m <描述> <commit id>
 git show <tagname>
 
 查看名为 name 的标签信息
+```
 
 ## 本质解析
 
 ### merge
 
-<img src="../pictures//15fddc2aad5a0279.gif" width="500"/>
+<img src="../pictures//15fddc2aad5a0279.gif" width="300"/>
 
 此图含义：当前 HEAD 指向 master 分支，使用命令如下:
 
@@ -367,7 +419,7 @@ git merge branch1
 
 ### rebase
 
-<img src="../pictures//1600abd620a8e28c.gif" width="500"/>
+<img src="../pictures//1600abd620a8e28c.gif" width="300"/>
 
 此图含义：当前 HEAD 指向 master 分支，使用命令如下:
 
@@ -381,7 +433,7 @@ git rebase master
 
 ### reset
 
-<img src="../pictures//15fe19c8a3235853.gif" width="500"/>
+<img src="../pictures//15fe19c8a3235853.gif" width="300"/>
 
 此图含义：当前 HEAD 指向 branch1 分支，使用命令如下:
 
@@ -389,7 +441,7 @@ git rebase master
 git reset 第三个 commit id
 ```
 
-<img src="../pictures//15fe333cb605b0de.gif" width="500"/>
+<img src="../pictures//15fe333cb605b0de.gif" width="300"/>
 
 此图含义：当前 HEAD 指向 branch1 分支，使用命令如下:
 
@@ -401,7 +453,7 @@ git reset branch2
 
 ### checkout
 
-<img src="../pictures//160089d53b4f65a5.gif" width="500"/>
+<img src="../pictures//160089d53b4f65a5.gif" width="300"/>
 
 此图含义：当前 HEAD 指向 branch1 分支，使用命令如下:
 
