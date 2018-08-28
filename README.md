@@ -1,11 +1,15 @@
+
+<center> 
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | 
-| :--------: | :---------: | :---------: | :---------: | :---------: | :---------:| 
+| :--------: | :---------: | :---------: | :---------: | :---------: | :---------:|
 | Java [:coffee:](#java-coffee) | Android[:computer:](#Android-computer)|网络[:cloud:](#网络-cloud) | 算法[:pencil2:](#算法-pencil2) | 工具[:hammer:](#工具-hammer)|后记[:memo:](#后记-memo) |
+</center>
 
-
+<br>
 <div align="center">
-    <img src="pictures//LogoMakr_8rssLe.png" width="150px">
+    <img src="pictures//LogoMakr_3qozGk.png" width="150px">
 </div>
+
 
 ## Java :coffee:
 
@@ -19,6 +23,7 @@ Java 常用容器的源码分析。
 
 - [Java 并发](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
 
+线程、线程池、线程安全、线程锁。
 
 - [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
 
