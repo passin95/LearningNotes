@@ -6,6 +6,8 @@
 
 - [Java 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
 
+- [Java 容器](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
+
 - [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
 
 参考 深入理解 Java 虚拟机。
@@ -13,6 +15,12 @@
 ## Android :computer:
 
 - [源码解析](https://github.com/passin95/LearningNotes/blob/master/notes/源码解析.md)
+
+- [自定义 View](https://github.com/passin95/LearningNotes/blob/master/notes/自定义%20View.md)
+
+- [RxJava](https://github.com/passin95/LearningNotes/blob/master/notes/RxJava.md)
+
+- [性能相关](https://github.com/passin95/LearningNotes/blob/master/notes/性能相关.md)
 
 ## 网络 :cloud:
 
