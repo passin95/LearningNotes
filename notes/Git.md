@@ -64,7 +64,7 @@ master：本地仓库默认分支，一般作为主分支使用。
 
 origin/master：远程仓库 origin 的 master 分支镜像。
 
-origin/HEAD：远程仓库 origin 的 HEAD 镜像，它永远指向默认分支 origin/master。
+origin/HEAD：远程仓库 origin 的 HEAD 镜像，它永远指向分支 origin/master。
 
 HEAD，master，origin/master，origin/HEAD 等概念都类似于内存中的指针，区别在于它们指向的是 commit。
 
@@ -420,7 +420,7 @@ git show <tagname>
 
 ### merge
 
-<img src="../pictures//15fddc2aad5a0279.gif" width="300"/>
+<img src="../pictures//15fddc2aad5a0279.gif" width="400"/>
 
 此图含义：当前 HEAD 指向 master 分支，使用命令如下:
 
@@ -432,7 +432,7 @@ git merge branch1
 
 ### rebase
 
-<img src="../pictures//1600abd620a8e28c.gif" width="300"/>
+<img src="../pictures//1600abd620a8e28c.gif" width="400"/>
 
 此图含义：当前 HEAD 指向 master 分支，使用命令如下:
 
@@ -446,7 +446,7 @@ git rebase master
 
 ### reset
 
-<img src="../pictures//15fe19c8a3235853.gif" width="300"/>
+<img src="../pictures//15fe19c8a3235853.gif" width="400"/>
 
 此图含义：当前 HEAD 指向 branch1 分支，使用命令如下:
 
@@ -454,7 +454,7 @@ git rebase master
 git reset 第三个 commit id
 ```
 
-<img src="../pictures//15fe333cb605b0de.gif" width="300"/>
+<img src="../pictures//15fe333cb605b0de.gif" width="400"/>
 
 此图含义：当前 HEAD 指向 branch1 分支，使用命令如下:
 
@@ -466,7 +466,7 @@ git reset branch2
 
 ### checkout
 
-<img src="../pictures//160089d53b4f65a5.gif" width="300"/>
+<img src="../pictures//160089d53b4f65a5.gif" width="400"/>
 
 此图含义：当前 HEAD 指向 branch1 分支，使用命令如下:
 

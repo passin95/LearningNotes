@@ -824,6 +824,7 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404
 # 参考资料
 
 - 上野宣. 图解 HTTP[M]. 人民邮电出版社, 2014.
+- [HTTP - CS-Notes](https://github.com/CyC2018/CS-Notes/blob/master/notes/HTTP.md)
 - [HTTP/2 简介 ](https://developers.google.com/web/fundamentals/performance/http2/?hl=zh-cn)
 - [浅谈 HTTP 中 Get 与 Post 的区别 ](https://www.cnblogs.com/hyddd/archive/2009/03/31/1426026.html)
 - [The Difference Between URLs and URIs](https://danielmiessler.com/study/url-uri/)
