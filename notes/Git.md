@@ -136,6 +136,10 @@ git log --oneline
 git reflog
 
 查看所有引用的移动过程。
+
+git reflog <name>
+
+查看分支 name 的移动过程。
 ```
 
 #### git diff 
@@ -147,7 +151,7 @@ git diff 文件
 
 git diff --staged
 
-查看工作区与上一条 commit 的区别。
+查看暂存区与当前 commit 的区别。
 
 git diff HEAD
 
@@ -269,11 +273,11 @@ git reset HEAD^ 命令，则此时 master 指向该 commit，HEAD 指向 master�
 ```
 git reset HEAD^(HEAD~1)
 
-将 HEAD 指向上一个 commit，若工作区和暂存区存在文件修改需先处理。reset 成功后，会保留工作目录，并清空暂存区。
+将 HEAD 指向上一个 commit，若工作区和暂存区存在文件修改需先处理。reset 成功后，会保留工作区内容，并清空暂存区。
 
 git reset <commid id>
 
-将 HEAD 指向指定 commit
+将 HEAD 指向指定 commit。
 
 git reset --hard HEAD^
 
