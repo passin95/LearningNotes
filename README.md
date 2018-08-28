@@ -26,7 +26,7 @@ Java 常用容器的源码分析。
 
 - [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
 
-参考 深入理解 Java 虚拟机。
+参考深入理解 Java 虚拟机。
 
 ## Android :computer:
 
@@ -36,7 +36,7 @@ Java 常用容器的源码分析。
 
 - [自定义 View](https://github.com/passin95/LearningNotes/blob/master/notes/自定义%20View.md)
 
-主要参考扔物线老师的自定义View系列
+主要参考扔物线老师的自定义View系列。
 
 - [RxJava2](https://github.com/passin95/LearningNotes/blob/master/notes/RxJava.md)
 
@@ -50,7 +50,7 @@ RxJava2 的操作符和源码分析。
 
 - [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
 
-TCP/IP 协议族简介、HTTP、HTTPS、HTTP的具体应用。
+TCP/IP 协议族简介、HTTP、HTTPS、HTTP相关功能的具体应用。
 
 - [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
 
@@ -58,7 +58,7 @@ Base64、序列化、Hash。
 
 ## 算法 :pencil2:
 
-- [Leetcode](https://github.com/passin95/LearningNotes/blob/master/notes/Leetcode.md)、
+- [Leetcode](https://github.com/passin95/LearningNotes/blob/master/notes/Leetcode.md)
 
 ## 工具 :hammer:
 
