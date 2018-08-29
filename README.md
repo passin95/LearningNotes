@@ -1,7 +1,7 @@
 
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#android-computer) | 网络[:cloud:](#cloud-网络) | 编程思想[:couple:](#couple-编程思想) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android%20studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#android-computer) | 网络[:cloud:](#cloud-网络) | 编程思想[:couple:](#couple-编程思想) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -14,83 +14,83 @@
 
 - [Java 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
 
-针对一些 Java 的基础类和特性介绍。
+  针对一些 Java 的基础类和特性介绍。
 
 - [Java 容器](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
 
-Java 常用容器的源码分析。
+  Java 常用容器的源码分析。
 
 - [Java 并发](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
 
-线程、线程池、线程安全、线程锁。
+  线程、线程池、线程安全、线程锁。
 
 - [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
 
-参考深入理解 Java 虚拟机。
+  参考深入理解 Java 虚拟机。
 
 ### :computer: Android 
 
 - [源码分析](https://github.com/passin95/LearningNotes/blob/master/notes/源码分析.md)
 
-Android 常用框架的源码分析。
+  Android 常用框架的源码分析。
 
 - [自定义 View](https://github.com/passin95/LearningNotes/blob/master/notes/自定义%20View.md)
 
-主要参考扔物线老师的自定义 View 系列。
+  主要参考扔物线老师的自定义 View 系列。
 
 - [RxJava2](https://github.com/passin95/LearningNotes/blob/master/notes/RxJava.md)
 
-RxJava2 的操作符和源码分析。
+  RxJava2 的操作符和源码分析。
 
 - [性能相关](https://github.com/passin95/LearningNotes/blob/master/notes/性能相关.md)
 
-布局、内存、APK 瘦身、电量、性能检测工具。
+  布局、内存、APK 瘦身、电量、性能检测工具。
 
 ### :cloud: 网络 
 
 - [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
 
-TCP/IP 协议族简介、HTTP、HTTPS、HTTP 相关功能的具体应用。
+  TCP/IP 协议族简介、HTTP、HTTPS、HTTP 相关功能的具体应用。
 
 - [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
 
-Base64、序列化、Hash。
+  Base64、序列化、Hash。
 
 ### :couple: 编程思想 
 
 - [面向对象](https://github.com/passin95/LearningNotes/blob/master/notes/面向对象.md)
 
-三大特性（封装、继承、多态）和五大原则（单一职责原则、开放封闭原则、里氏替换原则、依赖倒置原则、接口分离原则）。
+  三大特性（封装、继承、多态）和五大原则（单一职责原则、开放封闭原则、里氏替换原则、依赖倒置原则、接口分离原则）。
 
 ### :pencil2: 算法 
 
 - [基础排序算法](https://github.com/passin95/LearningNotes/blob/master/notes/常用排序算法.md)
 
-快速排序、归并排序、堆排序、选择排序、冒泡排序、插入排序、希尔排序。
+  快速排序、归并排序、堆排序、选择排序、冒泡排序、插入排序、希尔排序。
 
 - [Leetcode](https://github.com/passin95/LearningNotes/blob/master/notes/Leetcode.md)
 
-Leetcode 题解。
+  Leetcode 题解。
 
 ### :speak_no_evil: Android Studio 
 
 - [常用插件](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20Studio%20实用插件.md)
 
-android Studio 常用插件。
+  Android Studio 常用插件。
 
 ### :hammer: 工具 
 
 - [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
 
-Git 常用命令和本质分析。
+  Git 常用命令和本质分析。
 
 ### :bulb: 编码规范 
 
 - [代码风格规范](https://github.com/passin95/LearningNotes/blob/master/notes/代码风格规范.md)
 
-Google Java代码风格规范、阿里 Java 开发手册，阿里 Android 开发手册。
+  Google Java代码风格规范、阿里 Java 开发手册，阿里 Android 开发手册。
 
-### 后记 :memo:
+### :memo: 后记 
 
 #### About
 
