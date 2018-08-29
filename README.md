@@ -88,7 +88,7 @@
 
 - [代码风格规范](https://github.com/passin95/LearningNotes/blob/master/notes/代码风格规范.md)
 
-  Google Java代码风格规范、阿里 Java 开发手册，阿里 Android 开发手册。
+  阿里巴巴Java开发手册、阿里巴巴Android开发手册。
 
 ### :memo: 后记 
 
