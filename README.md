@@ -38,10 +38,6 @@
 
   主要参考扔物线老师的自定义 View 系列。
 
-- [RxJava2](https://github.com/passin95/LearningNotes/blob/master/notes/RxJava.md)
-
-  RxJava2 的操作符和源码分析。
-
 - [性能相关](https://github.com/passin95/LearningNotes/blob/master/notes/性能相关.md)
 
   布局、内存、APK 瘦身、电量、性能检测工具。
