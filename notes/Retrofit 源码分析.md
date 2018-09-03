@@ -92,7 +92,7 @@ public Retrofit build() {
     }
 
     Executor callbackExecutor = this.callbackExecutor;
-    // 默认根据所在的编译环境去取决于使用哪种具体 platform 的实现类
+    // 默认根据所在的编译环境去取决于使用哪种具体 platform 的实现类。
     if (callbackExecutor == null) {
       callbackExecutor = platform.defaultCallbackExecutor();
     }
@@ -121,35 +121,35 @@ public Retrofit build() {
 
 ```java
 public <T> T create(final Class<T> service) {
-    // 检查该类是否是接口以及该类是否有 extends 其它接口
+    // 检查该类是否是接口以及该类是否有 extends 其它接口。
     Utils.validateServiceInterface(service);
-    // 是否在调用 create(Class) 时检测接口中所有方法是否符合规范，而不是在调用方法才检测
-    // 适合在开发、测试时使用 (ServiceMethod 对象构建的时候会进行一系列的检查)
+    // 是否在调用 create(Class) 时检测接口中所有方法是否符合规范，而不是在调用方法才检测，
+    // 适合在开发、测试时使用 (ServiceMethod 对象构建的时候会进行一系列的检查)。
     if (validateEagerly) {
       eagerlyValidateMethods(service);
     }
     // Java 动态代理，Proxy.newProxyInstance 会把参数 service 类中的所有方法都实现 InvocationHandler 接口中的 invoke() 方法，
-    // 在调用该类的方法时，会回调到 invoke() 方法
+    // 在调用该类的方法时，会回调到 invoke() 方法。
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
         new InvocationHandler() {
           private final Platform platform = Platform.get();
 
           @Override public Object invoke(Object proxy, Method method, @Nullable Object[] args)
               throws Throwable {
-            // 如果该方法是 Object.class 原本就存在的方法，则直接调用原本的方法
+            // 如果该方法是 Object.class 原本就存在的方法，则直接调用原本的方法。
             if (method.getDeclaringClass() == Object.class) {
               return method.invoke(this, args);
             }
-            // 针对 java8 做的兼容，针对非 android 环境的情况，具体可看 Platform 类
+            // 针对 java8 做的兼容，针对非 android 环境的情况，具体可看 Platform 类。
             if (platform.isDefaultMethod(method)) {
               return platform.invokeDefaultMethod(method, service, proxy, args);
             }
             // 通过解析网络请求接口方法的参数、返回值和注解类型获取网络请求所需的数据。
             ServiceMethod<Object, Object> serviceMethod =
                 (ServiceMethod<Object, Object>) loadServiceMethod(method);
-            // 提供 OkHttp 进行网络请求所需的数据并将 Retrofit 和 OkHttp 连接到一起
+            // 提供 OkHttp 进行网络请求所需的数据并将 Retrofit 和 OkHttp 连接到一起。
             OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
-            // 返回想要的数据适配结果
+            // 返回想要的数据适配结果。
             return serviceMethod.adapt(okHttpCall);
           }
         });
@@ -167,7 +167,7 @@ private final Map<Method, ServiceMethod<?, ?>> serviceMethodCache = new Concurre
 ServiceMethod<?, ?> loadServiceMethod(Method method) {
 
   ServiceMethod<?, ?> result = serviceMethodCache.get(method);
-  // 如果存在直接返回
+  // 如果 result 存在直接返回
   if (result != null) return result;
   // 对 serviceMethodCache 进行双重校验锁，防止多线程操作时可能重复构建
   synchronized (serviceMethodCache) {
@@ -190,7 +190,6 @@ final class ServiceMethod<R, T> {
   private final okhttp3.Call.Factory callFactory;
   // 网络请求适配器
   private final CallAdapter<R, T> callAdapter;
-
   // 请求地址拼接头
   private final HttpUrl baseUrl;
   // 数据转换器
@@ -206,9 +205,9 @@ final class ServiceMethod<R, T> {
   private final boolean isFormEncoded;
   private final boolean isMultipart;
 
-  // ParameterHandler 是一个抽象类，定义了一个抽象方法，统一规范向 RequestBuilder 参数进行赋值。
+  // ParameterHandler 是一个抽象类，定义了一个抽象方法，统一规范向 RequestBuilder 参数进行赋值
   为不同注解对 RequestBuilder
-  //ParameterHandler[] 保存着方法所有参数中不同注解是向 RequestBuilder 赋值的方式
+  // ParameterHandler[] 保存着方法所有参数中不同注解是向 RequestBuilder 赋值的方式
   private final ParameterHandler<?>[] parameterHandlers;
 
 }
@@ -218,20 +217,20 @@ final class ServiceMethod<R, T> {
 
 ```java
 public ServiceMethod build() {
-  // 根据网络请求接口返回类型和方法注解（不一定用到，例如 RxjavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器
+  // 根据网络请求接口返回类型和方法注解（不一定用到，例如 RxjavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器。
   callAdapter = createCallAdapter();
-  // responseType 为最终我们想要的结果，例如使用的 RxJava2CallAdapterFactory
-  // 假设接口方法返回值为 Observable<User>,则 responseType 为 User
+  // responseType 为最终我们想要的结果，例如使用的 RxJava2CallAdapterFactory。
+  // 假设接口方法返回值为 Observable<User>,则 responseType 为 User。
   responseType = callAdapter.responseType();
   if (responseType == Response.class || responseType == okhttp3.Response.class) {
     throw methodError("'"
         + Utils.getRawType(responseType).getName()
         + "' is not a valid response body type. Did you mean ResponseBody?");
   }
-  // 根据 responseType 和方法上注解，从 Retrofit 对象中获取可用的数据转换器 
+  // 根据 responseType 和方法上注解，从 Retrofit 对象中获取可用的数据转换器 。
   responseConverter = createResponseConverter();
 
-  // 解析网络请求接口方法的注解和注解值,获取该次请求的 httpMethod、hasBody、contentType 等
+  // 解析网络请求接口方法的注解和注解值,获取该次请求的 httpMethod、hasBody、contentType 等数据。
   for (Annotation annotation : methodAnnotations) {
     parseMethodAnnotation(annotation);
   }
@@ -241,7 +240,7 @@ public ServiceMethod build() {
     throw methodError("HTTP method annotation is required (e.g., @GET, @POST, etc.).");
   }
 
-  // 规范检查 不含有请求体时，不应该为@Multipart 注解或@FormEncoded 注解，
+  // 规范检查 不含有请求体时，不应该为@Multipart 注解或@FormEncoded 注解。
   if (!hasBody) {
     if (isMultipart) {
       throw methodError(
@@ -253,24 +252,24 @@ public ServiceMethod build() {
     }
   }
 
-  // 获取该方法的参数数量
+  // 获取该方法的参数数量。
   int parameterCount = parameterAnnotationsArray.length;
   parameterHandlers = new ParameterHandler<?>[parameterCount];
   for (int p = 0; p < parameterCount; p++) {
-    // 获取第 p 个参数的参数类型
+    // 获取第 p 个参数的参数类型。
     Type parameterType = parameterTypes[p];
     if (Utils.hasUnresolvableType(parameterType)) {
       throw parameterError(p, "Parameter type must not include a type variable or wildcard: %s",
           parameterType);
     }
 
-    // 获取第 p 个参数的所有注解
+    // 获取第 p 个参数的所有注解。
     Annotation[] parameterAnnotations = parameterAnnotationsArray[p];
     if (parameterAnnotations == null) {
       throw parameterError(p, "No Retrofit annotation found.");
     }
-    // 通过解析参数的类型和注解构建不同的 ParameterHandler<?> 对象实现类
-    // 后面会调用 parseParameter.apply() 方法赋值给 RequestBuilder 构建网络请求
+    // 通过解析参数的类型和注解构建不同的 ParameterHandler<?> 对象实现类。
+    // 后面会调用 parseParameter.apply() 方法赋值给 RequestBuilder 构建Request。
     parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);
   }
 
@@ -283,24 +282,24 @@ public ServiceMethod build() {
 ```java
 final class ServiceMethod<R, T> {
     private CallAdapter<T, R> createCallAdapter() {
-      // 获取该方法的返回类型对应的 Type 对象
+      // 获取该方法的返回类型对应的 Type 对象。
       Type returnType = method.getGenericReturnType();
-      // 如果有无法辨别的 Type 抛出异常
+      // 如果有无法辨别的 Type 抛出异常。
       if (Utils.hasUnresolvableType(returnType)) {
         throw methodError(
             "Method return type must not include a type variable or wildcard: %s", returnType);
       }
-      // 如果返回类型为 Void，抛出异常
+      // 如果返回类型为 Void，抛出异常。
       if (returnType == void.class) {
         throw methodError("Service methods cannot return void.");
       }
-      // 获取该方法上的所有注解
+      // 获取该方法上的所有注解。
       Annotation[] annotations = method.getAnnotations();
       try {
-        // 通过返回类型 Type 和方法所有注解 annotations 获取一个可用的的 CallAdapter
+        // 通过返回类型 Type 和方法所有注解 annotations 获取一个可用的的 CallAdapter。
         return (CallAdapter<T, R>) retrofit.callAdapter(returnType, annotations);
       } catch (RuntimeException e) {
-        // 没有一个可用的 CallAdapter 抛出异常
+        // 没有一个可用的 CallAdapter 抛出异常。
         throw methodError(e, "Unable to create call adapter for %s", returnType);
       }
     }
@@ -319,17 +318,17 @@ public final class Retrofit {
     checkNotNull(returnType, "returnType == null");
     checkNotNull(annotations, "annotations == null");
 
-    // 从 skipPast 所在 callAdapterFactories 位置的下一个开始遍历，即跳过该 CallAdapter.Factory
+    // 从 skipPast 所在 callAdapterFactories 位置的下一个开始遍历，即跳过该 CallAdapter.Factory。
     int start = callAdapterFactories.indexOf(skipPast) + 1;
     for (int i = start, count = callAdapterFactories.size(); i < count; i++) {
-      // 遍历 CallAdapter.Factory 是否有可用的 CallAdapter
+      // 遍历 CallAdapter.Factory 是否有可用的 CallAdapter。
       CallAdapter<?, ?> adapter = callAdapterFactories.get(i).get(returnType, annotations, this);
       if (adapter != null) {
         return adapter;
       }
     }
     
-    // 没有可用的 callAdapter,便并抛出异常说明
+    // 没有可用的 callAdapter,便并抛出异常说明。
     StringBuilder builder = new StringBuilder("Could not locate call adapter for ")
         .append(returnType)
         .append(".\n");
@@ -418,7 +417,7 @@ private ParameterHandler<?> parseParameter(
           throw parameterError(p, "Multiple Retrofit annotations found, only one allowed.");
         }
 
-        // 取最后一个有效的注解结果
+        // 取最后一个有效的注解结果。
         result = annotationAction;
       }
 
@@ -436,42 +435,42 @@ private ParameterHandler<?> parseParameter(
 ```java
 private ParameterHandler<?> parseParameterAnnotation(
      int p, Type type, Annotation[] annotations, Annotation annotation) {
-       // p：方法第 p 个参数；type 为变量类型；annotations 为该参数上所有注解; annotation 为 annotations[p]
-       // 这里假定 type 为一个 Map<String,String>
+       // p 为方法第 p 个参数；type 为变量类型；annotations 为该参数上所有注解; annotation 为 annotations[p]。
+       // 这里假定 type 为一个 Map<String,String>。
        if (annotation instanceof FieldMap) {
-         // 没有添加@FormEncoded 抛异常
+         // 没有添加@FormEncoded 抛异常。
         if (!isFormEncoded) {
           throw parameterError(p, "@FieldMap parameters can only be used with form encoding.");
         }
-        // 此时 rawParameterType 为 Map
+        // 此时 rawParameterType 为 Map。
         Class<?> rawParameterType = Utils.getRawType(type);
-        // 如果 rawParameterType 不是 Map 的实现类
+        // 如果 rawParameterType 不是 Map 的实现类。
         if (!Map.class.isAssignableFrom(rawParameterType)) {
           throw parameterError(p, "@FieldMap parameter type must be Map.");
         }
         Type mapType = Utils.getSupertype(type, rawParameterType, Map.class);
-        // 如果 Map 没有声明具体的泛型类型则抛异常
+        // 如果 Map 没有声明具体的泛型类型则抛异常。
         if (!(mapType instanceof ParameterizedType)) {
           throw parameterError(p,
               "Map must include generic types (e.g., Map<String, String>)");
         }
         
         ParameterizedType parameterizedType = (ParameterizedType) mapType;
-        // 获取 Map<String,String> 第一个泛型，此处为 String
+        // 获取 Map<String,String> 第一个泛型，此处为 String。
         Type keyType = Utils.getParameterUpperBound(0, parameterizedType);
-        // 如果第一个泛型（key）不为 String 抛异常
+        // 如果第一个泛型（key）不为 String 抛异常。
         if (String.class != keyType) {
           throw parameterError(p, "@FieldMap keys must be of type String: " + keyType);
         }
-        // 获取第二个泛型（value），此处为 String
+        // 获取第二个泛型（value），此处为 String。
         Type valueType = Utils.getParameterUpperBound(1, parameterizedType);
-        // 将 valueType 转换为 String，一般默认使用的是 ToStringConverter 转换器
+        // 将 valueType 转换为 String，一般默认使用的是 ToStringConverter 转换器。
         Converter<?, String> valueConverter =
             retrofit.stringConverter(valueType, annotations);
         
-        // 标记使用了普通表单
+        // 标记使用了普通表单。
         gotField = true;
-        // 构建 ParameterHandler.FieldMap
+        
         return new ParameterHandler.FieldMap<>(valueConverter, ((FieldMap) annotation).encoded());
 
       }
@@ -494,7 +493,7 @@ static final class FieldMap<T> extends ParameterHandler<Map<String, T>> {
       throw new IllegalArgumentException("Field map was null.");
     }
 
-    // 遍历 value 解析 T 并赋值给 RequestBuilder
+    // 遍历 value 解析 T 并赋值给 RequestBuilder。
     for (Map.Entry<String, T> entry : value.entrySet()) {
       String entryKey = entry.getKey();
       if (entryKey == null) {
@@ -535,17 +534,17 @@ public interface CallAdapter<R, T> {
   T adapt(Call<R> call);
 
 
-  // 工厂模式，一是对外隐藏 CallAdapter 的实例化，二是制定构建 CallAdapter 的规范
+  // 工厂模式，一是对外隐藏 CallAdapter 的实例化，二是制定构建 CallAdapter 的规范。
   abstract class Factory {
  
-    // 提供 Type 和 Annotation 让 CallAdapter 去确定自己能够处理的 Type 或 Annotation，若返回 null 则表示无法处理
+    // 提供 Type 和 Annotation 让 CallAdapter 去确定自己能够处理的 Type 或 Annotation，若返回 null 则表示无法处理。
     public abstract @Nullable CallAdapter<?, ?> get(Type returnType, Annotation[] annotations,
         Retrofit retrofit);
 
     /**
      * Extract the upper bound of the generic parameter at {@code index} from {@code type}. For
      * example, index 1 of {@code Map<String, ? extends Runnable>} returns {@code Runnable}.
-     * 获取该类型中第 index 个泛型的实际类型
+     * 获取该类型中第 index 个泛型的实际类型。
      */
     protected static Type getParameterUpperBound(int index, ParameterizedType type) {
       return Utils.getParameterUpperBound(index, type);
@@ -554,7 +553,7 @@ public interface CallAdapter<R, T> {
     /**
      * Extract the raw class type from {@code type}. For example, the type representing
      * {@code List<? extends Runnable>} returns {@code List.class}.
-     * 获取声明泛型的类或者接口
+     * 获取声明泛型的类或者接口。
      */
     protected static Class<?> getRawType(Type type) {
       return Utils.getRawType(type);
@@ -572,7 +571,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
 
   @Override
   public CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
-    // 此处假设 returnType 由接口方法 Method.getGenericReturnType() 得到 Observable<User>
+    // 此处假设 returnType 由接口方法 Method.getGenericReturnType() 得到 Observable<User>。
     // 此处 rawType 即为 Observable.class
     Class<?> rawType = getRawType(returnType);
 
@@ -584,7 +583,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
           false, true);
     }
 
-    // 如果 rawType 不为 RxJava 以下四种被观察者 返回 null 表示无法适配为当前 rawType
+    // 如果 rawType 不为 RxJava 以下四种被观察者 返回 null 表示无法适配为当前 rawType。
     boolean isFlowable = rawType == Flowable.class;
     boolean isSingle = rawType == Single.class;
     boolean isMaybe = rawType == Maybe.class;
@@ -595,8 +594,8 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
     boolean isResult = false;
     boolean isBody = false;
     Type responseType;
-    // 泛型参数化的对象，自动实现 ParameterizedType 接口（即申明泛型为具体类）
-    // 如果返回类型 returnType 没有使用泛型，抛异常
+    // 泛型参数化的对象，自动实现 ParameterizedType 接口（即申明泛型为具体类）。
+    // 如果返回类型 returnType 没有使用泛型，抛异常。
     if (!(returnType instanceof ParameterizedType)) {
       String name = isFlowable ? "Flowable"
           : isSingle ? "Single"
@@ -608,16 +607,16 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
     // 获取第一个泛型类型，以 Observable<User> 为例，则此处 observableType 为 User。
     Type observableType = getParameterUpperBound(0, (ParameterizedType) returnType);
     // 此时 rawObservableType 也为 User
-    // 若假设 observableType 为 Observable<Response<User>> 则 rawObservableType 为 Response<User>
+    // 若假设 observableType 为 Observable<Response<User>> 则 rawObservableType 为 Response<User>。
     Class<?> rawObservableType = getRawType(observableType);
 
     if (rawObservableType == Response.class) {
-      //如果没有申明泛型类型，抛异常
+      //如果没有申明泛型类型，抛异常。
       if (!(observableType instanceof ParameterizedType)) {
         throw new IllegalStateException("Response must be parameterized"
             + " as Response<Foo> or Response<? extends Foo>");
       }
-      // 拿到 Response<T> 第一个泛型类型，也就是 T
+      // 拿到 Response<T> 第一个泛型类型，也就是 T。
       responseType = getParameterUpperBound(0, (ParameterizedType) observableType);
     } else if (rawObservableType == Result.class) {
       if (!(observableType instanceof ParameterizedType)) {
@@ -627,11 +626,11 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
       responseType = getParameterUpperBound(0, (ParameterizedType) observableType);
       isResult = true;
     } else {
-      // responseType 则也为 User
+      // responseType 则也为 User。
       responseType = observableType;
       isBody = true;
     }
-    // 构建 RxJava2CallAdapter 并返回
+    // 构建 RxJava2CallAdapter 并返回。
     return new RxJava2CallAdapter(responseType, scheduler, isAsync, isResult, isBody, isFlowable,
         isSingle, isMaybe, false);
   }
@@ -646,8 +645,8 @@ public interface Converter<F, T> {
 
   abstract class Factory {
     /**
-     * 将 ResponseBody 转换为其它类型对象，如果该工厂无法处理该转换则返回 null
-     * 例如将 ResponseBody 转化为一个 Bean 对象
+     * 将 ResponseBody 转换为其它类型对象，如果该工厂无法处理该转换则返回 null。
+     * 例如将 ResponseBody 转化为一个 Bean 对象。
      */
     public @Nullable Converter<ResponseBody, ?> responseBodyConverter(Type type,
         Annotation[] annotations, Retrofit retrofit) {
@@ -655,8 +654,8 @@ public interface Converter<F, T> {
     }
 
     /**
-     * 将一种类型对象转换为 RequestBody, 如果该工厂无法处理该转换则返回 null
-     * 例如将 bean 对象转化为一个 ResponseBody
+     * 将一种类型对象转换为 RequestBody, 如果该工厂无法处理该转换则返回 null。
+     * 例如将 bean 对象转化为一个 ResponseBody。
      */
     public @Nullable Converter<?, RequestBody> requestBodyConverter(Type type,
         Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) {
@@ -664,7 +663,7 @@ public interface Converter<F, T> {
     }
 
     /**
-     * 将一个类型对象转换为 String
+     * 将一个类型对象转换为 String。
      */
     public @Nullable Converter<?, String> stringConverter(Type type, Annotation[] annotations,
         Retrofit retrofit) {
@@ -685,10 +684,10 @@ final class BuiltInConverters extends Converter.Factory {
   public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations,
       Retrofit retrofit) {
     if (type == ResponseBody.class) {
-      // 方法注解 annotations 是否包含@Streaming 注解
-      // @Streaming 的一般用于大文件的传输
-      // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，并生成了新的 ResponseBody，避免服务器再次传输数据
-      // 使用 Streaming 则是用于边接收数据边处理（不断更新Response）
+      // 方法注解 annotations 是否包含@Streaming 注解，
+      // @Streaming 的一般用于大文件的传输，
+      // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，并生成了新的 ResponseBody，避免服务器再次传输数据。
+      // 使用 Streaming 则是用于边接收数据边处理（不断更新Response）。
       return Utils.isAnnotationPresent(annotations, Streaming.class)
           ? StreamingResponseBodyConverter.INSTANCE
           : BufferingResponseBodyConverter.INSTANCE;
@@ -750,7 +749,7 @@ final class BuiltInConverters extends Converter.Factory {
   }
   
 
-  // 该转换器在 Retrofit 主要用于将网络接口方法的变量转换为 String 类型
+  // 该转换器在 Retrofit 主要用于将网络接口方法的变量转换为 String 类型。
   static final class ToStringConverter implements Converter<Object, String> {
     static final ToStringConverter INSTANCE = new ToStringConverter();
 
@@ -796,7 +795,7 @@ final class OkHttpCall<T> implements Call<T> {
       call = rawCall;
       if (call == null) {
         try {
-          // 创建 okhttp3.Call
+          // 构建 okhttp3.Call。
           call = rawCall = createRawCall();
         } catch (IOException | RuntimeException | Error e) {
           throwIfFatal(e); 
@@ -809,7 +808,7 @@ final class OkHttpCall<T> implements Call<T> {
     if (canceled) {
       call.cancel();
     }
-    // 解析 OkHttp 的 Response
+    // 解析 OkHttp 的 Response。
     return parseResponse(call.execute());
   }
 }
@@ -818,7 +817,7 @@ final class OkHttpCall<T> implements Call<T> {
 
 ```java
   private okhttp3.Call createRawCall() throws IOException {
-    // args 为方法参数实际的传参 此处的作用就是为 RequestBuilder 成员变量赋值并构造 okhttp3.Call
+    // args 为方法参数实际的传参 此处的作用就是为 RequestBuilder 成员变量赋值并构造 okhttp3.Call。
     okhttp3.Call call = serviceMethod.toCall(args);
     if (call == null) {
       throw new NullPointerException("Call.Factory returned null.");
@@ -830,7 +829,7 @@ final class OkHttpCall<T> implements Call<T> {
 
 ```java
 okhttp3.Call toCall(@Nullable Object... args) throws IOException {
-  // 构建 RequestBuilder
+  // 构建 RequestBuilder。
   RequestBuilder requestBuilder = new RequestBuilder(httpMethod, baseUrl, relativeUrl, headers,
       contentType, hasBody, isFormEncoded, isMultipart);
 
@@ -842,12 +841,12 @@ okhttp3.Call toCall(@Nullable Object... args) throws IOException {
     throw new IllegalArgumentException("Argument count (" + argumentCount
         + ") doesn't match expected count (" + handlers.length + ")");
   }
-  // 调用 ParameterHandler.apply() 为 RequestBuilder 赋值
+  // 调用 ParameterHandler.apply() 为 RequestBuilder 赋值。
   for (int p = 0; p < argumentCount; p++) {
     handlers[p].apply(requestBuilder, args[p]);
   }
 
-  // 构建 OkHttp.Call
+  // 构建 OkHttp.Call。
   return callFactory.newCall(requestBuilder.build());
 }
 ```
@@ -857,7 +856,7 @@ okhttp3.Call toCall(@Nullable Object... args) throws IOException {
 Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
   ResponseBody rawBody = rawResponse.body();
 
-  // 构建一个一样的新的 ResponseBody(如果持有引用，可能出现服务器再次发送导致修改 ResponseBody)
+  // 构建一个一样的新的 ResponseBody(如果持有引用，可能出现服务器再次发送导致修改 ResponseBody)。
   rawResponse = rawResponse.newBuilder()
       .body(new NoContentResponseBody(rawBody.contentType(), rawBody.contentLength()))
       .build();
@@ -880,9 +879,9 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
 
   ExceptionCatchingRequestBody catchingBody = new ExceptionCatchingRequestBody(rawBody);
   try {
-    // 通过数据转换器转换成我们想要的 responseType(例如 Call<User> 则 T 为 User)
+    // 通过数据转换器转换成我们想要的 responseType(例如 Call<User> 则 T 为 User)。
     T body = serviceMethod.toResponse(catchingBody);
-    // 构建 Retrofit 的 response
+    // 构建 Retrofit 的 response。
     return Response.success(body, rawResponse);
   } catch (RuntimeException e) {
     // If the underlying source threw an exception, propagate that rather than indicating it was
@@ -923,7 +922,7 @@ final class RxJava2CallAdapter<R> implements CallAdapter<R, Object> {
 
    
     Observable<?> observable;
-    // 如果接口方法返回类型为 Observable<Result<T>>
+    // 如果接口方法返回类型为 Observable<Result<T>>。
     if (isResult) {
       observable = new ResultObservable<>(responseObservable);
     } 
@@ -931,7 +930,7 @@ final class RxJava2CallAdapter<R> implements CallAdapter<R, Object> {
     else if (isBody) {
       observable = new BodyObservable<>(responseObservable);
     } 
-    // 如果接口方法返回类型为 Observable<Response<T>>
+    // 如果接口方法返回类型为 Observable<Response<T>>。
     else {
       observable = responseObservable;
     }
@@ -967,7 +966,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
     this.originalCall = originalCall;
   }
 
-  // 该方法在调用 subscribe() 方法时被调用
+  // 该方法在调用 subscribe() 方法时被调用。
   @Override protected void subscribeActual(Observer<? super Response<T>> observer) {
     // Since Call is a one-shot type, clone it for each new observer.
     Call<T> call = originalCall.clone();
@@ -978,7 +977,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
     try {
       Response<T> response = call.execute();
       if (!disposable.isDisposed()) {
-        //返回response给observer的实现类调用。
+        //返回 response 给 observer 的实现类调用。
         observer.onNext(response);
       }
       if (!disposable.isDisposed()) {
@@ -1009,14 +1008,14 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
 final class BodyObservable<T> extends Observable<T> {
   private final Observable<Response<T>> upstream;
 
-  // upstream 为被观察者 CallExecuteObservable
+  // upstream 为被观察者 CallExecuteObservable。
   BodyObservable(Observable<Response<T>> upstream) {
     this.upstream = upstream;
   }
 
-  // 该方法在调用 subscribe() 方法时被调用
+  // 该方法在调用 subscribe() 方法时被调用。
   @Override protected void subscribeActual(Observer<? super T> observer) {
-    // 传入外部调用的观察者 observer 作为变量实例化 BodyObservable 并产生订阅关系
+    // 传入外部调用的观察者 observer 作为变量实例化 BodyObservable 并产生订阅关系。
     upstream.subscribe(new BodyObserver<T>(observer));
   }
 
@@ -1029,8 +1028,8 @@ final class BodyObservable<T> extends Observable<T> {
     }
 
     @Override public void onNext(Response<R> response) {
-      // 主要代码是这一行，对于 BodyObserver 来说，观察到的是 response
-      // 对于外部观察者 observer 来说，如果网络请求成功，得到的是 response.body()
+      // 主要代码是这一行，对于 BodyObserver 来说，观察到的是 response，
+      // 对于传入的观察者 observer 来说，如果网络请求成功，观察到的是 response.body()。
       if (response.isSuccessful()) {
         observer.onNext(response.body());
       } else {

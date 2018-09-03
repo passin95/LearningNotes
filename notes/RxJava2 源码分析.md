@@ -224,7 +224,6 @@ static final class MapSingleObserver<T, R> implements SingleObserver<T> {
     @Override
     public void onSuccess(T value) {
         // 此处暂时省略其它代码
-
         t.onSuccess(v);
     }
 
@@ -249,7 +248,7 @@ public final class SingleJust<T> extends Single<T> {
     @Override
     protected void subscribeActual(SingleObserver<? super T> s) {
         // s 为SingleJust的观察者，调用 s 的接口方法去通知观察者，
-        // 之后 s 又会通知下一个观察者，并依次向下通知
+        // 之后 s 又会通知下一个观察者，并依次向下通知。
         s.onSubscribe(Disposables.disposed());
         s.onSuccess(value);
     }
@@ -297,7 +296,7 @@ public final class SingleMap<T, R> extends Single<R> {
         @Override
         public void onSuccess(T value) {
             // T 为自身（observer1） 想要的数据类型，
-            // R 为下一个 observer（observer）想要的数据类型
+            // R 为下一个 observer（observer）想要的数据类型。
             R v;
             try {
                 // 我们在实例化该被观察者时会实现 mapper 接口，此时调用该实现转换数据类型。
@@ -327,8 +326,8 @@ public final class SingleFlatMap<T, R> extends Single<R> {
             SingleSource<? extends R> o;
 
             try {
-                // 此处和Map操作符基本类似，只是限制了mapper的泛型上下限
-                // 该接口实现中得到了一个新的被观察者（链），在 Demo 为Single.just(integer + 1)
+                // 此处和Map操作符基本类似，只是多限制了mapper的泛型上下限。
+                // 该接口实现中得到了一个新的被观察者（链），在 Demo 为Single.just(integer + 1)。
                 o = ObjectHelper.requireNonNull(mapper.apply(value), "The single returned by the mapper is null");
             } catch (Throwable e) {
                 Exceptions.throwIfFatal(e);
@@ -337,9 +336,9 @@ public final class SingleFlatMap<T, R> extends Single<R> {
             }
 
             if (!isDisposed()) {
-                // 订阅后，将是一个新的链式调用过程，该过程走完才接上原来的调用链
-                // 此时FlatMapSingleObserver类似结构图中的observer
-                // 在 FlatMapSingleObserver 的 onxxx() 方法中续上 actual（observer2）继续向下传递结果。
+                // 订阅后，将是一个新的链式调用过程，该过程走完才接上原来的调用链。
+                // 此时FlatMapSingleObserver类似结构图中的observer，
+                // 在 FlatMapSingleObserver 的 onXXX() 方法调用actual（observer2）.onXXX()继续向下传递结果。
                 o.subscribe(new FlatMapSingleObserver<R>(this, actual));
             }
         }
@@ -380,10 +379,10 @@ public final class SingleSubscribeOn<T> extends Single<T> {
         // 此处注意，SingleSubscribeOn被订阅时，便已经调用该方法。
         s.onSubscribe(parent);
 
-        // scheduler对不同线程池的使用做了一层接口封装,作为线程调度器使用。
-        // 调用scheduler.scheduleDirect()方法将在scheduler所对应的线程池中执行SubscribeOnObserver的run()方法，
+        // scheduler对不同线程(池)的使用做了一层接口封装,作为线程调度器使用。
+        // 调用scheduler.scheduleDirect()方法将在scheduler所维护的线程(池)中执行SubscribeOnObserver的run()方法，
         // run()方法执行的是source（single4）的订阅过程，
-        // 也就是说，若之后不再切换线程，从source（single4）的subscribeActual()开始之后的所有代码都在该线程池执行。
+        // 也就是说，若之后不再切换线程，从source（single4）的subscribeActual()开始之后的所有代码都在该线程(池)中执行。
         Disposable f = scheduler.scheduleDirect(parent);
 
         parent.task.replace(f);
@@ -431,7 +430,7 @@ public final class SingleObserveOn<T> extends Single<T> {
 
     @Override
     protected void subscribeActual(final SingleObserver<? super T> s) {
-        // 该方法中只有正常的订阅过程，不涉及到线程切换
+        // 该方法中只有正常的订阅过程，不涉及到线程切换。
         source.subscribe(new ObserveOnSingleObserver<T>(s, scheduler));
     }
 
@@ -446,7 +445,7 @@ public final class SingleObserveOn<T> extends Single<T> {
         @Override
         public void onSuccess(T value) {
             this.value = value;
-            // 我们可以看到在调用 onxxx()之后才执行线程切换并执行run()方法
+            // 我们可以看到在调用 ObserveOnSingleObserver.onXXX()之后才在scheduler所管理的线程执行run()方法。
             Disposable d = scheduler.scheduleDirect(this);
         }
 
@@ -474,6 +473,75 @@ public final class SingleObserveOn<T> extends Single<T> {
 <img src="../pictures//RxJavaPic3.png" /> 
 
 ### 终看 RxJava
+
+该小节的Demo代码较长，读者可对Demo的代码的执行顺序和所处线程尝试自行分析，再向下阅读。
+
+```java
+Single.defer(new Callable<SingleSource<Integer>>() {
+    @Override
+    public SingleSource<Integer> call() throws Exception {
+        return Single.just(1)
+                .subscribeOn(Schedulers.io());
+    }
+})
+        .subscribeOn(Schedulers.single())
+        .subscribeOn(Schedulers.io())
+        .flatMap(new Function<Integer, SingleSource<String>>() {
+            @Override
+            public SingleSource<String> apply(Integer integer) throws Exception {
+                return Single.just("1")
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(Schedulers.single());
+            }
+        })
+        .doOnSubscribe(disposable -> {
+            Log.i("rxjava", "doOnSubcribe");
+        })
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .map(new Function<String, Double>() {
+            @Override
+            public Double apply(String s) throws Exception {
+                return Double.parseDouble(s);
+            }
+        })
+        .doAfterTerminate(new Action() {
+            @Override
+            public void run() throws Exception {
+                Log.i("rxjava", "doAfterTerminate");
+            }
+        })
+        .doFinally(new Action() {
+            @Override
+            public void run() throws Exception {
+                Log.i("rxjava", "doFinally");
+            }
+        })
+        .observeOn(AndroidSchedulers.mainThread())
+        .map(new Function<Double, Float>() {
+            @Override
+            public Float apply(Double aDouble) throws Exception {
+                return Float.parseFloat(aDouble + "");
+            }
+        })
+        .subscribe(new SingleObserver<Float>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.i("rxjava", "onSubscribe");
+            }
+
+            @Override
+            public void onSuccess(Float aFloat) {
+                Log.i("rxjava", "onSuccess");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i("rxjava", "onError");
+            }
+        });
+```
+
+### defer
 
 
 
