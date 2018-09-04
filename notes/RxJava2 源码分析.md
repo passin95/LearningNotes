@@ -30,7 +30,7 @@
 
 为了更清晰的分析源码，以下的代码示例中的被观察者将使用 Single，而不是 Observable。Single 和 Observable 区别在于 Single 只会向观察者发送一个数据（例如在网络请求使用），而 Observable 则可以依次向观察者发送多个数据。
 
-注：下文说的切换线程执行某个代码块的意思是，将该代码块交由所指定的线程 (池) 执行。
+注：下文说的切换线程执行某个代码块的意思是：将该代码块交由所指定的线程 (池) 执行。
 
 
 ## 初探 RxJava
@@ -499,9 +499,9 @@ public final class SingleObserveOn<T> extends Single<T> {
 
 ## 终看 RxJava
 
-该小节的 Demo 代码较长（该Demo是笔者自己给自己出的题目，个人认为理解透该Demo对RxJava有一个深入的了解），读者可对 Demo 的代码的执行顺序和所处线程尝试自行分析，再向下阅读（向下阅读时请拷贝 Demo 到 Android Studio 方便对比，因为都以 Demo 的代码为基础进行分析）。
+该小节的 Demo 代码较长（该Demo是笔者自己给自己出的题目，个人认为理解透该 Demo 对 RxJava 有一个深入的了解），读者可对 Demo 的代码的执行顺序和所处线程尝试自行分析，再向下阅读（向下阅读时请拷贝 Demo 到 Android Studio 方便对比，因为都以 Demo 的代码为基础进行分析）。
 
-接下来将按照**链式调用结构**（自下向上的订阅以及自上向下的数据传递）的过程去对一些可能疑惑的地方展开分析，再对整个代码执行过程梳理。
+接下来将按照 RxJava **链式调用结构**（自下向上的订阅以及自上向下的数据传递）的过程去对一些可能疑惑的地方展开分析，再对整个代码执行过程梳理。
 
 对于 Single 的子类的 subscribeActual() 方法只有订阅操作的操作符将直接跳过。
 
@@ -814,7 +814,7 @@ Single.defer(new Callable<SingleSource<Integer>>() {
                 // 9. 该接口实现在 SingleFlatMapCallback.onSuccess() 中执行，且所处线程为 io 线程。
                 // 此处相当于丢弃了数据 integer 构建一个新的观察者链。
 
-                        // 11. Single.just(1) 被订阅后，在 subscribeActual() 中执行 observer.onXXX() 方法,所处线程为 newThread 线程。
+                       // 11. Single.just(1) 被订阅后，在 subscribeActual() 中执行 observer.onXXX() 方法,所处线程为 newThread 线程。
                 return Single.just("1")
                         // 10. 当 return 的 SingleSource<String> 被订阅后，切换 newThread 线程。
                         .subscribeOn(Schedulers.newThread())
