@@ -5,7 +5,7 @@
 
 为了更清晰的分析源码，以下的代码示例中的被观察者将使用 Single，而不是 Observable。Single和Observable区别在于Single只会向观察者发送一个数据（例如在网络请求使用），而 Observable 则可以依次向观察者发送多个数据。
 
-
+注：下文说的切换线程执行某个代码块的意思是，将该代码块交由所指定的线程(池)执行。
 
 
 ## 初探 RxJava
@@ -256,7 +256,7 @@ public final class SingleJust<T> extends Single<T> {
 }
 ```
 
-整个 RxJava 链式调用结构便如下图所示：
+整个 RxJava **链式调用结构**便如下图所示（下文都将该过程称之为链式调用结构）：
 
 <img src="../pictures//RxJavaPic2.png" /> 
 
@@ -472,9 +472,13 @@ public final class SingleObserveOn<T> extends Single<T> {
 
 <img src="../pictures//RxJavaPic3.png" /> 
 
-### 终看 RxJava
+## 终看 RxJava
 
-该小节的Demo代码较长，读者可对Demo的代码的执行顺序和所处线程尝试自行分析，再向下阅读。
+该小节的Demo代码较长（也很有学习价值），读者可对Demo的代码的执行顺序和所处线程尝试自行分析，再向下阅读。
+
+接下来将按照**链式调用结构**（自下向上的订阅以及自上向下的数据传递）的过程去对一些可能疑惑的地方展开分析，再对整个代码执行过程梳理。
+
+对于Single的子类的subscribeActual()方法只有订阅操作的操作符将直接跳过。
 
 ```java
 Single.defer(new Callable<SingleSource<Integer>>() {
@@ -541,7 +545,163 @@ Single.defer(new Callable<SingleSource<Integer>>() {
         });
 ```
 
-### defer
+### doFinally 和 doAfterTerminate 有何不同？
+
+查看源码我们可以发现，这2个操作符的代码几乎完全一致，唯一的本质区别是在执行dispose()方法时，doFinally执行runFinally(),而doAfterTerminate没有执行onAfterTerminate()，也就是说doFinally任何情况下最终都会调用Action.run()，而doAfterTerminate则在取消订阅后不再调用Action.run()。
+
+
+```java
+public final class SingleDoAfterTerminate<T> extends Single<T> {
+
+    static final class DoAfterTerminateObserver<T> implements SingleObserver<T>, Disposable {
+
+        final Action onAfterTerminate;
+
+        @Override
+        public void onSuccess(T t) {
+            downstream.onSuccess(t);
+            onAfterTerminate();
+        }
+
+        @Override
+        public void dispose() {
+            upstream.dispose();
+        }
+
+        private void onAfterTerminate() {
+            try {
+                onAfterTerminate.run();
+            } catch (Throwable ex) {
+                Exceptions.throwIfFatal(ex);
+                RxJavaPlugins.onError(ex);
+            }
+        }
+    }
+}
+```
+
+```java
+public final class SingleDoFinally<T> extends Single<T> {
+    static final class DoFinallyObserver<T> extends AtomicInteger implements SingleObserver<T>, Disposable {
+
+        final Action onFinally;
+        
+        @Override
+        public void onSuccess(T t) {
+            downstream.onSuccess(t);
+            runFinally();
+        }
+
+        @Override
+        public void dispose() {
+            upstream.dispose();
+            runFinally();
+        }
+
+        void runFinally() {
+            if (compareAndSet(0, 1)) {
+                try {
+                    onFinally.run();
+                } catch (Throwable ex) {
+                    Exceptions.throwIfFatal(ex);
+                    RxJavaPlugins.onError(ex);
+                }
+            }
+        }
+    }
+}
+```
+
+我们继续分析下doFinally或doAfterTerminate的Action.run()的执行时期和执行顺序。
+
+我们发现其实这2个操作符的实际操作很简单，在执行完链式调用结构后，再执行Action.run()方法。
+
+而当两个同时使用时，我们可以发现他们并没有必定的先后执行顺序，
+而是根据被观察者的链式创建先后顺序有关，先被创建的被观察者的Action.run()后执行，也就是说doAfterTerminate写在doFinally上面，Log先打印doFinally后打印doAfterTerminate。
+
+```java
+static final class DoFinallyObserver<T> extends AtomicInteger implements SingleObserver<T>, Disposable {
+
+    final SingleObserver<? super T> downstream;
+
+    final Action onFinally;
+    
+    @Override
+    public void onSuccess(T t) {
+        // 执行该方法会向下传递数据直至最后一个观察者拿到数据。
+        // 以Demo为例，此时downstream 为ObserveOnSingleObserver。
+        downstream.onSuccess(t);
+        runFinally();
+    }
+}
+
+static final class DoAfterTerminateObserver<T> implements SingleObserver<T>, Disposable {
+
+    final SingleObserver<? super T> downstream;
+
+    final Action onAfterTerminate;
+
+    @Override
+    public void onSuccess(T t) {
+         // 执行该方法会向下传递数据直至最后一个观察者拿到数据。
+         // 以Demo为例，此时downstream 为DoFinallyObserver，并执行它的onSuccess()方法。
+        downstream.onSuccess(t);
+        
+        onAfterTerminate();
+    }
+}
+```
+ 
+### doOnSubscribe和subscribeOn连用是如何生效的？
+
+我们经常像Demo一样，连用doOnSubscribe和subscribeOn两个操作符，达到切换到指定线程
+为何可以线程执行实现接口
+
+### defer 操作符的
+
+defer操作符用于在订阅时才构建真正需要的被观察者。
+
+```java
+public final class SingleDefer<T> extends Single<T> {
+
+    final Callable<? extends SingleSource<? extends T>> singleSupplier;
+
+    public SingleDefer(Callable<? extends SingleSource<? extends T>> singleSupplier) {
+        this.singleSupplier = singleSupplier;
+    }
+
+    // 重点：此方法在SingleDefer被订阅时才调用。
+    @Override
+    protected void subscribeActual(SingleObserver<? super T> observer) {
+        SingleSource<? extends T> next;
+
+        // SingleDefer自身也是一个被观察者，但最终去产生订阅的是，实现call接返回的被观察者。
+        try {
+            next = ObjectHelper.requireNonNull(singleSupplier.call(), "The singleSupplier returned a null SingleSource");
+        } catch (Throwable e) {
+            Exceptions.throwIfFatal(e);
+            EmptyDisposable.error(e, observer);
+            return;
+        }
+        
+        // 此处用 observer 订阅call接口返回的被观察者续接上调用链。
+        // 重点：此时call方法中的被观察者链也是一个新的链式调用过程。
+        next.subscribe(observer);
+    }
+
+}
+```
+
+该操作符在一些特定时候将很有用，例如：
+
+```java
+Observable<List<User>> observable = retrofit.create(UserService.class).getUserList()
+```
+
+这是一个以 RxJava 结合Retrofit 得到的一个被观察者对象过程，但是由于反射的机制，在我们调用getUserList()方法时，便会在当前线程（一般此时为main线程）去执行retrofit.create()中代理对象的invoke()方法，而该方法的 ServiceMethod 的实例化是较为耗时的，此时便会堵塞main线程。
+
+此时我们便可以使用defer操作符，在构建该observable前（SingleDefer被订阅前）对线程进行切换，从而防止堵塞main线程。关于Retrofit的处理可[点击查看详情](https://github.com/passin95/P-MVP/blob/master/pmvp/src/main/java/com/passin/pmvp/http/repository/RepositoryManager.java)。
+
 
 
 
