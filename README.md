@@ -70,9 +70,9 @@
 
 ### :speak_no_evil: Android Studio 
 
-- [常用插件](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20Studio%20实用插件.md)
+- [常用插件](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20Studio%20Plugins.md)
 
-  Android Studio 常用插件。
+  Android Studio Plugins。
 
 ### :hammer: 工具 
 

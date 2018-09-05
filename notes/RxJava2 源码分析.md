@@ -1,28 +1,31 @@
+
+# RxJava2 源码分析
+
 <!-- TOC -->
 
-- [前言](#前言)
-- [初探 RxJava](#初探-rxjava)
-    - [Single.just()](#singlejust)
-    - [single.subscribe(observer)](#singlesubscribeobserver)
-    - [小结](#小结)
-- [再探 RxJava](#再探-rxjava)
-    - [RxJava 链式调用结构的本质](#rxjava-链式调用结构的本质)
-    - [Map 和 FlapMap](#map-和-flapmap)
-        - [map](#map)
-        - [flatMap](#flatmap)
-    - [线程切换](#线程切换)
-        - [subscribeOn](#subscribeon)
-        - [observeOn](#observeon)
-        - [小结](#小结-1)
-- [终看 RxJava](#终看-rxjava)
-    - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-和-doafterterminate-有何不同)
-    - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
-    - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#为什么连用两个-subscribeon-操作符只有第一个有效)
-    - [defer 到底有何作用？](#defer-到底有何作用)
-    - [Demo 执行过程梳理](#demo-执行过程梳理)
+- [RxJava2 源码分析](#rxjava2-源码分析)
+    - [前言](#前言)
+    - [初探 RxJava](#初探-rxjava)
+        - [Single.just()](#singlejust)
+        - [single.subscribe(observer)](#singlesubscribeobserver)
+        - [小结](#小结)
+    - [再探 RxJava](#再探-rxjava)
+        - [RxJava 链式调用结构的本质](#rxjava-链式调用结构的本质)
+        - [Map 和 FlapMap](#map-和-flapmap)
+            - [map](#map)
+            - [flatMap](#flatmap)
+        - [线程切换](#线程切换)
+            - [subscribeOn](#subscribeon)
+            - [observeOn](#observeon)
+            - [小结](#小结-1)
+    - [终看 RxJava](#终看-rxjava)
+        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-和-doafterterminate-有何不同)
+        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
+        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#为什么连用两个-subscribeon-操作符只有第一个有效)
+        - [defer 到底有何作用？](#defer-到底有何作用)
+        - [Demo 执行过程梳理](#demo-执行过程梳理)
 
 <!-- /TOC -->
-
 
 ## 前言
 
