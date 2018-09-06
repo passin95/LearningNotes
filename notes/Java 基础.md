@@ -921,3 +921,4 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 
 - Eckel B. Java 编程思想[M]. 机械工业出版社, 2002.
 - Bloch J. Effective java[M]. Addison-Wesley Professional, 2017.
+- [CS-Notes. Java 基础](https://github.com/CyC2018/CS-Notes/blob/master/notes/Java%20%E5%9F%BA%E7%A1%80.md)
