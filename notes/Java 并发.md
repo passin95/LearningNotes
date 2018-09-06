@@ -11,7 +11,8 @@
 
 - 每个进程都有自己的内存空间、可执行代码和唯一的进程标识符（PID），而每个线程在Java中都有自己的私有栈，堆一般使用进程共享内存并与其他线程共享。
 
-## 线程的状态
+## 线程的状态（生命周期）
+
  <img src="../pictures//线程生命周期.png" />
  <br></br>
 
@@ -40,11 +41,37 @@ Blocking状态一般为：
 
 ### 限期等待（Timed Waiting）
 
-
+无需等待其它线程显式地唤醒，在一定时间之后会被系统自动唤醒。
 
 ### 死亡（Terminated）
 
 线程结束任务之后自己结束，或者产生了异常而结束。
+
+## 多线程开发规范
+
+- 为线程赋予一个有意义的名字有助于问题的排查和线程的追踪。
+
+# Thread
+
+## Thread的父子关系
+
+
+```java
+private void init(ThreadGroup g, Runnable target, String name, long stackSize, AccessControlContext acc) {
+    if (name == null) {
+        throw new NullPointerException("name cannot be null");
+    } else {
+        this.name = name;
+        Thread parent = currentThread(); 
+        SecurityManager var8 = System.getSecurityManager();
+        // ……省略其它代码
+    }
+}
+```
+
+currentThread()方法为获取当前线程，在线程调用start()前并没有创建线程，因此可以发现一个线程的创建一个线程的创建由另一个线程完成，并且被创建线程的父线程为创建它的线程。
+
+##
 
 # 面试题解
 
