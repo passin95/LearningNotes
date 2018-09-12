@@ -13,9 +13,8 @@
 
 ## 线程的状态（生命周期）
 
- <img src="../pictures//线程生命周期.png" />
- <br></br>
-
+[<img src="../pictures//线程生命周期.png" />](https://www.cnblogs.com/huangzejun/p/7908898.html)
+<center>点击图片跳转图片出处</center>
  
 ###  新建(New）
 
@@ -29,9 +28,10 @@
 
 Running状态的线程也是属于Runnable状态，反之不成立。
 
-### 阻塞（Blocking）
+### 阻塞（Blocked）
 
-Blocking状态一般为：
+Blocked状态一般为：
+- 调用了sleep()或wait()或在run方法中其它线程的.join()方法。
 - 为了获取某个锁资源，从而加入到该锁的阻塞队列时。
 - 正在进行某个阻塞的IO操作，例如网络数据的读写。
 
@@ -88,7 +88,6 @@ private void init(ThreadGroup group, Runnable target, String name, long stackSiz
             this.priority = parent.getPriority();
 
             // 省略部分代码
-        
     }
 }
 ```
@@ -128,13 +127,172 @@ Thread.yield()方法用于告知CPU调度器当前线程愿意放弃所占用CPU
 
 Thread.yield()会使当前线程从Running状态转换为Runnable状态。
 
+### 中断
+
+一个线程执行完毕之后会自动结束，如果在运行过程中发生异常也会提前结束。
+
+#### interrupt()和InterruptedException
+
+通过调用一个线程的 interrupt() 来中断该线程，如果该线程处于阻塞、限期等待或者无限期等待状态，那么就会抛出 InterruptedException，从而提前结束该线程。但是不能中断 I/O 阻塞和 synchronized 锁阻塞。
+
+除了上述情况之外，仅仅主动调用interrupt()并不会对实际线程的执行代码造成任何影响,它仅仅是将 interrupt 标识为已打断状态。也就是说，当外部调用interrupt()时，线程是否中断执行，取决于线程自身是否愿意结束（结合isInterrupted()使用），标识仅仅作为参考作用。
+
+```java
+public class InterruptExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread1 = new MyThread1();
+        thread1.start();
+        thread1.interrupt();
+        System.out.println("Main run");
+    }
+
+    private static class MyThread1 extends Thread {
+        @Override
+        public void run() {
+            try {
+                TimeUnit.MINUTES.sleep(2);
+                System.out.println("Thread run");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+```java
+Main run
+java.lang.InterruptedException: sleep interrupted
+	at java.lang.Thread.sleep(Native Method)
+	at java.lang.Thread.sleep(Thread.java:340)
+	at java.util.concurrent.TimeUnit.sleep(TimeUnit.java:386)
+	at me.passin.demo.InterruptExample$MyThread1.run(InterruptExample.java:24)
+```
+
+值得注意的是线程执行的run方法中若捕捉了InterruptedException 异常之后会擦除该线程的 interrupt 标识。
+
+```java
+public class InterruptExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Thread is interrupted ? "+ isInterrupted());
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    System.out.println("Thread InterruptedException");
+                    e.printStackTrace();
+                }
+                System.out.println("Thread run");
+            }
+        };
+        thread.start();
+        thread.interrupt();
+        TimeUnit.MILLISECONDS.sleep(100);
+        System.out.println("Thread is interrupted ? "+ thread.isInterrupted());
+    }
+}
+```
+
+```
+Thread is interrupted ? true
+Thread InterruptedException
+Thread run
+Thread is interrupted ? false
+```
+
+#### isInterrupted()和Thread.interrupted()
+
+这2个方法的返回值都用于当前线程是否被打断，不同在于，isInterrupted()不会影响 interrupt 标识的改变，而Thread.interrupted()在调用结束后会擦除掉当前线程的 interrupt 标识（标识为未打断状态），即如果当前被打断了（调用了interrupt()方法）,第一次调用Thread.interrupted() 会返回true，然后interrupt 标识会被擦除，第二次再调用Thread.interrupted()则会返回 false，除非该线程在两次调用Thread.interrupted()期间线程又一次被打断。
+
+isInterrupted()和interrupt()结合使用
+
+```java
+public class InterruptExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                while (true) {
+                    System.out.println("Thread run");
+                    if (isInterrupted()) {
+                        System.out.println("Thread active acceptance of interruption");
+                        return;
+                    }
+                }
+            }
+        };
+        thread.start();
+        thread.interrupt();
+        TimeUnit.MILLISECONDS.sleep(100);
+        System.out.println("Thread is interrupted ? "+ thread.isInterrupted());
+    }
+}
+```
+
+```
+Thread run
+Thread active acceptance of interruption
+Thread is interrupted ? false
+```
 
 
+### join
 
+在线程中调用另一个线程的 join() 方法，会将当前线程挂起(处于Blocked状态)，直到目标线程执行结束或到达给定的时间或被打断。
 
-### 小结
+对于以下代码，虽然 b 线程先启动，但是因为在 b 线程中调用了 a 线程的 join() 方法，b 线程会等待 a 线程结束才继续执行，因此最后能够保证 a 线程的输出先于 b 线程的输出。
 
+```java
+public class JoinExample {
 
+    public static void main(String[] args) throws InterruptedException {
+        A a = new A();
+        B b = new B(a);
+        b.start();
+        a.start();
+//      b.interrupt();
+    }
+
+    private static class A extends Thread {
+        @Override
+        public void run() {
+            System.out.println("A");
+        }
+    }
+
+    private static class B extends Thread {
+        private A a;
+
+        B(A a) {
+            this.a = a;
+        }
+
+        @Override
+        public void run() {
+            try {
+                a.join();
+            } catch (InterruptedException e) {
+                System.out.println("ThreadB InterruptedException");
+            }
+            System.out.println("B");
+        }
+    }
+}
+```
+
+```
+A
+B
+```
+
+取消注释 b.interrupt() 后的结果：
+```
+ThreadB InterruptedException
+B
+A
+```
 
 
 ## 多线程开发规范

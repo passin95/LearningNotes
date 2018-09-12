@@ -351,7 +351,7 @@ obj = null;
 
 ## 类的生命周期
 
-<div align="center"> <img src="../pictures//32b8374a-e822-4720-af0b-c0f485095ea2.jpg" width=""/> </div><br>
+<div align="center"> <img src="../pictures//32b8374a-e822-4720-af0b-c0f485095ea2.jpg"/> </div><br>
 
 包括以下 7 个阶段：
 
