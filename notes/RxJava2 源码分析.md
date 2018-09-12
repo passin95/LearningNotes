@@ -469,7 +469,6 @@ public final class SingleObserveOn<T> extends Single<T> {
 
         final Scheduler scheduler;
 
-
         @Override
         public void onSuccess(T value) {
             this.value = value;

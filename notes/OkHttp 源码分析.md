@@ -65,7 +65,7 @@ Request 类比较简单，主要是对构建 Http 请求报文的变量进行赋
 
 ```java
 public final class Request {
-
+  
   // 网络请求地址
   final HttpUrl url;
   // 网络请求方法
@@ -93,6 +93,7 @@ public final class Request {
 
 ```java
 public final class Response implements Closeable {
+  
   // 请求体
   final Request request;
   // 应用层协议
@@ -119,6 +120,7 @@ public final class Response implements Closeable {
   final long receivedResponseAtMillis;
   // 缓存控制器
   private volatile CacheControl cacheControl; // Lazily initialized.
+  
 }
 ```
 
@@ -128,6 +130,7 @@ public final class Response implements Closeable {
 
 ```java
 public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory {
+  
   // 网络请求调度器
   final Dispatcher dispatcher;
   // 代理方式，分包有 DIRECT (直连)、HTTP 、SOCKS 三种
@@ -183,6 +186,8 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   final int writeTimeout;
   // webSocket 用于间隔向对方确认继续
   final int pingInterval;
+  
+}
 ```
 
 ### OkHttpClient 对 Call.Factory 的实现
@@ -190,7 +195,7 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
 ```java
 public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory{
 
-    // 使用工厂模式构建 Call 的实现类 RealCall。
+  // 使用工厂模式构建 Call 的实现类 RealCall。
   @Override public Call newCall(Request request) {
     // 三个参数分别为 OkHttpClient 本身，Request，是否使用 WebSocket。
     return RealCall.newRealCall(this, request, false /* for web socket */);
@@ -209,6 +214,7 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory{
 
 ```java
 public final class Dispatcher {
+  
   // 所允许的同时进行的网络请求的最大数量。
   private int maxRequests = 64;
   // 所允许的同时进行网络请求不同域名总和的最大数量。
@@ -226,7 +232,6 @@ public final class Dispatcher {
 
   // 正在执行的同步网络请求队列。
   private final Deque<RealCall> runningSyncCalls = new ArrayDeque<>();
-
 
   public synchronized ExecutorService executorService() {
     if (executorService == null) {
@@ -281,7 +286,6 @@ public final class Dispatcher {
       idleCallback.run();
     }
   }
-
 }
 ```
 
@@ -291,31 +295,31 @@ execute() 为同步请求方式,即会在调用 Call.execute() 的当前线程�
 execute() 和 enqueue() 的核心方法都在 getResponseWithInterceptorChain() 中。
 
 ```java
-  @Override public Response execute() throws IOException {
-    synchronized (this) {
-      if (executed) throw new IllegalStateException("Already Executed");
-      executed = true;
-    }
-    captureCallStackTrace();
-    // 网络请求过程监听，默认空实现。
-    // 网络请求开始事件回调。
-    eventListener.callStart(this);
-    try {
-      // dispatcher 为网络请求调度器。
-      client.dispatcher().executed(this);
-      //进行网络请求并得到响应结果。
-      Response result = getResponseWithInterceptorChain();
-      if (result == null) throw new IOException("Canceled");
-      return result;
-    } catch (IOException e) {
-      // 网络请求失败事件回调。
-      eventListener.callFailed(this, e);
-      throw e;
-    } finally {
-      // execute 请求完成。
-      client.dispatcher().finished(this);
-    }
+@Override public Response execute() throws IOException {
+  synchronized (this) {
+    if (executed) throw new IllegalStateException("Already Executed");
+    executed = true;
   }
+  captureCallStackTrace();
+  // 网络请求过程监听，默认空实现。
+  // 网络请求开始事件回调。
+  eventListener.callStart(this);
+  try {
+    // dispatcher 为网络请求调度器。
+    client.dispatcher().executed(this);
+    //进行网络请求并得到响应结果。
+    Response result = getResponseWithInterceptorChain();
+    if (result == null) throw new IOException("Canceled");
+    return result;
+  } catch (IOException e) {
+    // 网络请求失败事件回调。
+    eventListener.callFailed(this, e);
+    throw e;
+  } finally {
+    // execute 请求完成。
+    client.dispatcher().finished(this);
+  }
+}
 ```
 
 ### enqueue()
@@ -536,6 +540,7 @@ BridgeInterceptor 把在 OkHttpClint 的部分配置拼接到实际的请求报�
 
 ```java
 public final class BridgeInterceptor implements Interceptor {
+  
   private final CookieJar cookieJar;
 
   public BridgeInterceptor(CookieJar cookieJar) {
@@ -617,7 +622,6 @@ public final class BridgeInterceptor implements Interceptor {
 
     return responseBuilder.build();
   }
-
 }
 ```
 
@@ -626,6 +630,7 @@ public final class BridgeInterceptor implements Interceptor {
 
 ```java
 public final class CacheInterceptor implements Interceptor {
+  
   // 网络请求缓存接口规范，OkHttp 默认提供了实现类 Cache。
   final InternalCache cache;
 

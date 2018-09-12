@@ -237,7 +237,6 @@ Thread active acceptance of interruption
 Thread is interrupted ? false
 ```
 
-
 ### join
 
 在线程中调用另一个线程的 join() 方法，会将当前线程挂起(处于Blocked状态)，直到目标线程执行结束或到达给定的时间或被打断。
@@ -294,12 +293,73 @@ B
 A
 ```
 
+# 线程安全与数据同步
 
-## 多线程开发规范
+## synchronized
+
+synchronized 关键字提供了一种锁的机制，确保共享变量的线程间互斥访问，从而防止数据不一致的问题。
+
+synchronized 包括两个monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到monitor enter成功之前都必须从主内存中获取数据，而不是从CPU的缓存中取数据，在 monitor exit 运行成功之后，会将更新后的值刷入主内存中。
+
+## 死锁
+
+死锁是指两个或两个以上的进程（线程）在执行过程中，由于竞争资源或者由于彼此通信而造成的一种阻塞的现象，若无外力作用，它们都将无法推进下去。
+
+### 死锁产生条件
+
+死锁的发生必须具备以下四个必要条件：
+
+#### 互斥条件
+
+指进程对所分配到的资源进行排它性使用，即在一段时间内某资源只由一个进程占用。如果此时还有其它进程请求资源，则请求者只能等待，直至占有资源的进程用毕释放。
+
+#### 请求和保持条件
+
+指进程已经保持至少一个资源，但又提出了新的资源请求，而该资源已被其它进程占有，此时请求进程阻塞，但又对自己已获得的其它资源保持不放。
+
+#### 不剥夺条件
+
+指进程已获得的资源，在未使用完之前，不能被剥夺，只能在使用完时由自己释放。
+
+#### 环路等待条件
+
+指在发生死锁时，必然存在一个进程——资源的环形链，即进程集合{P0，P1，P2，···，Pn}中的P0正在等待一个P1占用的资源；P1正在等待P2占用的资源，……，Pn正在等待已被P0占用的资源。
+
+### 简单的死锁Demo
+
+多线程操作时，交叉锁可能导致死锁的Demo
+
+```java
+private final Object MONITOR_READ = new Object();
+private final Object MONITOR_WRITE = new Object();
+
+public void read() {
+    synchronized (MONITOR_READ) {
+        synchronized (MONITOR_WRITE) {
+            // ……
+        }
+    }
+}
+
+public void write() {
+    synchronized (MONITOR_WRITE) {
+        synchronized (MONITOR_READ) {
+            // ……
+        }
+    }
+}   
+```
+
+# 线程间通信
+
+
+
+# 多线程开发规范
 
 - 为线程赋予一个有意义的名字有助于问题的排查和线程的追踪。
+- 缩小同步范围，从而减少锁争用。例如对于 synchronized，应该尽量使用同步块而不是同步方法。
+- 
 
-##
 
 # 面试题解
 

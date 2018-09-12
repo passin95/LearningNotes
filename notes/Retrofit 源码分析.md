@@ -70,7 +70,7 @@ private @Nullable okhttp3.Call.Factory callFactory;
 private HttpUrl baseUrl;
 // 数据转换器工厂列表
 private final List<Converter.Factory> converterFactories = new ArrayList<>();
- // 网络请求适配器
+// 网络请求适配器
 private final List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>();
 // 线程调度器，网络请求结束后使用什么线程执行响应
 private @Nullable Executor callbackExecutor;
@@ -188,6 +188,7 @@ ServiceMethod<?, ?> loadServiceMethod(Method method) {
 
 ```java
 final class ServiceMethod<R, T> {
+  
   private final okhttp3.Call.Factory callFactory;
   // 网络请求适配器
   private final CallAdapter<R, T> callAdapter;
@@ -534,7 +535,6 @@ public interface CallAdapter<R, T> {
   // 将 Call<R> 适配成 T
   T adapt(Call<R> call);
 
-
   // 工厂模式，一是对外隐藏 CallAdapter 的实例化，二是制定构建 CallAdapter 的规范。
   abstract class Factory {
  
@@ -642,6 +642,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
 
 ```java
 public interface Converter<F, T> {
+  
   T convert(F value) throws IOException;
 
   abstract class Factory {
@@ -681,6 +682,7 @@ BuiltInConverters 是 Retrofit 默认提供的 Converter.Factory。
 
 ```java
 final class BuiltInConverters extends Converter.Factory {
+  
   @Override
   public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations,
       Retrofit retrofit) {
@@ -717,7 +719,6 @@ final class BuiltInConverters extends Converter.Factory {
     }
   }
 
-
   static final class RequestBodyConverter implements Converter<RequestBody, RequestBody> {
     static final RequestBodyConverter INSTANCE = new RequestBodyConverter();
 
@@ -749,7 +750,6 @@ final class BuiltInConverters extends Converter.Factory {
     }
   }
   
-
   // 该转换器在 Retrofit 主要用于将网络接口方法的变量转换为 String 类型。
   static final class ToStringConverter implements Converter<Object, String> {
     static final ToStringConverter INSTANCE = new ToStringConverter();
@@ -767,15 +767,14 @@ final class BuiltInConverters extends Converter.Factory {
 
 ```java
 final class OkHttpCall<T> implements Call<T> {
+  
   private final ServiceMethod<T, ?> serviceMethod;
   private final @Nullable Object[] args;
-
  
   @GuardedBy("this")
   private @Nullable okhttp3.Call rawCall;
 
-
- @Override public Response<T> execute() throws IOException {
+  @Override public Response<T> execute() throws IOException {
     okhttp3.Call call;
 
     synchronized (this) {
@@ -817,19 +816,20 @@ final class OkHttpCall<T> implements Call<T> {
 ### createRawCall()
 
 ```java
-  private okhttp3.Call createRawCall() throws IOException {
-    // args 为方法参数实际的传参 此处的作用就是为 RequestBuilder 成员变量赋值并构造 okhttp3.Call。
-    okhttp3.Call call = serviceMethod.toCall(args);
-    if (call == null) {
-      throw new NullPointerException("Call.Factory returned null.");
-    }
-    return call;
+private okhttp3.Call createRawCall() throws IOException {
+  // args 为方法参数实际的传参 此处的作用就是为 RequestBuilder 成员变量赋值并构造 okhttp3.Call。
+  okhttp3.Call call = serviceMethod.toCall(args);
+  if (call == null) {
+    throw new NullPointerException("Call.Factory returned null.");
   }
+  return call;
+}
 ```
 #### serviceMethod.toCall()
 
 ```java
 okhttp3.Call toCall(@Nullable Object... args) throws IOException {
+  
   // 构建 RequestBuilder。
   RequestBuilder requestBuilder = new RequestBuilder(httpMethod, baseUrl, relativeUrl, headers,
       contentType, hasBody, isFormEncoded, isMultipart);
@@ -961,6 +961,7 @@ final class RxJava2CallAdapter<R> implements CallAdapter<R, Object> {
 
 ```java
 final class CallExecuteObservable<T> extends Observable<Response<T>> {
+  
   private final Call<T> originalCall;
 
   CallExecuteObservable(Call<T> originalCall) {
@@ -999,7 +1000,6 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
       }
     }
   }
-
 }
 ```
 
@@ -1007,6 +1007,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
 
 ```java
 final class BodyObservable<T> extends Observable<T> {
+  
   private final Observable<Response<T>> upstream;
 
   // upstream 为被观察者 CallExecuteObservable。
@@ -1044,7 +1045,6 @@ final class BodyObservable<T> extends Observable<T> {
         }
       }
     }
-
   }
 }
 ```
