@@ -297,9 +297,13 @@ A
 
 ## synchronized
 
-synchronized 关键字提供了一种锁的机制，确保共享变量的线程间互斥访问，从而防止数据不一致的问题。
+synchronized 关键字提供了一种锁的机制，从本质上说主要提供了2种作用：
 
-synchronized 包括两个monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到monitor enter成功之前都必须从主内存中获取数据，而不是从CPU的缓存中取数据，在 monitor exit 运行成功之后，会将更新后的值刷入主内存中。
+1.确保共享变量的线程间互斥访问，原理是对于从一个Monitor所监视的所以代码块，只能有一个线程可以访问（拿到Monitor的 lock），从而防止数据不一致的问题。
+
+2.synchronized 包括两个monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到monitor enter成功之前都必须从主内存中获取数据，而不是从CPU的缓存中取数据，在 monitor exit 运行成功之后，会将更新后的值刷入主内存中。
+
+
 
 ## 死锁
 
@@ -365,9 +369,6 @@ notify()只能唤醒wait set其中的一个线程（没有强制要求按照某�
 
 wait()方法和sleep()一样同样会被打断。
 
-### 
-
-
 # ExecutorService
 
 由于线程的创建、启动以及销毁都是比较耗费系统资源的，因此设计了一个名为线程池的类，不仅能够对线程进行多次复用，还对线程的管理进行了很好的封装。
@@ -391,48 +392,55 @@ public interface ExecutorService extends Executor {
     // 在此期间也不能再添加新的任务。 
     void shutdown();
 
-    // 立即强行关闭线程池。
+    // 调用立即强行关闭线程池，并返回等待执行的任务列表。
     List<Runnable> shutdownNow();
 
     // 线程池是否已经被关闭。
     boolean isShutdown();
 
-    //
+    // 线程池已关闭或所有任务已完成或停止。
     boolean isTerminated();
 
-    //
+    // 调用此方法，在shutdown请求发起后，除非以下任何一种情况发生，否则当前线程将一直到阻塞。 
+    // 1.所有任务执行完成；
+    // 2.超过超时时间；
+    // 3.当前线程被中断。
     boolean awaitTermination(long timeout, TimeUnit unit)
         throws InterruptedException;
 
-
+    // submit() 为execute()方法的拓展，返回值Future用以取消任务的执行或者等待完成得到返回值。
+    // Callable可以理解为可以有返回值的Runnable。
+    // Future.get()用以获取返回值，且该方法会堵塞当前线程。
     <T> Future<T> submit(Callable<T> task);
 
 
     <T> Future<T> submit(Runnable task, T result);
 
-
+    // 如果任务结束执行则 future.get()== null。
     Future<?> submit(Runnable task);
 
-
+    // 执行一组任务，返回一个Future的list，其中的Future持有任务执行完成的结果和状态对于每一个返回的结果，Future.isDone ＝ true。
     <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
         throws InterruptedException;
 
-
+    // 执行一组任务，返回一个Future的list，其中的Future持有任务执行完成的结果和状态，// 如果所有任务执行完成或者超时，对于每一个返回的结果中，Future.isDone ＝ true。
+    // 未执行完成的任务被取消，完成的任务可能正常结束或者异常结束。
     <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
                                   long timeout, TimeUnit unit)
         throws InterruptedException;
 
-
+    // 执行一组任务，当成功执行完一个任务（没有抛异常），就返回结果，
+    // 不论正常返回还是异常结束，未执行的任务都会被取消。
     <T> T invokeAny(Collection<? extends Callable<T>> tasks)
         throws InterruptedException, ExecutionException;
 
-
+    // 执行一组任务，在未超时情况下，当成功执行完一个任务（没有抛异常），就返回结果，
+    // 不论正常返回还是异常结束，未执行的任务都会被取消。  
     <T> T invokeAny(Collection<? extends Callable<T>> tasks,
                     long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException;
 }
 ```
-
 
 ## ThreadPoolExecutor
 
@@ -515,9 +523,10 @@ public static ExecutorService newCachedThreadPool()
 }
 ```
 
-从CachedThreadPool的实例化参数，我们可以看出，由于SynchronousQueue不存储任务，在没有空闲线程时，每执行一个任务，便创建一个线程，当某个线程执行完任务后，会将该线程缓存下来一定的时间（60s），在此时间内，若有新的任务，则用缓存的线程执行该任务，此时不再创建新线程。若某个线程超过了缓存时间仍然没有新的任务，则销毁该线程。
+从CachedThreadPool的实例化参数，我们可以看出，由于SynchronousQueue不存储Runnable，在没有空闲线程时，每执行一个任务，便创建一个线程，当某个线程执行完任务后，会将该线程缓存下来一定的时间（60s），在此时间内，若有新的任务，则用缓存的线程执行该任务，此时不再创建新线程。若某个线程超过了缓存时间仍然没有新的任务，则销毁该线程。
 
 ### FixedThreadPool
+
 ```java
 public static ExecutorService newFixedThreadPool(int nThreads) {
     return new ThreadPoolExecutor(nThreads, nThreads,
@@ -526,39 +535,36 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 }
 ```
 
-
-
-
-
-#### FixedThreadPool
-
-```java
-public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
-    return new ThreadPoolExecutor(nThreads, nThreads,
-                                    0L, TimeUnit.MILLISECONDS,
-                                    new LinkedBlockingQueue<Runnable>(),
-                                    threadFactory);
-}
-```
-
-
+创建一个固定数量线程的线程池。没执行任务则暂时没有线程，待执行任务时创建线程直到达到所设置的最大线程数量。
 
 ### SingleThreadExecutor
 
-只有一个线程
+```java
+    public static ExecutorService newSingleThreadExecutor() {
+        return new FinalizableDelegatedExecutorService
+            (new ThreadPoolExecutor(1, 1,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>()));
+    }
+```
 
+创建一个固定数量为1的线程池。并用代理对象FinalizableDelegatedExecutorService对ThreadPoolExecutor进行了一层包装，只暴露部分ThreadPoolExecutor类中需要的方法，且该代理类重写了finalize()方法，待GC机制想回收该线程池时，调用线程池的shutdown()方法。
 
+### 不推荐直接使用Executors
 
-线程池不允许使用Executors去创建，而是通过ThreadPoolExecutor的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
+不推荐使用Executors去创建线程池，而是通过ThreadPoolExecutor的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
 说明：Executors返回的线程池对象的弊端如下：
 1）FixedThreadPool和SingleThreadPool:允许的请求队列长度为Integer.MAX_VALUE，可能会堆积大量的请求，从而导致OOM。
 2）CachedThreadPool和ScheduledThreadPool:允许的创建线程数量为Integer.MAX_VALUE，可能会创建大量的线程，从而导致OOM。
+
+# 
 
 # 多线程开发规范
 
 - 为线程赋予一个有意义的名字有助于问题的排查和线程的追踪。
 - 缩小同步范围，从而减少锁争用。例如对于 synchronized，应该尽量使用同步块而不是同步方法。
 - 使用线程池而不是直接创建线程，因为线程是一个重量级的资源，直接创建线程资源利用率低，线程池可以有效地利用有限的线程执行任务。
+- 不推荐使用Executors去创建线程池。
 
 
 
