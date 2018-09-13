@@ -239,7 +239,7 @@ Thread is interrupted ? false
 
 ### join
 
-在线程中调用另一个线程的 join() 方法，会将当前线程挂起(处于Blocked状态)，直到目标线程执行结束或到达给定的时间或被打断。
+在线程中调用另一个线程的 join() 方法，会将当前线程挂起(处于Watting状态)，直到目标线程执行结束或到达给定的时间或被打断。
 
 对于以下代码，虽然 b 线程先启动，但是因为在 b 线程中调用了 a 线程的 join() 方法，b 线程会等待 a 线程结束才继续执行，因此最后能够保证 a 线程的输出先于 b 线程的输出。
 
@@ -350,15 +350,216 @@ public void write() {
 }   
 ```
 
-# 线程间通信
+# 线程间协作
+
+## wait()、notify()、notifyAll()
+
+这三个方法都不是Thread特有的方法，而是Object的方法，因为设计的需求便是多线程情况下，以Object为单位保持数据的安全和同步（锁的是对象），而不是锁线程。
+
+调用wait()方法会使当前线程挂起(处于Watting状态)，并释放该Object的Monitor的所有权并进入该Object 关联的wait set中，待有其它线程调用notify()或notifyAll()才能将其唤醒，或到达了wait()方法设置的timeout时间自动唤醒。
+被唤醒的线程需重新获取到该Object所关联的Monitor的lock才会继续执行。
+
+notify()只能唤醒wait set其中的一个线程（没有强制要求按照某一种方式选择将要唤醒的线程），notifyAll()可以同时唤醒wait set的所有线程，同样被唤醒的线程仍需要争抢 Monitor的 lock。
+
+只能用在同步方法或者同步控制块中使用，否则会在运行时抛出 IllegalMonitorStateExeception。
+
+wait()方法和sleep()一样同样会被打断。
+
+### 
 
 
+# ExecutorService
+
+由于线程的创建、启动以及销毁都是比较耗费系统资源的，因此设计了一个名为线程池的类，不仅能够对线程进行多次复用，还对线程的管理进行了很好的封装。
+
+我们先看一下线程池应该具备的基本操作和方法。
+
+```java
+public interface Executor {
+    
+    // 执行该Runnable接口实现的方法。 
+    void execute(Runnable command);
+}
+```
+
+```java
+public interface ExecutorService extends Executor {
+
+
+    // 关闭线程池。
+    // 调用该不会直接关闭线程池，而是将正在执行的或等待执行的任务全部执行完后关闭，
+    // 在此期间也不能再添加新的任务。 
+    void shutdown();
+
+    // 立即强行关闭线程池。
+    List<Runnable> shutdownNow();
+
+    // 线程池是否已经被关闭。
+    boolean isShutdown();
+
+    //
+    boolean isTerminated();
+
+    //
+    boolean awaitTermination(long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+
+    <T> Future<T> submit(Callable<T> task);
+
+
+    <T> Future<T> submit(Runnable task, T result);
+
+
+    Future<?> submit(Runnable task);
+
+
+    <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+        throws InterruptedException;
+
+
+    <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+                                  long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+
+    <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+        throws InterruptedException, ExecutionException;
+
+
+    <T> T invokeAny(Collection<? extends Callable<T>> tasks,
+                    long timeout, TimeUnit unit)
+        throws InterruptedException, ExecutionException, TimeoutException;
+}
+```
+
+
+## ThreadPoolExecutor
+
+```java
+public ThreadPoolExecutor(int corePoolSize,
+                            int maximumPoolSize,
+                            long keepAliveTime,
+                            TimeUnit unit,
+                            BlockingQueue<Runnable> workQueue,
+                            ThreadFactory threadFactory,RejectedExecutionHandler handler) {
+        if (corePoolSize < 0 ||
+            maximumPoolSize <= 0 ||
+            maximumPoolSize < corePoolSize ||
+            keepAliveTime < 0)
+            throw new IllegalArgumentException();
+        if (workQueue == null || threadFactory == null || handler == null)
+            throw new NullPointerException();
+        this.corePoolSize = corePoolSize;
+        this.maximumPoolSize = maximumPoolSize;
+        this.workQueue = workQueue;
+        this.keepAliveTime = unit.toNanos(keepAliveTime);
+        this.threadFactory = threadFactory;
+        this.handler = handler;
+}
+```
+- corePoolSize
+
+  核心线程数。核心线程会一直存活，即使没有任务需要执行,除非设置线程池的变量allowCoreThreadTimeout为true，则核心线程也会在空闲超时时关闭。
+
+  当线程池的线程数小于核心线程数时，即使有线程空闲,线程池也会优先创建新线程处理。
+
+- maximumPoolSize 
+
+  最大线程数。线程池所维护的最大线程数。
+
+- keepAliveTime 和 unit
+
+  当线程数量大于核心时，多余的空闲线程在销毁之前等待新任务的最大时间。
+  若allowCoreThreadTimeout=true，会销毁线程直至线程数量为0，否则直至线程数量=corePoolSize。
+
+- workQueue
+
+  任务队列。当核心线程数达到最大时，新任务会放在队列中排队等待执行。
+
+- rejectedExecutionHandler
+
+  任务拒绝处理器。
+  
+  当线程池线程数 = maxPoolSize，并且任务队列已满时,会拒绝新任务。
+
+  当线程池调用shutdown()后，在线程池真正关闭之前，再提交新任务，会拒绝新任务。
+
+### ThreadPoolExecutor的执行顺序
+
+1. 当线程数小于核心线程数时，创建线程。
+2. 当线程数大于等于核心线程数，且任务队列未满时，将任务放入任务队列。
+3. 当线程数大于等于核心线程数，且任务队列已满。若线程数小于最大线程数，创建线程；若线程数等于最大线程数，抛出异常，拒绝任务。
+
+### BlockingQueue
+
+BlockingQueue接口实现Queue接口，它支持两个附加操作：获取元素时等待队列变为非空，以及存储元素时等待空间变得可用。相对于同一操作他提供了四种机制：抛出异常、返回特殊值、阻塞等待、超时。
+
+BlockingQueue常用于生产者和消费者场景。这里简单说明一下线程池常使用的阻塞队列。
+
+- LinkedBlockingQueue：一个由链表结构组成的无界阻塞队列。默认容量大小为Integer.MAX_VALUE。
+
+- SynchronousQueue：一个不存储元素的阻塞队列。
+
+## Executors
+
+Executors工具类包装了一些线程池，我们针对其中一些方法进行分析。
+
+### CachedThreadPool
+
+```java
+public static ExecutorService newCachedThreadPool() 
+    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                    60L, TimeUnit.SECONDS,
+                                    new SynchronousQueue<Runnable>());
+}
+```
+
+从CachedThreadPool的实例化参数，我们可以看出，由于SynchronousQueue不存储任务，在没有空闲线程时，每执行一个任务，便创建一个线程，当某个线程执行完任务后，会将该线程缓存下来一定的时间（60s），在此时间内，若有新的任务，则用缓存的线程执行该任务，此时不再创建新线程。若某个线程超过了缓存时间仍然没有新的任务，则销毁该线程。
+
+### FixedThreadPool
+```java
+public static ExecutorService newFixedThreadPool(int nThreads) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>());
+}
+```
+
+
+
+
+
+#### FixedThreadPool
+
+```java
+public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>(),
+                                    threadFactory);
+}
+```
+
+
+
+### SingleThreadExecutor
+
+只有一个线程
+
+
+
+线程池不允许使用Executors去创建，而是通过ThreadPoolExecutor的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
+说明：Executors返回的线程池对象的弊端如下：
+1）FixedThreadPool和SingleThreadPool:允许的请求队列长度为Integer.MAX_VALUE，可能会堆积大量的请求，从而导致OOM。
+2）CachedThreadPool和ScheduledThreadPool:允许的创建线程数量为Integer.MAX_VALUE，可能会创建大量的线程，从而导致OOM。
 
 # 多线程开发规范
 
 - 为线程赋予一个有意义的名字有助于问题的排查和线程的追踪。
 - 缩小同步范围，从而减少锁争用。例如对于 synchronized，应该尽量使用同步块而不是同步方法。
-- 
+- 使用线程池而不是直接创建线程，因为线程是一个重量级的资源，直接创建线程资源利用率低，线程池可以有效地利用有限的线程执行任务。
+
 
 
 # 面试题解
