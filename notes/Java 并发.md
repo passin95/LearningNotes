@@ -94,7 +94,6 @@ private void init(ThreadGroup group, Runnable target, String name, long stackSiz
 
 - currentThread()方法为获取当前线程，在线程调用start()前并没有创建线程，因此可以发现一个线程的创建一个线程的创建由另一个线程完成，并且被创建线程的父线程为创建它的线程。
 
-
 ## 守护线程
 
 守护线程是一种比较特殊的线程，一般用于处理一些后台的工作，比如垃圾回收（GC）线程。当JVM 中没有一个非守护线程时，则 JVM 的进程会推出。
@@ -293,17 +292,44 @@ B
 A
 ```
 
+
+# Java内存模型
+
+Java内存模型和CPU缓存模型对理解线程安全与数据同步有很大的必要，因此这里先围绕Java内存模型展开讲解。
+
+
 # 线程安全与数据同步
 
 ## synchronized
 
-synchronized 关键字提供了一种锁的机制，从本质上说主要提供了2种作用：
+synchronized 关键字提供了一种锁的机制，它设计的初衷是锁方法中的资源，而不是某个方法或代码块。从本质上说主要提供了2种作用：
 
-1.确保共享变量的线程间互斥访问，原理是对于从一个Monitor所监视的所以代码块，只能有一个线程可以访问（拿到Monitor的 lock），从而防止数据不一致的问题。
+1.确保共享变量的线程间互斥访问，原理是对于从一个Monitor所监视的所有代码块，只能有一个线程可以访问（拿到Monitor的 lock），使得在这些代码块中每次只能有一个线程对变量进行读写。
 
-2.synchronized 包括两个monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到monitor enter成功之前都必须从主内存中获取数据，而不是从CPU的缓存中取数据，在 monitor exit 运行成功之后，会将更新后的值刷入主内存中。
+2.synchronized 包括两个monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到monitor enter成功之前都**必须从共享内存中获取数据**，而不是从缓存（CPU Cache）中取数据，在 monitor exit 运行成功之后，会将更新后的值刷入共享内存中。
 
+## volatile
 
+volatile的原理和实现机制：
+
+volatile 实际尚使用机器指令 **lock** ，**lock**相当于一个内存屏障，它会为内存的执行提供以下几个保障：
+
+- 确保指令重排序时不会将后面的代码排到内存屏障之前。
+- 确保指令重排序时不会将前面的代码排到内存屏障之后。
+- 确保执行到内存屏障修饰的指令时，前面的代码全部执行完成。
+- 强制将线程工作内存（CPU Cache）中的值刷新到主内存中。
+- 如果是写操作，会使其他线程的工作内存的volatile修饰的数据失效。
+- 如果是读操作，线程会先查看本地工作内存（CPU Cache）的数据是否失效，如果未失效，直接使用；如果已失效，则到共享内存中重新读取。
+
+从volatile的原理简单总结volatile的作用和注意事项：
+
+- 禁止指令的重排序优化。
+
+- volatile 只能保持变量的可见性，不能保证变量的操作都是原子操作。
+
+- volatile 只能修饰静态变量、实例变量，对于方法参数、局部变量、实例常量以及类常量都不能修饰。
+
+注：部分虚拟机中，long与double的读写不是原子操作，而是划分为两次32位的操作来进行，而加 volatile 后long 和double类型的变量操作将是原子操作。
 
 ## 死锁
 
@@ -557,7 +583,9 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 1）FixedThreadPool和SingleThreadPool:允许的请求队列长度为Integer.MAX_VALUE，可能会堆积大量的请求，从而导致OOM。
 2）CachedThreadPool和ScheduledThreadPool:允许的创建线程数量为Integer.MAX_VALUE，可能会创建大量的线程，从而导致OOM。
 
-# 
+# ThreadLocal
+
+ThreadLocal为每一个使用该变量的线程都提供了独立的副本，做到线程间的数据隔离,每一个线程都有属于自己的一份副本变量。
 
 # 多线程开发规范
 
@@ -566,18 +594,13 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 - 使用线程池而不是直接创建线程，因为线程是一个重量级的资源，直接创建线程资源利用率低，线程池可以有效地利用有限的线程执行任务。
 - 不推荐使用Executors去创建线程池。
 
-
-
 # 面试题解
 
 ### 什么是线程
 
-
 ### Thread类run()和start()的区别
 
 Thread.run()运行在当前线程，start()启动新创建的线程,并在新线程执行run()方法。
-
-##
 
 # 参考资料
 - 汪文君. Java高并发编程详解 [M]. 机械工业出版社, 2018.
