@@ -18,15 +18,15 @@
 
 - [Java 容器](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
 
-  Java 常用容器的源码分析。
+  Java 常用容器的介绍以及源码分析。
 
-- [Java 并发](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
+- [Java 并发](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20并发.md)
 
-  线程、线程池、线程安全、线程锁。
+  线程、线程池、线程安全、线程锁、Java内存模型。
 
 - [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
 
-  参考深入理解 Java 虚拟机。
+  主要参考深入理解 Java 虚拟机。
 
 ### :computer: Android 
 
