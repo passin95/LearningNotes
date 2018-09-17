@@ -92,6 +92,8 @@
 
 本仓库基于 [CS-Notes](https://github.com/CyC2018/CS-Notes) 进行排版，并根据自己的实际情况和理解进行编写，初衷是作为个人的读书笔记使用，也欢迎其它读者收阅、提供建议。
 
+学习笔记不是从网上到处拼凑而来，除了少部分引用书上和技术文档的原文，其余都是笔者的原创。在您引用本仓库内容或者对内容进行修改演绎时，请遵循文末的开源协议，谢谢。
+
 该笔记暂时由笔者一个人维护，为了方便在不同 PC 端编写笔记，因此不再在 commit 的时候提供详细的说明。
 
 #### Typesetting
@@ -108,5 +110,5 @@ Logo 通过 [logomakr](https://logomakr.com/) 进行设计.
 
 #### License
 
-除注明外，所有文章均采用 [Creative Commons BY-NC-ND 4.0（自由转载-保持署名-非商用-禁止演绎）](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh) 协议发布。
+除注明外，所有文章均采用 [Creative Commons BY-NC-ND 4.0（自由转载-保持署名-非商用-相同方式共享）](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh) 协议发布。
 

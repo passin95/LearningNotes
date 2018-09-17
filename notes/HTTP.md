@@ -14,6 +14,12 @@
     - [请求和响应报文](#请求和响应报文)
         - [1. 请求报文](#1-请求报文)
         - [2. 响应报文](#2-响应报文)
+    - [请求方法](#请求方法)
+        - [GET](#get)
+        - [HEAD](#head)
+        - [POST](#post)
+        - [PUT](#put)
+        - [DELETE](#delete)
     - [HTTP 状态码](#http-状态码)
         - [1XX 信息](#1xx-信息)
         - [2XX 成功](#2xx-成功)
@@ -149,6 +155,33 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 ### 2. 响应报文
 
 <div align="center"> <img src="../pictures//HTTP_ResponseMessageExample.png" width=""/> </div><br>
+
+## 请求方法
+
+### GET
+
+- 用于获取资源。
+- 不会修改服务器数据。
+- 不发送 Body。
+
+### HEAD
+
+- 用于获取报文首部，即返回的响应没有 Body。
+
+### POST
+
+- 用于增加或修改资源。
+- 传输内容写在 Body 中。
+
+### PUT
+
+- 向指定资源位置上传其最新内容。
+- 传输内容写在 Body 中。
+
+### DELETE
+
+- 用于删除指定资源位置的资源。
+- 不发送 Body。
 
 ## HTTP 状态码
 
