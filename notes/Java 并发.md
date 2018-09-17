@@ -3,7 +3,7 @@
 - [一、基础概念](#一基础概念)
     - [线程和进程](#线程和进程)
     - [线程的状态（生命周期）](#线程的状态生命周期)
-        - [新建 (New）](#新建-new)
+        - [新建（New）](#新建new)
         - [可运行（Runnable）](#可运行runnable)
         - [阻塞（Blocked）](#阻塞blocked)
         - [无限期等待（Watting）](#无限期等待watting)
@@ -46,6 +46,7 @@
         - [SingleThreadExecutor](#singlethreadexecutor)
         - [不推荐直接使用 Executors](#不推荐直接使用-executors)
 - [多线程开发规范](#多线程开发规范)
+- [Java 多线程面试题](#java-多线程面试题)
 - [参考资料](#参考资料)
 
 <!-- /TOC -->
@@ -67,7 +68,7 @@
 [<img src="../pictures//线程生命周期.png" />](https://www.cnblogs.com/huangzejun/p/7908898.html)
 <center> 点击图片跳转图片出处 </center>
  
-###  新建 (New）
+###  新建（New）
 
 创建 Thread 对象，在 start 启动之前，该线程不存在。
 
@@ -671,8 +672,12 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 - 多用并发集合，少用同步集合。
 - 不推荐使用 Executors 去创建线程池。
 
+# Java 多线程面试题
+
+https://www.nowcoder.com/discuss/334
+
 
 # 参考资料
 - 汪文君. Java 高并发编程详解 [M]. 机械工业出版社, 2018.
 - 周志明. 深入理解 Java 虚拟机 [M]. 机械工业出版社, 2011.
-- [CS-Notes. Java 并发 ](https://github.com/CyC2018/CS-Notes/blob/master/notes/Java%20 并发.md)
+- [CS-Notes. Java 并发](https://github.com/CyC2018/CS-Notes/blob/master/notes/Java%20并发.md)

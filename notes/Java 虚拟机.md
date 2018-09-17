@@ -9,7 +9,7 @@
 - 记录正在执行的虚拟机字节码指令的地址（如果正在执行的是本地方法则为空）。通过字节码解释器改变这个计数器的值来选择下一条需要执行的字节码指令。
 - 此内存区域在java的虚拟机规范当中是唯一一个没有规定OutOfMemoryError的区域。
 
-## Java虚拟机栈
+## Java 虚拟机栈
 
 每个 Java 方法在执行的同时会创建一个栈帧用于存储局部变量表、操作数栈、常量池引用等信息。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在 Java 虚拟机栈中入栈和出栈的过程。
 
@@ -131,6 +131,7 @@ Java 虚拟机使用该算法来判断对象是否可被回收，在 Java 中 GC
 - 本地方法栈中引用的对象
 - 方法区中类静态属性引用的对象
 - 方法区中的常量引用的对象
+- 运行中的线程
 
 ### 3. 引用类型
 
@@ -542,7 +543,7 @@ public static void main(String[] args) {
 
 使得 Java 类随着它的类加载器一起具有一种带有优先级的层次关系，从而使得基础类得到统一。
 
-例如 java.lang.Object 存放在 rt.jar 中，如果编写另外一个 java.lang.Object 的类并放到 ClassPath 中，程序可以编译通过。因为双亲委派模型的存在，所以在 rt.jar 中的 Object 比在 ClassPath 中的 Object 优先级更高，因为 rt.jar 中的 Object 使用的是启动类加载器，而 ClassPath 中的 Object 使用的是应用程序类加载器。正因为 rt.jar 中的 Object 优先级更高，因为程序中所有的 Object 都是这个 Object。
+例如 java.lang.Object 存放在 rt.jar 中，如果编写另外一个 java.lang.Object 的类并放到 ClassPath 中，程序可以编译通过。因为双亲委派模型的存在，所以在 rt.jar 中的 Object 比在 ClassPath 中的 Object 优先级更高，因为 rt.jar 中的 Object 使用的是启动类加载器，而 ClassPath 中的 Object 使用的是应用程序类加载器。正因为 rt.jar 中的 Object 优先级更高，所以程序中所有的 Object 都是这个 Object。
 
 **（三）实现** 
 

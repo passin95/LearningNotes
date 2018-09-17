@@ -22,7 +22,7 @@
 
 - [Java 并发](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20并发.md)
 
-  线程、线程池、线程安全、线程锁、Java内存模型。
+  线程、线程池、线程安全、线程锁、Java 内存模型。
 
 - [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
 
@@ -60,7 +60,7 @@
 
 ### :pencil2: 算法 
 
-- [基础排序算法](https://github.com/passin95/LearningNotes/blob/master/notes/常用排序算法.md)
+- [基础排序算法](https://github.com/passin95/LearningNotes/blob/master/notes/基础排序算法.md)
 
   快速排序、归并排序、堆排序、选择排序、冒泡排序、插入排序、希尔排序。
 
