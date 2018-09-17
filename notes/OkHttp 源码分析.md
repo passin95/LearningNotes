@@ -9,15 +9,15 @@
     - [二、Request 和 Response](#二request-和-response)
         - [Request](#request)
         - [Response](#response)
-    - [OkHttpClient](#okhttpclient)
+    - [三、OkHttpClient](#三okhttpclient)
         - [OkHttpClient 的成员变量](#okhttpclient-的成员变量)
         - [OkHttpClient 对 Call.Factory 的实现](#okhttpclient-对-callfactory-的实现)
-    - [三、RealCall](#三realcall)
+    - [四、RealCall](#四realcall)
         - [Dispatcher](#dispatcher)
         - [execute()](#execute)
         - [enqueue()](#enqueue)
         - [getResponseWithInterceptorChain()](#getresponsewithinterceptorchain)
-    - [四、Interceptor](#四interceptor)
+    - [五、Interceptor](#五interceptor)
         - [RetryAndFollowUpInterceptor](#retryandfollowupinterceptor)
         - [BridgeInterceptor](#bridgeinterceptor)
         - [CacheInterceptor](#cacheinterceptor)
@@ -124,7 +124,7 @@ public final class Response implements Closeable {
 }
 ```
 
-## OkHttpClient
+## 三、OkHttpClient
 
 ### OkHttpClient 的成员变量
 
@@ -204,7 +204,7 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory{
 }
 ```
 
-## 三、RealCall
+## 四、RealCall
 
 该类的核心方法有 2 个：execute() 和 enqueue() ，在看这两个方法前先简单看下 Dispatcher 类。
 
@@ -399,7 +399,7 @@ final class RealCall{
   }
 ```
 
-## 四、Interceptor
+## 五、Interceptor
 
 Interceptor 也叫拦截器，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求和问题进行拆分。
 Interceptor.Chain 的原理类似于 android 的触摸事件分发机制，即先执行的拦截器，会拿到最后的 response。在每一个拦截器 Interceptor 的 intercept() 方法中，会调用
