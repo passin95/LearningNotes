@@ -362,7 +362,7 @@ ThreadLocal 的原理类似于 Map，只不过在创建 key 的时候每一个 T
 
 程序在运行的过程中，会将运算所需要的数据从主内存复制一份到 CPU Cache 中，使 CPU 在计算时能直接对 CPU Cache 中的数据进行读取和写入，当运算结束后某个时候，再将 CPU Cache 中的最新数据刷新到主内存中,从而极大提高了 CPU 的吞吐能力。
 
-<div align="center"> <img src="../pictures//CPU 缓存模型.png" /> </div>
+<div align="center"> <img src="../pictures//CPU缓存模型.png"/></div>
 
 高速缓存的设计极大的提高了 CPU 的吞吐能力，但当多线程读写同一个数据时，便会带来缓存不一致的问题，因此不同的 CPU 都提供了一些自己设计的缓存一致性协议去解决该问题。
 
@@ -378,7 +378,7 @@ Java 内存模型指定了 Java 虚拟机在计算机的软硬件上的工作方
 
 在计算机物理内存不会存在栈内存和堆内存的划分，它们都对应到物理的主内存，也有一部分堆栈内存的数据存储在 CPU Cache 或寄存器中。
 
-<div align="center"> <img src="../pictures//Java 内存模型.png" /> </div>
+<div align="center"> <img src="../pictures//Java内存模型.png" /> </div>
 
 # 线程安全与数据同步
 

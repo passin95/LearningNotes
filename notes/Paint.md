@@ -3,33 +3,35 @@
 
 ## 基本设置
 
-### Paint.setStyle(Style style)
+### 绘制模式
 
-设置绘制模式，默认值为FILL。
+Paint.setStyle(Style style)
+
+style默认值为FILL。
 
 - Paint.Style.STROKE - 画线模式
 - Paint.Style.FILL - 填充模式
 - Paint.Style.FILLFILL_AND_STROKE - 两种模式并用
 
-### Paint.setColor(int color) 
+### 颜色
 
-设置颜色
+Paint.setColor(int color) 
 
-### Paint.setStrokeWidth(float width) 
+### 线条宽度
 
-设置线条宽度
+Paint.setStrokeWidth(float width) 
 
-### Paint.setTextSize(float textSize) 
+### 文字大小
 
-设置文字大小
+Paint.setTextSize(float textSize) 
 
-### Paint.setAntiAlias(boolean aa) 
+### 抗锯齿开关
 
-设置抗锯齿开关
+Paint.setAntiAlias(boolean aa) 
 
-### Paint.setStrokeCap(cap)
+### 线条端点形状
 
-设置线条端点形状
+Paint.setStrokeCap(cap)
 
 - Paint.Cap.ROUND - 圆头
 - Paint.Cap.BUTT - 平头 
@@ -38,3 +40,5 @@
 ### 
 
 
+# 参考资料
+- [绘制基础 - HenCoder](https://hencoder.com/ui-1-1/)
