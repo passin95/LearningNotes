@@ -545,7 +545,7 @@ Single.defer(new Callable<SingleSource<Integer>>() {
         .doFinally(new Action() {
             @Override
             public void run() throws Exception {
-                Log.i("rxjava", "doFinally");
+                Log.i("rxjava", "doFinally - 1");
             }
         })
         .observeOn(AndroidSchedulers.mainThread())
