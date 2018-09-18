@@ -64,7 +64,7 @@
 - From Survivor（幸存者）
 - To Survivor
 
-<div align="center"> <img src="../pictures//java虚拟机内存分类.png" width=""/> </div><br>
+<div align="center"> <img src="../pictures//Java虚拟机内存分类.png" width=""/> </div><br>
 
 Java 堆不需要连续内存，并且可以动态增加其内存，增加失败会抛出 OutOfMemoryError 异常。
 

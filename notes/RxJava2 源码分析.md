@@ -20,6 +20,7 @@
             - [小结](#小结-1)
     - [终看 RxJava](#终看-rxjava)
         - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-和-doafterterminate-有何不同)
+        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-写在-observeon-之前和之后有何区别)
         - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
         - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#为什么连用两个-subscribeon-操作符只有第一个有效)
         - [defer 到底有何作用？](#defer-到底有何作用)
@@ -548,6 +549,12 @@ Single.defer(new Callable<SingleSource<Integer>>() {
             }
         })
         .observeOn(AndroidSchedulers.mainThread())
+        .doFinally(new Action() {
+            @Override
+            public void run() throws Exception {
+                Log.i("rxjava", "doFinally - 2");
+            }
+        })
         .map(new Function<Double, Float>() {
             @Override
             public Float apply(Double aDouble) throws Exception {
@@ -678,6 +685,61 @@ static final class DoAfterTerminateObserver<T> implements SingleObserver<T>, Dis
     }
 }
 ```
+
+### doFinally() 写在 observeOn() 之前和之后有何区别？
+
+先抛结论 doFinally() 如果写在 observeOn() 之前,则 observeOn() 往下的观察者的 onXXX() 方法（除了onSubscribe()）都会后于doFinally()执行。
+
+以下以 Demo 为例说明原因。
+
+先贴一下 ObserveOnSingleObserver的 onSuccess() 和 run() 方法
+
+```java
+static final class ObserveOnSingleObserver<T> extends AtomicReference<Disposable>
+implements SingleObserver<T>, Disposable, Runnable {
+    @Override
+    public void onSuccess(T value) {
+        this.value = value;
+        Disposable d = scheduler.scheduleDirect(this);
+        DisposableHelper.replace(this, d);
+    }
+
+    @Override
+    public void run() {
+        Throwable ex = error;
+        if (ex != null) {
+            downstream.onError(ex);
+        } else {
+            downstream.onSuccess(value);
+        }
+    }
+}
+```
+
+再看DoFinallyObserver.onSuccess()所执行的代码
+
+```java
+static final class DoFinallyObserver<T> extends AtomicInteger implements SingleObserver<T>, Disposable {
+    final SingleObserver<? super T> downstream;
+    
+    @Override
+    public void onSuccess(T t) {
+        // downstream 为 ObserveOnSingleObserver
+        downstream.onSuccess(t);
+        runFinally();
+
+        // 也就是说上面的代码等价于
+        this.value = value;
+        Disposable d = scheduler.scheduleDirect(this);
+        DisposableHelper.replace(this, d);
+                
+        // 也就是说对于此时的DoFinallyObserver.onSuccess()，
+        // 他所做的事情仅仅是在调度新的线程去异步执行ObserveOnSingleObserver.run()，也就是异步执行观察者链的向下回调。
+        // 从而直接执行到了runFinally()
+        runFinally();
+    }
+}
+```
  
 ### doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？
 
@@ -795,89 +857,97 @@ Observable<List<User>> observable = retrofit.create(UserService.class).getUserLi
 以数字 1 2 3 4 …… 标记执行顺序。
 
 ```java
-Single.defer(new Callable<SingleSource<Integer>>() {
-    @Override
-    public SingleSource<Integer> call() throws Exception {
-        // 6. call 方法的执行在 SingleDefer 的 subscribeActual() 中，且 subscribeActual() 所处线程为 single 线程。
+   Single.defer(new Callable<SingleSource<Integer>>() {
+            @Override
+            public SingleSource<Integer> call() throws Exception {
+                // 6. call 方法的执行在 SingleDefer 的 subscribeActual() 中，且 subscribeActual() 所处线程为 single 线程。
 
-               //  8. Single.just(1) 被订阅后，在 subscribeActual() 执行 observer.onXXX() 方法，所处线程为 io 线程。
-        return Single.just(1)
-                // 7. 当 return 的 SingleSource<Integer> 被订阅后，切换 io 线程。
-                .subscribeOn(Schedulers.io());
-    }
-})
-        // 5. 切换到 single 线程
-        .subscribeOn(Schedulers.single())
-        // 4. 切换到 io 线程
-        .subscribeOn(Schedulers.io())
-        .flatMap(new Function<Integer, SingleSource<String>>() {
-            @Override
-            public SingleSource<String> apply(Integer integer) throws Exception {
-                // 9. 该接口实现在 SingleFlatMapCallback.onSuccess() 中执行，且所处线程为 io 线程。
-                // 此处相当于丢弃了数据 integer 构建一个新的观察者链。
+                //  8. Single.just(1) 被订阅后，在 subscribeActual() 执行 observer.onXXX() 方法，所处线程为 io 线程。
+                return Single.just(1)
+                        // 7. 当 return 的 SingleSource<Integer> 被订阅后，切换 io 线程。
+                        .subscribeOn(Schedulers.io());
+            }
+        })
+                // 5. 切换到 single 线程
+                .subscribeOn(Schedulers.single())
+                // 4. 切换到 io 线程
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Function<Integer, SingleSource<String>>() {
+                    @Override
+                    public SingleSource<String> apply(Integer integer) throws Exception {
+                        // 9. 该接口实现在 SingleFlatMapCallback.onSuccess() 中执行，且所处线程为 io 线程。
+                        // 此处相当于丢弃了数据 integer 构建一个新的观察者链。
 
-                       // 11. Single.just(1) 被订阅后，在 subscribeActual() 中执行 observer.onXXX() 方法,所处线程为 newThread 线程。
-                return Single.just("1")
-                        // 10. 当 return 的 SingleSource<String> 被订阅后，切换 newThread 线程。
-                        .subscribeOn(Schedulers.newThread())
-                        // 12.切换到 single 线程后继续向下传递数据 "1"。
-                        .observeOn(Schedulers.single());
-            }
-        })
-        .doOnSubscribe(disposable -> {
-            // 3. 此处在 subscribeOn(Schedulers.io()) 被订阅时执行，所处线程为 main 线程。
-            Log.i("rxjava", "doOnSubcribe");
-        })
-        // 2. 切换线程至主线程
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .map(new Function<String, Double>() {
-            @Override
-            public Double apply(String s) throws Exception {
-                // 13. 数据转换，所处线程为 single 线程。
-                return Double.parseDouble(s);
-            }
-        })
-        .doAfterTerminate(new Action() {
-            @Override
-            public void run() throws Exception {
-                // 18. doAfterTerminate，所处线程为 Single 线程，理由和 17 一致。
-                Log.i("rxjava", "doAfterTerminate");
-            }
-        })
-        .doFinally(new Action() {
-            @Override
-            public void run() throws Exception {
-                // 17. doFinally，注意：所处线程为 Single 线程！因为该代码块是在 第 12 步骤切换到 single 线程执行的。
-                // 或者说 DoAfterTerminateObserver.onSuccess() 是在 single 线程执行的。
-                Log.i("rxjava", "doFinally");
-            }
-        })
-        // 14.切换到 main 线程
-        .observeOn(AndroidSchedulers.mainThread())
-        .map(new Function<Double, Float>() {
-            @Override
-            public Float apply(Double aDouble) throws Exception {
-                // 15. 数据转换，所处线程为 main 线程。
-                return Float.parseFloat(aDouble + "");
-            }
-        })
-        .subscribe(new SingleObserver<Float>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                // 1. 会多次被调用，第一次调用为 subscribeOn(AndroidSchedulers.mainThread()) 被订阅时。
-                Log.i("rxjava", "onSubscribe");
-            }
+                        // 11. Single.just(1) 被订阅后，在 subscribeActual() 中执行 observer.onXXX() 方法,// 所处线程为 newThread 线程。
+                        return Single.just("1")
+                                // 10. 当 return 的 SingleSource<String> 被订阅后，切换 newThread 线程。
+                                .subscribeOn(Schedulers.newThread())
+                                // 12.切换到 single 线程后继续向下传递数据 "1"。
+                                .observeOn(Schedulers.single());
+                    }
+                })
+                .doOnSubscribe(disposable -> {
+                    // 3. 此处在 subscribeOn(Schedulers.io()) 被订阅时执行，所处线程为 main 线程。
+                    Log.i("rxjava", "doOnSubcribe");
+                })
+                // 2. 切换线程至主线程
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .map(new Function<String, Double>() {
+                    @Override
+                    public Double apply(String s) throws Exception {
+                        // 13. 数据转换，所处线程为 single 线程。
+                        return Double.parseDouble(s);
+                    }
+                })
+                .doAfterTerminate(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        // 16. doAfterTerminate，所处线程为 Single 线程，理由和 15 一致。
+                        Log.i("rxjava", "doAfterTerminate");
+                    }
+                })
+                .doFinally(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        // 15. doFinally，注意：所处线程为 Single 线程！因为该代码块是在 第 12 步骤切换到 single 线程执行的。
+                        // 或者说 DoAfterTerminateObserver.onSuccess() 是在 single 线程执行的。
+                        // 注意：该调用链之下涉及到 observeOn() 方法，则 doFinally()会提前于最外层的Observer的onSuccess()执行
+                        Log.i("rxjava", "doFinally - 1");
+                    }
+                })
+                // 14.切换到 main 线程
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        // 19. doFinally 所处线程为 main 线程。
+                        Log.i("rxjava", "doFinally - 2");
+                    }
+                })
+                .map(new Function<Double, Float>() {
+                    @Override
+                    public Float apply(Double aDouble) throws Exception {
+                        // 17. 数据转换，所处线程为 main 线程。
+                        return Float.parseFloat(aDouble + "");
+                    }
+                })
+                .subscribe(new SingleObserver<Float>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        // 1. 会多次被调用，第一次调用为 subscribeOn(AndroidSchedulers.mainThread()) 被订阅时。
+                        Log.i("rxjava", "onSubscribe");
+                    }
 
-            @Override
-            public void onSuccess(Float aFloat) {
-                // 16. onSuccess,所处线程为主线程
-                Log.i("rxjava", "onSuccess");
-            }
+                    @Override
+                    public void onSuccess(Float aFloat) {
+                        // 18. onSuccess,所处线程为主线程
+                        Log.i("rxjava", "onSuccess");
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                // 16. onError,所处线程为主线程
-                Log.i("rxjava", "onError");
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        // 18. onError,所处线程为主线程
+                        Log.i("rxjava", "onError");
+                    }
+                });
 ```

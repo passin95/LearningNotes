@@ -24,4 +24,12 @@ drawARGB(int a, int r, int g, int b)
 
 drawCircle(float centerX, float centerY, float radius, Paint paint) 
 
-### 
+### 矩形
+
+drawRect(float left, float top, float right, float bottom, Paint paint) 
+
+### 点
+
+drawPoint(float x, float y, Paint paint)
+
+###
