@@ -45,11 +45,22 @@ Paint.setShader(Shader shader)
 
 同时setShader()和setColor/ARGB()和Color时优先使用Shader的颜色。
 
-#### 线性渐变
+#### 着色规则 
 
-```java
+- Shader.TileMode.CLAMP -  夹子模式（直译），端点之外延续端点处的颜色。
+- Shader.TileMode.MIRROR - 镜像模式，以任何一个渐变中间或端点为基准都是堆成的。
+- Shader.TileMode.REPEAT - 重复模式。
 
-```
+
+#### 线性渐变 Shape
+
+LinearGradient(float x0, float y0, float x1, float y1, int color0, int color1, Shader.TileMode tile)
+
+- x0 y0 x1 y1 - 渐变的两个端点的位置。
+- color0 color1 - 端点的颜色。
+- tile - 端点范围之外的着色规则。
+
+
 
 ### 
 
