@@ -17,6 +17,8 @@ style默认值为FILL。
 
 Paint.setColor(int color) 
 
+Paint.setARGB(int a, int r, int g, int b) 
+
 ### 线条宽度
 
 Paint.setStrokeWidth(float width) 
@@ -36,6 +38,18 @@ Paint.setStrokeCap(cap)
 - Paint.Cap.ROUND - 圆头
 - Paint.Cap.BUTT - 平头 
 - Paint.Cap.SQUARE - 方头
+
+### 着色器
+
+Paint.setShader(Shader shader)
+
+同时setShader()和setColor/ARGB()和Color时优先使用Shader的颜色。
+
+#### 线性渐变
+
+```java
+
+```
 
 ### 
 
