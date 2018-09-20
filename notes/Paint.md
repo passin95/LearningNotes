@@ -49,9 +49,38 @@ Paint.setStrokeMiter(float miter)
 
 <img src="../pictures//006tNc79ly1fig7btolhij30e706dglp.jpg"/>
 
-### setStrokeJoin
+## 双线性过滤 FilterBitmap
+
+setFilterBitmap(boolean filter)
 
 线条在 Join 类型为 MITER 时对于 MITER 的长度限制
+
+<img src="../pictures//006tNc79ly1fig7dbga6ij30jb0a00tr.jpg"/>
+
+## 阴影 ShadowLayer
+
+setShadowLayer(float radius, float dx, float dy, int shadowColor)
+
+- radius - 阴影的模糊范围
+- dx dy - 阴影的偏移量
+- shadowColor - 阴影的颜色
+
+在之后的绘制内容下面加一层阴影。清楚阴影使用clearShadowLayer()。
+
+```java
+paint.setShadowLayer(10, 0, 0, Color.RED);
+
+canvas.drawText(text, 80, 300, paint);  
+```
+
+<img src="../pictures//006tNc79ly1fig7ev8io8j30cv02y74f.jpg"/>
+
+注意：
+
+- 在硬件加速开启的情况下， setShadowLayer() 只支持文字的绘制，文字之外的绘制必须关闭硬件加速才能正常绘制阴影。
+- 如果 shadowColor 是半透明的，阴影的透明度就使用 shadowColor 自己的透明度；而如果 shadowColor 是不透明的，阴影的透明度就使用 paint 的透明度。
+
+## 
 
 ## 设置颜色
 
@@ -266,11 +295,71 @@ canvas.restoreToCount(saved);
 
 <img src= "../pictures//006tNc79ly1fig73037soj30sj0x3myt.jpg"/>
 
+## 设置图形轮廓
 
+setPathEffect(PathEffect effect)
 
-
+对 Canvas 所有的图形绘制（drawXXX()）有效
     
+### CornerPathEffect
 
+ CornerPathEffect(float radius)
+
+ - radius - 圆角的半径
+
+把所有拐角变成圆角。
+
+<img src= "../pictures//006tNc79ly1fig7dobrizj30iv0agt8z.jpg"/>
+
+
+### DiscretePathEffect
+
+DiscretePathEffect(float segmentLength, float deviation)
+
+- segmentLength - 切段线段长度
+- deviation - 偏离量
+
+将线条切段后随机偏离。
+
+<img src= "../pictures//006tNc79ly1fig7dug01cj30ir0bawet.jpg"/>
+
+### DashPathEffect
+
+DashPathEffect(float[] intervals, float phase)
+
+- intervals - 虚线的格式（必须是偶数）
+- phase - 以原虚线起点开始的偏移量
+
+使用虚线来绘制线条。
+
+<img src= "../pictures//006tNc79ly1fig7dz1jenj30iw0b9mxh.jpg"/>
+
+### SumPathEffect
+
+ SumPathEffect(PathEffect first, PathEffect second)
+
+ 分别按照两种 PathEffect 分别对目标进行绘制。
+
+<img src= "../pictures//006tNc79ly1fig7ekjh7lj30dw05jq2z.jpg"/>
+
+### ComposePathEffect
+
+先对目标 Path 使用一个 PathEffect，然后再对这个改变后的 Path 使用另一个 PathEffect。
+
+```java
+PathEffect dashEffect = new DashPathEffect(new float[]{20, 10}, 0);  
+PathEffect discreteEffect = new DiscretePathEffect(20, 5);  
+pathEffect = new SumPathEffect(dashEffect, discreteEffect);
+
+canvas.drawPath(path, paint);  
+```
+
+<img src= "../pictures//006tNc79ly1fig7epf94aj30dr05eq2x.jpg"/>
+
+### 注意事项
+
+- Canvas.drawLine() 和 Canvas.drawLines() 方法画直线时，setPathEffect() 是不支持硬件加速的。
+- PathDashPathEffect 对硬件加速的支持也有问题，所以当使用 PathDashPathEffect 的时候，最好也把硬件加速关了。
 
 
 
