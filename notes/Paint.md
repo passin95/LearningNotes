@@ -1,9 +1,7 @@
 
 # Paint
 
-## 基本设置
-
-### 绘制模式
+## 绘制模式 Style
 
 Paint.setStyle(Style style)
 
@@ -13,25 +11,19 @@ style默认值为FILL。
 - Paint.Style.FILL - 填充模式
 - Paint.Style.FILLFILL_AND_STROKE - 两种模式并用
 
-### 颜色
-
-Paint.setColor(int color) 
-
-Paint.setARGB(int a, int r, int g, int b) 
-
-### 线条宽度
+## 线条宽度 StrokeWidth
 
 Paint.setStrokeWidth(float width) 
 
-### 文字大小
+## 文字大小 TextSize
 
 Paint.setTextSize(float textSize) 
 
-### 抗锯齿开关
+## 抗锯齿开关 AntiAlias
 
 Paint.setAntiAlias(boolean aa) 
 
-### 线条端点形状
+## 线条端点形状 StrokeCap
 
 Paint.setStrokeCap(cap)
 
@@ -39,31 +31,255 @@ Paint.setStrokeCap(cap)
 - Paint.Cap.BUTT - 平头 
 - Paint.Cap.SQUARE - 方头
 
-### 着色器
+## 拐角的形状 StrokeJoin
+
+Paint.setStrokeJoin(Paint.Join join)
+
+- Paint.Join.MITER - 尖角（默认）
+- Paint.Join.BEVEL - 平角
+- Paint.Join.ROUND - 圆角
+
+### 尖角时延长线最大值 StrokeMiter
+
+Paint.setStrokeMiter(float miter)
+
+- miter - 对于转角长度的限制，默认值为4。
+
+当线条拐角为 MITER 时，拐角处的外缘会自动使用延长线来补偿。a/b比值超过miter时，自动改用 BEVEL 的方式来渲染连接点。
+
+<img src="../pictures//006tNc79ly1fig7btolhij30e706dglp.jpg"/>
+
+### setStrokeJoin
+
+线条在 Join 类型为 MITER 时对于 MITER 的长度限制
+
+## 设置颜色
+
+Canvas 绘制的内容，有三层对颜色的处理：
+
+<img src="../pictures//52eb2279ly1fig6dcywn2j20j909yabu.jpg"/>
+
+### 基本颜色
+
+#### 直接设置
+
+Paint.setColor(int color) 
+
+Paint.setARGB(int a, int r, int g, int b) 
+
+#### 着色器 Shape
 
 Paint.setShader(Shader shader)
 
 同时setShader()和setColor/ARGB()和Color时优先使用Shader的颜色。
 
-#### 着色规则 
+##### 着色规则 Shader.TileMode
+
+Shader.TileMode 为端点范围之外的着色规则。
 
 - Shader.TileMode.CLAMP -  夹子模式（直译），端点之外延续端点处的颜色。
 - Shader.TileMode.MIRROR - 镜像模式，以任何一个渐变中间或端点为基准都是堆成的。
 - Shader.TileMode.REPEAT - 重复模式。
 
+##### 线性渐变 LinearGradient
 
-#### 线性渐变 Shape
-
-LinearGradient(float x0, float y0, float x1, float y1, int color0, int color1, Shader.TileMode tile)
+LinearGradient(float x0, float y0, float x1, float y1, int color0, int color1, Shader.TileMode tileMode)
 
 - x0 y0 x1 y1 - 渐变的两个端点的位置。
 - color0 color1 - 端点的颜色。
-- tile - 端点范围之外的着色规则。
+- tileMode - 端点范围之外的着色规则。
+
+以不同着色规则看一下它们的具体的显示区别。
+
+```java
+Shader shader = new LinearGradient(100, 100, 500, 500, Color.parseColor("#E91E63"),  
+        Color.parseColor("#2196F3"), Shader.TileMode.XXX);
+```
+
+CLAMP:
+
+<img src="../pictures//52eb2279ly1fig6e7vbemj20cj090goh.jpg"/>
+
+MIRROR:
+
+<img src="../pictures//52eb2279ly1fig6egtxw5j20ck08xjv6.jpg"/>
+
+REPEAT:
+
+<img src="../pictures//52eb2279ly1fig6em2wabj20ck08xjvo.jpg"/>
+
+
+##### 辐射渐变 RadialGradient
+
+RadialGradient(float centerX, float centerY, float radius,int colors[], float stops[], TileMode tileMode)
+
+- centerX centerY - 辐射中心的坐标
+- radius - 辐射半径
+- centerColor - 辐射中心的颜色
+- edgeColor - 辐射边缘的颜色
+- tileMode - 辐射范围之外的着色模式。
+
+<img src="../pictures//52eb2279ly1fig6ewf1o5j206d066q4a.jpg"/>
+
+##### 扫描渐变 SweepGradient
+
+ SweepGradient(float cx, float cy, int color0, int color1)
+
+- cx cy - 扫描的中心
+- color0 - 扫描的起始颜色
+- color1 - 扫描的终止颜色
+
+<img src="../pictures//52eb2279ly1fig6fmbemdj206u061my4.jpg"/>
+
+##### Bitmap
+
+BitmapShader(Bitmap bitmap, Shader.TileMode tileX, Shader.TileMode tileY)
+
+- bitmap - 用来做模板的 Bitmap 对象
+- tileX - 横向的 TileMode
+- tileY - 纵向的 TileMode。
+
+<img src="../pictures//52eb2279ly1fig6fragq2j20lc089djv.jpg"/>
+
+##### 混合着色器 ComposeShader
+
+把两个 Shader 一起使用。
+
+ComposeShader(Shader shaderA, Shader shaderB, PorterDuff.Mode mode)
+
+- shaderA 目标图像
+- shaderB 源图像
+- mode - 两个 Shader 的叠加模式，即 shaderA 和 shaderB 应该怎样共同绘制。默认类型是 PorterDuff.Mode 。
+
+```java
+// 第一个 Shader：头像的 Bitmap
+Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.batman);  
+Shader shader1 = new BitmapShader(bitmap1, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+
+// 第二个 Shader：从上到下的线性渐变（由透明到黑色）
+Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.batman_logo);  
+Shader shader2 = new BitmapShader(bitmap2, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+
+// ComposeShader：结合两个 Shader
+Shader shader = new ComposeShader(shader1, shader2, PorterDuff.Mode.SRC_OVER);  
+paint.setShader(shader);
+```
+> 上面这段代码中使用了两个 BitmapShader 来作为 ComposeShader() 的参数，而 ComposeShader() 在硬件加速下是不支持两个相同类型的 Shader 的，所以这里需要关闭硬件加速才能看到效果。
+
+<img src="../pictures//52eb2279ly1fig6hbeg7gj20qy08cafn.jpg"/>
+
+###### 叠加策略 PorterDuff.Mode
+
+<img src="../pictures//52eb2279ly1fig6ia1twgj20ds07tdgs.jpg"/>
+
+第一类：Alpha 合成（关于 Alpha 通道计算）。
+
+<img src="../pictures//52eb2279ly1fig6im3hhcj20o50zt7bj.jpg"/>
+
+第二类，混合（就是常见的色彩叠加）
+
+<img src="../pictures//52eb2279ly1fig6iw04v0j20ny0hzmzj.jpg"/>
+
+### 颜色过滤 ColorFilter
+
+Paint.setColorFilter(ColorFilter filter)
+
+为绘制设置颜色过滤。颜色过滤的意思，就是为绘制的内容设置一个统一的过滤策略，然后 Canvas.drawXXX() 方法会对每个像素都进行过滤后再绘制出来。
+
+#### LightingColorFilter 
+
+LightingColorFilter(int mul, int add)
+
+- mul - 和目标像素相乘
+- add - 用来和目标像素相加
+
+具体算法如下所示：
+
+```
+R' = R * mul.R / 0xff + add.R  
+G' = G * mul.G / 0xff + add.G  
+B' = B * mul.B / 0xff + add.B  
+```
+
+想去掉原像素中的红色，可以把它的 mul 改为 0x00ffff （红色部分为 0 ）， ，那么它的计算过程就是：
+
+```
+R' = R * 0x0 / 0xff + 0x0 = 0 // 红色被移除  
+G' = G * 0xff / 0xff + 0x0 = G  
+B' = B * 0xff / 0xff + 0x0 = B  
+```
+
+<img src= "../pictures//52eb2279ly1fig6k1n8aij209104faay.jpg"/>
+
+#### PorterDuffColorFilter
+
+PorterDuffColorFilter(int color, PorterDuff.Mode mode) 
+
+一个指定的颜色（作为源图像）和一种指定的 PorterDuff.Mode 来与绘制对象（目标图像）进行合成。
+
+PorterDuffColorFilter 作为一个 ColorFilter，只能指定一种颜色作为源，而不是一个 Bitmap。
+
+#### ColorMatrixColorFilter
+
+ColorMatrixColorFilter(ColorMatrix matrix)
+
+- ColorMatrix - 内部是一个 4x5 的矩阵。
+
+```
+[ a, b, c, d, e,
+  f, g, h, i, j,
+  k, l, m, n, o,
+  p, q, r, s, t ]
+```
+
+ColorMatrix 可以把要绘制的像素进行转换。对于颜色 [R, G, B, A] ，转换算法是这样的：
+
+```
+R’ = a*R + b*G + c*B + d*A + e;  
+G’ = f*R + g*G + h*B + i*A + j;  
+B’ = k*R + l*G + m*B + n*A + o;  
+A’ = p*R + q*G + r*B + s*A + t;  
+```
+
+### Xfermode
+
+Paint.setXfermode(Xfermode xfermode)
+
+Xfermode 全名为Transfer mode，暂时只有一个子类 PorterDuffXfermode，它的用处为以绘制的内容作为源图像和 View 中已绘制的内容作为目标图像选取一个 PorterDuff.Mode 作为绘制内容的颜色处理方案。
+
+由于 View 的的显示区域都会参与计算，并且 View 自身的底色并不是默认的透明色，会导致范围之外都变成了黑色，因此得使用离屏缓冲，把要绘制的内容单独绘制在缓冲层。用法如下：
+
+```java
+int saved = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
+
+canvas.drawBitmap(rectBitmap, 0, 0, paint); // 先画方
+paint.setXfermode(xfermode); // 设置 Xfermode
+canvas.drawBitmap(circleBitmap, 0, 0, paint); // 画圆
+paint.setXfermode(null); // 用完及时清除 Xfermode
+
+canvas.restoreToCount(saved);
+```
+
+除此之外，还应该注意控制它的透明区域不要太小，要让它足够覆盖到要和它结合绘制的内容，否则得到的结果很可能不是你想要的。
+
+如图所示，由于透明区域过小而覆盖不到的地方，将不会受到 Xfermode 的影响。
+
+<img src= "../pictures//006tNc79ly1fig73037soj30sj0x3myt.jpg"/>
 
 
 
-### 
+
+    
+
+
+
+
+
+
+
+
 
 
 # 参考资料
 - [绘制基础 - HenCoder](https://hencoder.com/ui-1-1/)
+- [Paint 详解 - HenCoder](https://hencoder.com/ui-1-1/)
