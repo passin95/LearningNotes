@@ -36,8 +36,7 @@
 
 在 Android 里，每个 View 都有一个自己的坐标系，彼此之间是不影响的。这个坐标系的原点是 View 左上角的那个点；水平方向是 x 轴，右正左负；竖直方向是 y 轴。
 
-<div align="center"> <img src="../pictures//坐标系.png" width="400"/> </div><br>
-
+<div align="center"> <img src="../pictures//坐标系.png" width="400"/> </div>
 
 ## 绘制颜色
 

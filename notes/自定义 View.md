@@ -10,15 +10,15 @@
 
 - [Paint](https://github.com/passin95/LearningNotes/blob/master/notes/Paint.md)
 
-  Paint Api 相关说明。
+  Paint Api 说明。
 
 - [Canvas](https://github.com/passin95/LearningNotes/blob/master/notes/Canvas.md)
 
-  Canvas、Path Api 相关说明。
+  Canvas APi 部分基础说明、Path Api 说明。
 
 - [文字的绘制](https://github.com/passin95/LearningNotes/blob/master/notes/文字的绘制.md)
 
-  文字的绘制相关。
+  文字的绘制。
 
 - [绘制辅助](https://github.com/passin95/LearningNotes/blob/master/notes/绘制辅助.md)
 

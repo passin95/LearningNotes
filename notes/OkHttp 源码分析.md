@@ -3,26 +3,26 @@
 
 <!-- TOC -->
 
-- [OkHttp 源码解析](#okhttp-源码解析)
-    - [说明](#说明)
-    - [一、OkHttp 的基本使用](#一okhttp-的基本使用)
-    - [二、Request 和 Response](#二request-和-response)
-        - [Request](#request)
-        - [Response](#response)
-    - [三、OkHttpClient](#三okhttpclient)
-        - [OkHttpClient 的成员变量](#okhttpclient-的成员变量)
-        - [OkHttpClient 对 Call.Factory 的实现](#okhttpclient-对-callfactory-的实现)
-    - [四、RealCall](#四realcall)
-        - [Dispatcher](#dispatcher)
-        - [execute()](#execute)
-        - [enqueue()](#enqueue)
-        - [getResponseWithInterceptorChain()](#getresponsewithinterceptorchain)
-    - [五、Interceptor](#五interceptor)
-        - [RetryAndFollowUpInterceptor](#retryandfollowupinterceptor)
-        - [BridgeInterceptor](#bridgeinterceptor)
-        - [CacheInterceptor](#cacheinterceptor)
-        - [ConnectInterceptor](#connectinterceptor)
-        - [CallServerInterceptor](#callserverinterceptor)
+- [OkHttp 源码解析](#okhttp-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+  - [说明](#%E8%AF%B4%E6%98%8E)
+  - [一、OkHttp 的基本使用](#%E4%B8%80%E3%80%81okhttp-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+  - [二、Request 和 Response](#%E4%BA%8C%E3%80%81request-%E5%92%8C-response)
+    - [Request](#request)
+    - [Response](#response)
+  - [三、OkHttpClient](#%E4%B8%89%E3%80%81okhttpclient)
+    - [OkHttpClient 的成员变量](#okhttpclient-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+    - [OkHttpClient 对 Call.Factory 的实现](#okhttpclient-%E5%AF%B9-callfactory-%E7%9A%84%E5%AE%9E%E7%8E%B0)
+  - [四、RealCall](#%E5%9B%9B%E3%80%81realcall)
+    - [Dispatcher](#dispatcher)
+    - [execute()](#execute)
+    - [enqueue()](#enqueue)
+    - [getResponseWithInterceptorChain()](#getresponsewithinterceptorchain)
+  - [五、Interceptor](#%E4%BA%94%E3%80%81interceptor)
+    - [RetryAndFollowUpInterceptor](#retryandfollowupinterceptor)
+    - [BridgeInterceptor](#bridgeinterceptor)
+    - [CacheInterceptor](#cacheinterceptor)
+    - [ConnectInterceptor](#connectinterceptor)
+    - [CallServerInterceptor](#callserverinterceptor)
 
 <!-- /TOC -->
 
@@ -149,9 +149,9 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   final EventListener.Factory eventListenerFactory;
   // 针对存在使用多个代理时，选择下一次网络请求使用的代理方式。
   final ProxySelector proxySelector;
-  // CookieJar 是一个接口方法，用于使用 Cookie 时存放 List<Cookie> 和根据 HttpUrl 去找到相应 Cookie。
+  // CookieJar 是一个接口方法，用于使用 Cookie 时存放于 List<Cookie> 和根据 HttpUrl 去找到相应 Cookie。
   final CookieJar cookieJar;
-  // OkHttp 提供的缓存类。
+  // OkHttp 提供的缓存类，默认没有，需自行配置缓存存储位置和存储空间上限。
   final @Nullable Cache cache;
   // CacheInterceptor 为缓存操作应该具有的方法接口，构造函数的参数为 InternalCache，即面向接口编程。
   // 提供拓展给开发者实现自己的缓存算法。
@@ -162,11 +162,11 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   final @Nullable SSLSocketFactory sslSocketFactory;
   // 对发送过来的证书进行层级梳理。
   final @Nullable CertificateChainCleaner certificateChainCleaner;
-  // 用于验证对方发过来的证书中的 Hostname 和用户请求服务器的 Hostname 是否一致。
+  // 用于验证 HTTPS 握手过程中对方发过来的证书中的所属者和用户请求服务器的 Hostname 是否一致。
   final HostnameVerifier hostnameVerifier;
   // Android 证书锁，即不全信任客户端证书库，还对服务器证书传过来的证书指纹和客户端应用中已写入的指纹进行匹配。
   final CertificatePinner certificatePinner;
-  // 当返回错误码 407 时，自动进行认证。区别在于第一个是向代理服务器进行认证，第二个是向目标服务器进行认证。
+  // 当返回错误码 401 时，自动调用该接口的实现类进行认证。区别在于第一个是向代理服务器进行认证，第二个是向目标服务器进行认证。
   final Authenticator proxyAuthenticator;
   final Authenticator authenticator;
   // 连接池
@@ -178,11 +178,11 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   final boolean followRedirects;
   // 请求失败后是否需要重试。
   final boolean retryOnConnectionFailure;
-  // 连接超时时间
+  // 连接（TCP或TLS）超时时间
   final int connectTimeout;
   // 发出 request 报文结束至收到的 response 报文所允许的最大时间
   final int readTimeout;
-  // 发送 request 报文开始至发送结束所允许的最大时间
+  // 发送 request 报文开始至发送request 报文结束所允许的最大时间
   final int writeTimeout;
   // webSocket 用于间隔向对方确认继续
   final int pingInterval;
@@ -766,7 +766,7 @@ public final class ConnectInterceptor implements Interceptor {
 
     // We need the network to satisfy this request. Possibly for validating a conditional GET.
     boolean doExtensiveHealthChecks = !request.method().equals("GET");
-    // 用于向 TCP 层读写数据。
+    // 用于向 TCP 层读写数据(编码和解码 HTTP 请求)。
     HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
     // 获取到可用的连接并建立并加入连接池管理。
     RealConnection connection = streamAllocation.connection();
@@ -777,6 +777,8 @@ public final class ConnectInterceptor implements Interceptor {
 ```
 
 ### CallServerInterceptor
+
+它负责实质的请求与响应的 I/O 操作，即向 Socket 里写入请求数据，和从 Socket 里读取响应数据。
 
 ```java
 public final class CallServerInterceptor implements Interceptor {
