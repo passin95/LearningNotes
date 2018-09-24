@@ -6,7 +6,7 @@
 
 <br>
 
-### 绘制基础
+### 自定义 View
 
 - [Paint](https://github.com/passin95/LearningNotes/blob/master/notes/Paint.md)
 
@@ -20,12 +20,21 @@
 
   文字的绘制。
 
-- [绘制辅助](https://github.com/passin95/LearningNotes/blob/master/notes/绘制辅助.md)
+- [绘制辅助](https://github.com/passin95/LearningNotes/blob/master/notes/范围裁切和几何变换.md)
 
   范围裁切和几何变换。
 
+- [动画](https://github.com/passin95/LearningNotes/blob/master/notes/动画.md)
 
+  视图动画、属性动画和 Transition。
 
+- [自定义 View 流程](https://github.com/passin95/LearningNotes/blob/master/notes/自定义View流程.md)
+
+  布局流程和绘制流程等。
+
+- [触摸反馈](https://github.com/passin95/LearningNotes/blob/master/notes/触摸反馈.md)
+
+  触摸反馈以及触摸反馈算法的编写。
 
 ### 动画
 
