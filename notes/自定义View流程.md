@@ -31,7 +31,7 @@
 
 MeasureSpec 用于决定 View 和 ViewGroup 之间的尺寸规则，因此我们先看一下 MeasureSpec 的常用方法及其原理。
 
-结论：前 2 位标识 mode，后 24 位标识具体的 size，中间 6 位标识数据的 status（是否被父 View 限制等）
+结论：前 2 位标识 mode，后 24 位标识具体的 size，中间 6 位标识数据的 state（是否被父 View 限制等）
 
 ```java
 public static class MeasureSpec {
@@ -63,7 +63,7 @@ public static class MeasureSpec {
     }
 
     public static int getSize(int measureSpec) {
-        // 提取后 30 位的数值。
+        // 提取后 30 位的数值。即获取大小和状态。
         // ~MODE_MASK 为对 MODE_MASK 按位取反。
         return (measureSpec & ~MODE_MASK);
     }
@@ -114,6 +114,7 @@ public static int resolveSizeAndState(int size, int measureSpec, int childMeasur
         default:
             result = size;
     }
+    // 对 childMeasuredState 过滤掉 size，并标识具体的 state。
     return result | (childMeasuredState & MEASURED_STATE_MASK);
 }
 ```
