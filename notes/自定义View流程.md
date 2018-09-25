@@ -18,7 +18,7 @@
 
 ## 布局流程
 
-<img src="../pictures//自定义 View 布局流程.png"/>
+<img src="../pictures//自定义View布局流程.png"/>
 
 布局过程的自定义一般情况下分为 3 类：
 - 重写 onMeasure() 来修改已有的 View 的尺寸。
@@ -63,7 +63,8 @@ public static class MeasureSpec {
     }
 
     public static int getSize(int measureSpec) {
-        // 提取后 30 位的数值。~MODE_MASK 为对 MODE_MASK 按位取反。
+        // 提取后 30 位的数值。
+        // ~MODE_MASK 为对 MODE_MASK 按位取反。
         return (measureSpec & ~MODE_MASK);
     }
 }
@@ -97,10 +98,10 @@ public static int resolveSizeAndState(int size, int measureSpec, int childMeasur
         case MeasureSpec.AT_MOST:
             // 超过了限制的大小,返回 specSize。
             if (specSize < size) {
-                // 用于标识着测量的尺寸比视图所希望的尺寸小。
+                // MEASURED_STATE_TOO_SMALL 用于标识着测量的尺寸比视图所希望的尺寸小。
                 result = specSize | MEASURED_STATE_TOO_SMALL;
             } else {
-                // 没超过限制值，返回 size
+                // 没超过限制值，返回 size。
                 result = size;
             }
             break;
@@ -193,7 +194,7 @@ public class DemoLayout extends ViewGroup {
                     break;
             }
             chindView.measure(childWidthSpec,heightWidthSpec);
-            // 调用上面这行代码后，可通过 chindView.getMeasuredHeight() 和 chindView.getMeasuredWidth() 去决定子 View 的位置，
+            // 调用上面这行代码后，可通过 chindView.getMeasuredHeight() 和 chindView.getMeasuredWidth() 去决定子 View 的实际尺寸和位置，
             // 并根据实际需求对子 View 的位置进行保存。
             // lp.setCoordinate(left,top,right,bottom);
         }

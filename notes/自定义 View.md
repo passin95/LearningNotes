@@ -26,20 +26,12 @@
 
 - [动画](https://github.com/passin95/LearningNotes/blob/master/notes/动画.md)
 
-  视图动画、属性动画和 Transition。
+  视图动画、属性动画以及 Transition。
 
 - [自定义 View 流程](https://github.com/passin95/LearningNotes/blob/master/notes/自定义View流程.md)
 
-  布局流程和绘制流程等。
+  布局流程以及绘制流程等。
 
 - [触摸反馈](https://github.com/passin95/LearningNotes/blob/master/notes/触摸反馈.md)
 
-  触摸反馈以及触摸反馈算法的编写。
-
-### 动画
-
-
-### 布局
-
-
-### 进阶
+  触摸反馈流程以及触摸反馈算法的编写。
