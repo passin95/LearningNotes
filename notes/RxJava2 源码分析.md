@@ -3,28 +3,28 @@
 
 <!-- TOC -->
 
-- [RxJava2 源码分析](#rxjava2-源码分析)
-    - [前言](#前言)
-    - [初探 RxJava](#初探-rxjava)
+- [RxJava2 源码分析](#rxjava2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [前言](#%E5%89%8D%E8%A8%80)
+    - [初探 RxJava](#%E5%88%9D%E6%8E%A2-rxjava)
         - [Single.just()](#singlejust)
         - [single.subscribe(observer)](#singlesubscribeobserver)
-        - [小结](#小结)
-    - [再探 RxJava](#再探-rxjava)
-        - [RxJava 链式调用结构的本质](#rxjava-链式调用结构的本质)
-        - [Map 和 FlapMap](#map-和-flapmap)
+        - [小结](#%E5%B0%8F%E7%BB%93)
+    - [再探 RxJava](#%E5%86%8D%E6%8E%A2-rxjava)
+        - [RxJava 链式调用结构的本质](#rxjava-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%9C%AC%E8%B4%A8)
+        - [Map 和 FlapMap](#map-%E5%92%8C-flapmap)
             - [map](#map)
             - [flatMap](#flatmap)
-        - [线程切换](#线程切换)
+        - [线程切换](#%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2)
             - [subscribeOn](#subscribeon)
             - [observeOn](#observeon)
-            - [小结](#小结-1)
-    - [终看 RxJava](#终看-rxjava)
-        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-和-doafterterminate-有何不同)
-        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-写在-observeon-之前和之后有何区别)
-        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
-        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#为什么连用两个-subscribeon-操作符只有第一个有效)
-        - [defer 到底有何作用？](#defer-到底有何作用)
-        - [Demo 执行过程梳理](#demo-执行过程梳理)
+            - [小结](#%E5%B0%8F%E7%BB%93)
+    - [终看 RxJava](#%E7%BB%88%E7%9C%8B-rxjava)
+        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C%EF%BC%9F)
+        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB%EF%BC%9F)
+        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84%EF%BC%9F)
+        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88%EF%BC%9F)
+        - [defer 到底有何作用？](#defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8%EF%BC%9F)
+        - [Demo 执行过程梳理](#demo-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E6%A2%B3%E7%90%86)
 
 <!-- /TOC -->
 
@@ -35,7 +35,6 @@
 为了更清晰的分析源码，以下的代码示例中的被观察者将使用 Single，而不是 Observable。Single 和 Observable 区别在于 Single 只会向观察者发送一个数据（例如在网络请求使用），而 Observable 则可以依次向观察者发送多个数据。
 
 注：下文说的切换线程执行某个代码块的意思是：将该代码块交由所指定的线程 (池) 执行。
-
 
 ## 初探 RxJava
 
@@ -67,7 +66,6 @@ SingleObserver<Integer> observer = new SingleObserver<Integer>() {
 // 从语意上看被观察者 “订阅” 观察者，实际是观察者订阅被观察者（下面也将如此描述），
 // 因此多次调用 single.subscribe() 是互不影响的。
 single.subscribe(observer);
-
 ```
 
 ### Single.just()
@@ -150,7 +148,6 @@ public final void subscribe(SingleObserver<? super T> observer) {
 - 当被观察者 single **被订阅时（调用 single.subscribe(observer)）**，执行的核心方法为被观察者 single 的 subscribeActual(observer) 方法，通过传入观察者 observer 的对象去控制观察者 observer 的方法执行。
 
 <img src="../pictures//RxJavaPic1.png" /> 
-
 
 ## 再探 RxJava
 
@@ -582,7 +579,6 @@ Single.defer(new Callable<SingleSource<Integer>>() {
 ### doFinally 和 doAfterTerminate 有何不同？
 
 查看源码我们可以发现，这 2 个操作符的代码几乎完全一致，唯一的本质区别是在执行 dispose() 方法时，doFinally 执行 runFinally(),而 doAfterTerminate 没有执行 onAfterTerminate()，也就是说 doFinally 任何情况下最终都会调用 Action.run()，而 doAfterTerminate 则在取消订阅后不再调用 Action.run()。
-
 
 ```java
 public final class SingleDoAfterTerminate<T> extends Single<T> {

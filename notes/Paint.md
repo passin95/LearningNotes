@@ -31,7 +31,7 @@
     - [尖角时延长线最大值 StrokeMiter](#%E5%B0%96%E8%A7%92%E6%97%B6%E5%BB%B6%E9%95%BF%E7%BA%BF%E6%9C%80%E5%A4%A7%E5%80%BC-strokemiter)
     - [双线性过滤 FilterBitmap](#%E5%8F%8C%E7%BA%BF%E6%80%A7%E8%BF%87%E6%BB%A4-filterbitmap)
     - [阴影 ShadowLayer](#%E9%98%B4%E5%BD%B1-shadowlayer)
-    - [过滤画面（特效） MaskFilter](#%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%E7%89%B9%E6%95%88-maskfilter)
+    - [过滤画面（特效） MaskFilter](#%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%EF%BC%88%E7%89%B9%E6%95%88%EF%BC%89-maskfilter)
       - [BlurMaskFilter](#blurmaskfilter)
       - [EmbossMaskFilter](#embossmaskfilter)
   - [图形轮廓 PathEffect](#%E5%9B%BE%E5%BD%A2%E8%BD%AE%E5%BB%93-patheffect)
@@ -95,7 +95,7 @@ Shader.TileMode 为端点范围之外的着色规则。
 
 - Shader.TileMode.CLAMP -  夹子模式（直译），端点之外延续端点处的颜色。
 - Shader.TileMode.MIRROR - 镜像模式，以任何一个渐变中间或端点为基准都是堆成的。
-- Shader.TileMode.REPEAT - 重复模式。
+- Shader.TileMode.REPEAT - 重复模式
 
 ##### 线性渐变 LinearGradient
 
@@ -133,7 +133,7 @@ RadialGradient(float centerX, float centerY, float radius,int colors[], float st
 - radius - 辐射半径
 - centerColor - 辐射中心的颜色
 - edgeColor - 辐射边缘的颜色
-- tileMode - 辐射范围之外的着色模式。
+- tileMode - 辐射范围之外的着色模式
 
 <img src="../pictures//52eb2279ly1fig6ewf1o5j206d066q4a.jpg"/>
 
@@ -151,8 +151,8 @@ RadialGradient(float centerX, float centerY, float radius,int colors[], float st
 
 BitmapShader(Bitmap bitmap, Shader.TileMode tileX, Shader.TileMode tileY)
 
-- bitmap - 用来做模板的 Bitmap 对象
-- tileX - 横向的 TileMode
+- bitmap - 用来做模板的 Bitmap 对象。
+- tileX - 横向的 TileMode。
 - tileY - 纵向的 TileMode。
 
 <img src="../pictures//52eb2279ly1fig6fragq2j20lc089djv.jpg"/>
@@ -163,9 +163,9 @@ BitmapShader(Bitmap bitmap, Shader.TileMode tileX, Shader.TileMode tileY)
 
 ComposeShader(Shader shaderA, Shader shaderB, PorterDuff.Mode mode)
 
-- shaderA 目标图像
-- shaderB 源图像
-- mode - 两个 Shader 的叠加模式，即 shaderA 和 shaderB 应该怎样共同绘制。默认类型是 PorterDuff.Mode 。
+- shaderA 目标图像。
+- shaderB 源图像。
+- mode - 两个 Shader 的叠加模式，即 shaderA 和 shaderB 应该怎样共同绘制。默认类型是 PorterDuff.Mode。
 
 ```java
 // 第一个 Shader：头像的 Bitmap
@@ -206,8 +206,8 @@ Paint.setColorFilter(ColorFilter filter)
 
 LightingColorFilter(int mul, int add)
 
-- mul - 和目标像素相乘
-- add - 用来和目标像素相加
+- mul - 和目标像素相乘。
+- add - 用来和目标像素相加。
 
 具体算法如下所示：
 
