@@ -82,10 +82,9 @@ public static final int MEASURED_SIZE_MASK = 0x00ffffff;
 
 public static final int MEASURED_STATE_TOO_SMALL = 0x01000000;
 
-
 public static int resolveSize(int size, int measureSpec) {
     // MEASURED_SIZE_MASK 用于获取 View 的实际大小。
-    return resolveSizeAndState(size, measureSpec, 0) & MEASURED_SIZE_MASK;
+    return resolveSizeAndState(size, measureSpec, 0) &  ;
 }
 
 public static int resolveSizeAndState(int size, int measureSpec, int childMeasuredState) {
@@ -114,7 +113,7 @@ public static int resolveSizeAndState(int size, int measureSpec, int childMeasur
         default:
             result = size;
     }
-    // 对 childMeasuredState 过滤掉 size，并标识具体的 state。
+    // 对 childMeasuredState 过滤掉 尺寸大小，并标识某个具体的 state。
     return result | (childMeasuredState & MEASURED_STATE_MASK);
 }
 ```
@@ -173,6 +172,7 @@ public class DemoLayout extends ViewGroup {
             int heightWidthSpec = 0;
 
             // 根据开发者的要求和 ViewGroup 的可用空间去决定子 View 的大小。
+
             switch (lp.width) {
                 case LayoutParams.WRAP_CONTENT:
                     // 尺寸上限为 MeasureSpec 中的 size，也就是 oddWidth
@@ -195,6 +195,9 @@ public class DemoLayout extends ViewGroup {
                     break;
             }
             chindView.measure(childWidthSpec,heightWidthSpec);
+            // 上面这些思路可用 measureChildWithMargins(chindView, widthMeasureSpec, usedWidth, heightMeasureSpec, usedHeight) 代替，
+            // 因为该方法对 padding、margin 进行了处理，注意的是需要使用 ViewGroup.MarginLayoutParams。
+
             // 调用上面这行代码后，可通过 chindView.getMeasuredHeight() 和 chindView.getMeasuredWidth() 去决定子 View 的实际尺寸和位置，
             // 并根据实际需求对子 View 的位置进行保存。
             // lp.setCoordinate(left,top,right,bottom);
@@ -216,7 +219,7 @@ public class DemoLayout extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         for (int i = 0; i < getChildCount(); i++) {
             View chindView = getChildAt(i);
-            // 提取测量的位置并进行自我布局
+            // 提取测量的位置并进行自我布局，也可以使用 Rect[] 进行保存。
             DemoLayout.LayoutParams st =
                     (DemoLayout.LayoutParams) chindView.getLayoutParams();
             chindView.layout(st.mLeft, st.mTop, st.mRight, st.mBottom);
