@@ -34,4 +34,4 @@
 
 - [触摸反馈](https://github.com/passin95/LearningNotes/blob/master/notes/触摸反馈.md)
 
-  触摸反馈流程以及触摸反馈算法的编写。
+  事件分发机制、触摸反馈流程以及触摸反馈算法的编写。
