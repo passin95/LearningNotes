@@ -3,29 +3,29 @@
 
 <!-- TOC -->
 
-- [Retrofit 源码解析](#retrofit-源码解析)
-    - [一、Retrofit 的基本使用](#一retrofit-的基本使用)
-    - [二、Retrofit 的构建](#二retrofit-的构建)
-        - [Retrofit 的成员变量](#retrofit-的成员变量)
-        - [Retrofit.Builder](#retrofitbuilder)
-    - [三、Retrofit.create()](#三retrofitcreate)
-        - [Retrofit.loadServiceMethod()](#retrofitloadservicemethod)
-    - [四、ServiceMethod 的构建](#四servicemethod-的构建)
-        - [ServiceMethod 的成员变量](#servicemethod-的成员变量)
-        - [ServiceMethod.Builder](#servicemethodbuilder)
-            - [createCallAdapter()](#createcalladapter)
-            - [createResponseConverter()](#createresponseconverter)
-            - [parseParameter()](#parseparameter)
-    - [五、CallAdapter](#五calladapter)
-        - [RxJava2CallAdapterFactory](#rxjava2calladapterfactory)
-    - [六、Converter](#六converter)
-        - [BuiltInConverters](#builtinconverters)
-    - [七、OkHttpCall](#七okhttpcall)
-        - [createRawCall()](#createrawcall)
-            - [serviceMethod.toCall()](#servicemethodtocall)
-        - [parseResponse()](#parseresponse)
-    - [八、serviceMethod.adapt(okHttpCall)](#八servicemethodadaptokhttpcall)
-        - [BodyObservable](#bodyobservable)
+- [Retrofit 源码解析](#retrofit-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+  - [一、Retrofit 的基本使用](#%E4%B8%80retrofit-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+  - [二、Retrofit 的构建](#%E4%BA%8Cretrofit-%E7%9A%84%E6%9E%84%E5%BB%BA)
+    - [Retrofit 的成员变量](#retrofit-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+    - [Retrofit.Builder](#retrofitbuilder)
+  - [三、Retrofit.create()](#%E4%B8%89retrofitcreate)
+    - [Retrofit.loadServiceMethod()](#retrofitloadservicemethod)
+  - [四、ServiceMethod 的构建](#%E5%9B%9Bservicemethod-%E7%9A%84%E6%9E%84%E5%BB%BA)
+    - [ServiceMethod 的成员变量](#servicemethod-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+    - [ServiceMethod.Builder](#servicemethodbuilder)
+      - [createCallAdapter()](#createcalladapter)
+      - [createResponseConverter()](#createresponseconverter)
+      - [parseParameter()](#parseparameter)
+  - [五、CallAdapter](#%E4%BA%94calladapter)
+    - [RxJava2CallAdapterFactory](#rxjava2calladapterfactory)
+  - [六、Converter](#%E5%85%ADconverter)
+    - [BuiltInConverters](#builtinconverters)
+  - [七、OkHttpCall](#%E4%B8%83okhttpcall)
+    - [createRawCall()](#createrawcall)
+      - [serviceMethod.toCall()](#servicemethodtocall)
+    - [parseResponse()](#parseresponse)
+  - [八、serviceMethod.adapt(okHttpCall)](#%E5%85%ABservicemethodadaptokhttpcall)
+    - [BodyObservable](#bodyobservable)
 
 <!-- /TOC -->
 
@@ -104,7 +104,7 @@ public Retrofit build() {
     
     callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
 
-    // 数据转换器工厂
+    // 数据转换器工厂。
     List<Converter.Factory> converterFactories =
         new ArrayList<>(1 + this.converterFactories.size());
         
@@ -162,15 +162,15 @@ public <T> T create(final Class<T> service) {
 该方法比较简单，使用了懒加载的思想，并对 ServiceMethod 进行了缓存。
 
 ```java
-// Retrofit 的全局变量
+// Retrofit 的全局变量。
 private final Map<Method, ServiceMethod<?, ?>> serviceMethodCache = new ConcurrentHashMap<>();
 
 ServiceMethod<?, ?> loadServiceMethod(Method method) {
 
   ServiceMethod<?, ?> result = serviceMethodCache.get(method);
-  // 如果 result 存在直接返回
+  // 如果 result 存在直接返回。
   if (result != null) return result;
-  // 对 serviceMethodCache 进行双重校验锁，防止多线程操作时可能重复构建
+  // 对 serviceMethodCache 进行双重校验锁，防止多线程操作时可能重复构建。
   synchronized (serviceMethodCache) {
     result = serviceMethodCache.get(method);
     if (result == null) {
@@ -200,16 +200,16 @@ final class ServiceMethod<R, T> {
   private final String httpMethod;
   // 网络请求的相对地址,与 baseUrl 进行拼接
   private final String relativeUrl;
-  // 余下的描述请到 https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md 进行深入了解
+  // 余下的描述请到 https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md 进行深入了解。
   private final Headers headers;
   private final MediaType contentType;
   private final boolean hasBody;
   private final boolean isFormEncoded;
   private final boolean isMultipart;
 
-  // ParameterHandler 是一个抽象类，定义了一个抽象方法，统一规范向 RequestBuilder 参数进行赋值
+  // ParameterHandler 是一个抽象类，定义了一个抽象方法，统一规范向 RequestBuilder 参数进行赋值。
   为不同注解对 RequestBuilder
-  // ParameterHandler[] 保存着方法所有参数中不同注解是向 RequestBuilder 赋值的方式
+  // ParameterHandler[] 保存着方法所有参数中不同注解是向 RequestBuilder 赋值的方式。
   private final ParameterHandler<?>[] parameterHandlers;
 
 }
