@@ -36,7 +36,7 @@
 
 - [自定义 View](https://github.com/passin95/LearningNotes/blob/master/notes/自定义%20View.md)
 
-  主要参考扔物线老师的自定义 View 系列。
+  主要参考 **Hencoder** 的 **自定义 View** 系列以及 **GcsSloop** 的 **自定义控件** 系列。
 
 - [性能相关](https://github.com/passin95/LearningNotes/blob/master/notes/性能相关.md)
 

@@ -1,20 +1,18 @@
 
 ## 说明
 
-自定义 View 的读书笔记内容主要以扔物线老师的 [HenCorder](https://hencoder.com/overview/) 自定义 View 系列为基础进行拓展，因此更直观、易懂的讲解请移步 [HenCorder](https://hencoder.com/overview/) 学习。
+自定义 View 的读书笔记内容主要参考 **扔物线** 的 [HenCorder](https://hencoder.com/overview/) 自定义 View 系列和 **Gcssloop** 的 [自定义控件](http://www.gcssloop.com/category/customview) 系列，因此更直观、易懂的讲解请移步 [HenCorder](https://hencoder.com/overview/) 或 [自定义控件](http://www.gcssloop.com/category/customview) 学习。
 
-
-<br>
 
 ### 自定义 View
 
 - [Paint](https://github.com/passin95/LearningNotes/blob/master/notes/Paint.md)
 
-  Paint Api 说明。
+  Paint API 说明。
 
 - [Canvas](https://github.com/passin95/LearningNotes/blob/master/notes/Canvas.md)
 
-  Canvas APi 部分基础说明、Path Api 说明。
+  Canvas APi 部分基础说明、Path API 说明。
 
 - [文字的绘制](https://github.com/passin95/LearningNotes/blob/master/notes/文字的绘制.md)
 
