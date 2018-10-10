@@ -7,7 +7,7 @@
 ## 程序计数器
 
 - 记录正在执行的虚拟机字节码指令的地址（如果正在执行的是本地方法则为空）。通过字节码解释器改变这个计数器的值来选择下一条需要执行的字节码指令。
-- 此内存区域在java的虚拟机规范当中是唯一一个没有规定OutOfMemoryError的区域。
+- 此内存区域在java的虚拟机规范当中是唯一一个没有规定 OutOfMemoryError 的区域。
 
 ## Java 虚拟机栈
 
@@ -15,12 +15,12 @@
 
 <div align="center"> <img src="../pictures//f5757d09-88e7-4bbd-8cfb-cecf55604854.png" width=""/> </div><br>
 
-###1. 局部变量表
+### 1. 局部变量表
 
 局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（refrence）类型和returnAddress类型（指向了一条字节码指令的地址）。
 系统不会为局部变量赋予初始值（实例变量和类变量都会被赋予初始值）。也就是说不存在类变量那样的准备阶段。
 
-###2. 操作数栈
+### 2. 操作数栈
 
 虚拟机把操作数栈作为它的工作区——大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。比如，iadd指令就要从操作数栈中弹出两个整数，执行加法运算，其结果又压回到操作数栈中，看看下面的示例，它演示了虚拟机是如何把两个int类型的局部变量相加，再把结果保存到第三个局部变量的：
 
@@ -64,7 +64,7 @@
 - From Survivor（幸存者）
 - To Survivor
 
-<div align="center"> <img src="../pictures//Java虚拟机内存分类.png" width=""/> </div><br>
+<div align="center"> <img src="../pictures//Java虚拟机内存分类.png"/> </div><br>
 
 Java 堆不需要连续内存，并且可以动态增加其内存，增加失败会抛出 OutOfMemoryError 异常。
 
@@ -78,7 +78,7 @@ Java 堆不需要连续内存，并且可以动态增加其内存，增加失败
 
 对这块区域进行垃圾回收的主要目标是对常量池的回收和对类的卸载，但是一般比较难实现。
 
-JDK 1.7 之前，HotSpot 虚拟机把它当成永久代来进行垃圾回收，JDK 1.8 之后，取消了永久代，用 metaspace（元数据）区替代。
+JDK 1.7 之前，HotSpot 虚拟机把它当成永久代来进行垃圾回收，JDK 1.8 之后，HotSpot 虚拟机改变了原有方法区的物理实现，将原本由 JVM 管理内存的方法区的内存移到了虚拟机以外的计算机本地内存，并将其称为元空间（Metaspace）。
 
 ## 运行时常量池
 
@@ -171,49 +171,6 @@ obj = null;  // 使对象只被软引用关联
 Object obj = new Object();
 WeakReference<Object> wf = new WeakReference<Object>(obj);
 obj = null;
-```
-
-WeakHashMap 的 Entry 继承自 WeakReference，主要用来实现缓存。
-
-```java
-private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V>
-```
-
-Tomcat 中的 ConcurrentCache 就使用了 WeakHashMap 来实现缓存功能。ConcurrentCache 采取的是分代缓存，经常使用的对象放入 eden 中，而不常用的对象放入 longterm。eden 使用 ConcurrentHashMap 实现，longterm 使用 WeakHashMap，保证了不常使用的对象容易被回收。
-
-```java
-public final class ConcurrentCache<K, V> {
-
-    private final int size;
-
-    private final Map<K, V> eden;
-
-    private final Map<K, V> longterm;
-
-    public ConcurrentCache(int size) {
-        this.size = size;
-        this.eden = new ConcurrentHashMap<>(size);
-        this.longterm = new WeakHashMap<>(size);
-    }
-
-    public V get(K k) {
-        V v = this.eden.get(k);
-        if (v == null) {
-            v = this.longterm.get(k);
-            if (v != null)
-                this.eden.put(k, v);
-        }
-        return v;
-    }
-
-    public void put(K k, V v) {
-        if (this.eden.size() >= size) {
-            this.longterm.putAll(this.eden);
-            this.eden.clear();
-        }
-        this.eden.put(k, v);
-    }
-}
 ```
 
 **（四）虚引用** 

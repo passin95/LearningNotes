@@ -18,7 +18,7 @@
         - [yield](#yield)
         - [线程 interrupt](#%E7%BA%BF%E7%A8%8B-interrupt)
             - [interrupt() 和 InterruptedException](#interrupt-%E5%92%8C-interruptedexception)
-            - [isInterrupted() 和 Thread.interrupted()](#isinterrupted-%E5%92%8C-threadinterrupted)
+            - [thread.isInterrupted() 和 Thread.interrupted()](#threadisinterrupted-%E5%92%8C-threadinterrupted)
         - [join](#join)
     - [ThreadLocal](#threadlocal)
 - [Java 内存模型](#java-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B)
@@ -66,7 +66,6 @@
 ## 线程的状态（生命周期）
 
 [<img src="../pictures//线程生命周期.png" />](https://www.cnblogs.com/huangzejun/p/7908898.html)
-<center> 点击图片跳转图片出处 </center>
  
 ###  新建（New）
 
@@ -78,12 +77,12 @@
 
 由于线程和进程的运行都听令于 CPU 的调度，在 CPU 没有通过轮询或其他方式从任务可执行队列选中该线程前，处于 Runnable 状态，选中之后处于 Running 状态。
 
-Running 状态的线程也是属于 Runnable 状态，反之不成立。
+Running 状态的线程也属于 Runnable 状态，反之不成立。
 
 ### 阻塞（Blocked）
 
-Blocked 状态一般为：
-- 调用了 sleep() 或 wait() 或在 run 方法中其它线程的.join() 方法。
+Blocked 状态一般在以下几种情况发生：
+- 调用了 Thread.sleep() 方法。
 - 为了获取某个锁资源，从而加入到该锁的阻塞队列时。
 - 正在进行某个阻塞的 IO 操作，例如网络数据的读写。
 
@@ -107,9 +106,9 @@ Blocked 状态一般为：
 private void init(ThreadGroup group, Runnable target, String name, long stackSize, AccessControlContext acc) {
     // 线程组 ThreadGroup 默认为 null
     // 线程名 name 默认为"Thread-" + 数字 (递增)，在进程销毁后重新数字从 0 重新开始。
-    // 一般情况下，stackSize 越大，方法可递归调用的深度越深，但和具体的软硬件有关，
-    // 一般通过-xms 设置栈大小，因此 stackSize 一般使用默认值 0。
-    // AccessControlContext 默认为 null
+    // 一般情况下，stackSize 越大，方法可递归调用的深度越深，
+    // 但由于实际情况和具体的软硬件有关，因此 stackSize 一般使用默认值 0。
+    // AccessControlContext 默认为 null。
 
     if (name == null) {
         throw new NullPointerException("name cannot be null");
@@ -119,22 +118,22 @@ private void init(ThreadGroup group, Runnable target, String name, long stackSiz
         Thread parent = currentThread(); 
         SecurityManager securityManager = System.getSecurityManager();
 
-        // 如果没有指定线程组
+        // 如果没有指定线程组。
         if (group == null) {
                 if (securityManager != null) {
                     group = securityManager.getThreadGroup();
                 }
 
-                // 默认使用父线程的线程组。
+                // 默认使用父线程所处的的线程组。
                 if (group == null) {
                     group = parent.getThreadGroup();
                 }
             }
 
-            // 省略部分代码
+            // 省略部分代码。
 
-            // 默认线程下，新线程的线程组和父线程是同一个
-            // 优先级和是否是守护线程和父线程一致。
+            // 默认线程下，新线程和父线程是同一个线程组，
+            // 优先级和是否为守护线程和父线程一致。
             this.group = group;
             this.daemon = parent.isDaemon();
             this.priority = parent.getPriority();
@@ -148,7 +147,7 @@ private void init(ThreadGroup group, Runnable target, String name, long stackSiz
 
 ## 守护线程
 
-守护线程是一种比较特殊的线程，一般用于处理一些后台的工作，比如垃圾回收（GC）线程。当 JVM 中没有一个非守护线程时，则 JVM 的进程会推出。
+守护线程是一种比较特殊的线程，一般用于处理一些后台的工作，比如垃圾回收（GC）线程。当 JVM 中没有一个非守护线程时，则 JVM 的进程会退出。
 
 调用 Thread.setDaemon() 方法便可设置线程类型，true 代表守护线程，false 代表正常线程。该方法只在线程启动之前有效。
 
@@ -158,7 +157,7 @@ private void init(ThreadGroup group, Runnable target, String name, long stackSiz
 
 Thread.sleep(millis) 会休眠当前线程一定的毫秒，该方法不会放弃 monitor 锁的所有权。
 
-该方法可能抛出 InterruptedException,因为异常不能跨线程传播回 main() 中，因此必须在本地进行处理。线程中抛出的其它异常也同样需要在本地进行处理。
+该方法可能抛出 InterruptedException,因为异常不能跨线程传递回 main() 中，因此必须在所处线程进行处理，同时线程中抛出的其它异常也同样需要在所处线程进行处理。
 
 #### TimeUnit 代替 sleep
 
@@ -188,7 +187,7 @@ Thread.yield() 会使当前线程从 Running 状态转换为 Runnable 状态。
 
 通过调用一个线程的 interrupt() 来中断该线程，如果该线程处于阻塞、限期等待或者无限期等待状态，那么就会抛出 InterruptedException，并从该该状态脱离继续向下执行代码。但是不能中断 I/O 阻塞和 synchronized 锁阻塞。
 
-除了上述情况之外，仅仅主动调用 interrupt() 并不会对实际线程的执行代码造成任何影响,它仅仅是将 interrupt 标识为已打断状态。也就是说，当外部调用 interrupt() 时，线程是否中断执行，取决于线程自身是否愿意结束（结合 isInterrupted() 使用），标识仅仅作为参考作用。
+除了上述情况之外，仅仅主动调用 interrupt() 并不会对实际线程的执行代码造成任何影响,它仅仅是将 interrupt 标识为已打断状态。也就是说，当外部调用 interrupt() 时，线程是否中断执行，取决于线程自身是否愿意结束（结合 thread.isInterrupted() 使用），interrupt 标识仅仅作为参考作用。
 
 ```java
 public class InterruptExample {
@@ -222,7 +221,7 @@ java.lang.InterruptedException: sleep interrupted
 	at me.passin.demo.InterruptExample$MyThread1.run(InterruptExample.java:24)
 ```
 
-值得注意的是线程执行的 run 方法中若捕捉了 InterruptedException 异常之后会擦除该线程的 interrupt 标识。
+值得注意的是线程执行的 run() 方法中若捕捉了 InterruptedException 异常之后会擦除该线程的 interrupt 标识。
 
 ```java
 public class InterruptExample {
@@ -255,11 +254,9 @@ Thread run
 Thread is interrupted ? false
 ```
 
-#### isInterrupted() 和 Thread.interrupted()
+#### thread.isInterrupted() 和 Thread.interrupted()
 
-这 2 个方法的返回值都用于当前线程是否被打断，不同在于，isInterrupted() 不会影响 interrupt 标识的改变，而 Thread.interrupted() 在调用结束后会擦除掉当前线程的 interrupt 标识（标识为未打断状态），即如果当前被打断了（调用了 interrupt() 方法）,第一次调用 Thread.interrupted() 会返回 true，然后 interrupt 标识会被擦除，第二次再调用 Thread.interrupted() 则会返回 false，除非该线程在两次调用 Thread.interrupted() 期间线程又一次被打断。
-
-isInterrupted() 和 interrupt() 结合使用
+这 2 个方法的返回值都用于当前线程是否被打断，不同在于，thread.isInterrupted() 不会影响 interrupt 标识的改变，而 Thread.interrupted() 在调用结束后会擦除掉当前线程的 interrupt 标识（标识为未打断状态），即第一次调用 Thread.interrupted() 会返回 true，然后 interrupt 标识会被擦除，第二次再调用 Thread.interrupted() 则会返回 false，除非该线程在两次调用 Thread.interrupted() 期间线程又处于可被打断的状态。
 
 ```java
 public class InterruptExample {
@@ -350,7 +347,7 @@ A
 
 ThreadLocal 为每一个使用该变量的线程都提供了独立的副本，做到了线程间的数据隔离。
 
-ThreadLocal 的原理类似于 Map，只不过在创建 key 的时候每一个 Thead 都有存下了自己的 ThreadLocal，并以该 ThreadLocal 作为 key，简单点说就是 ThreadLocal 对 key 进行了包装，它能够根据当前线程作为 key 值的支点，去设置相应的 Value。
+ThreadLocal 的原理类似于 Map，只不过在创建 key 的时候每一个 Thead 都有存下了以自己作为实例化参数的 ThreadLocal，并以该 ThreadLocal 作为 key，简单点说就是 ThreadLocal 对 Key 进行了包装，它能够根据当前线程作为 Key 值的支点，去设置相应的 Value。
 
 # Java 内存模型
 
@@ -358,7 +355,7 @@ ThreadLocal 的原理类似于 Map，只不过在创建 key 的时候每一个 T
 
 ## CPU Cache 模型
 
-在当下计算机硬件设备中，由于 CPU 的处理速度比内存读写速度快几个数量级，为了解决这种导致 CPU 资源受限，在它们之间加入了高速缓存的设计。
+在当下计算机硬件设备中，由于 CPU 的处理速度比内存读写速度快几个数量级，为了解决这种导致 CPU 资源受限的问题，因此在它们之间加入了高速缓存的设计。
 
 程序在运行的过程中，会将运算所需要的数据从主内存复制一份到 CPU Cache 中，使 CPU 在计算时能直接对 CPU Cache 中的数据进行读取和写入，当运算结束后某个时候，再将 CPU Cache 中的最新数据刷新到主内存中,从而极大提高了 CPU 的吞吐能力。
 
@@ -373,7 +370,7 @@ Java 内存模型指定了 Java 虚拟机在计算机的软硬件上的工作方
 - 共享变量储存于主内存中，每个线程皆可访问。
 - 每个线程都有自己私有的工作内存，也称为线程本地内存。
 - 工作内存只储存该线程对共享变量的副本（非引用）。
-- 线程不能直接操作主内存，只有先操作了工作内存后（操作也可以是选择不使用或 CPU Cache 失效）才能写入主内存。
+- 线程不能直接操作主内存，只有先操作了工作内存后（包含了选择不使用或 CPU Cache 失效）才能写入主内存。
 - 本地内存和 Java 内存模型一样也是一个抽象的概念，它覆盖了 CPU 缓存、寄存器、编译器优化以及实际硬件等。
 
 在计算机物理内存不会存在栈内存和堆内存的划分，它们都对应到物理的主内存，也有一部分堆栈内存的数据存储在 CPU Cache 或寄存器中。
@@ -392,16 +389,14 @@ synchronized 关键字提供了一种锁的机制，它设计的初衷是锁方�
 
 ## volatile
 
-volatile 的原理和实现机制：
-
-volatile 实际尚使用机器指令 **lock** ，**lock**相当于一个内存屏障，它会为内存的执行提供以下几个保障：
+volatile 的本质是使用机器指令 **lock** ，**lock**相当于一个内存屏障，它会为内存的执行提供以下几个保障：
 
 - 确保指令重排序时不会将后面的代码排到内存屏障之前。
 - 确保指令重排序时不会将前面的代码排到内存屏障之后。
 - 确保执行到内存屏障修饰的指令时，前面的代码全部执行完成。
-- 强制将线程工作内存（CPU Cache）中的值刷新到主内存中。
-- 如果是写操作，会使其他线程的工作内存的 volatile 修饰的数据失效。
-- 如果是读操作，线程会先查看本地工作内存（CPU Cache）的数据是否失效，如果未失效，直接使用；如果已失效，则到主内存中重新读取。
+- 强制将线程本地工作内存中的值刷新到主内存中。
+- 如果是写操作，会标记其他线程的本地工作内存的 volatile 修饰的数据失效。
+- 如果是读操作，线程会先查看本地工作内存的数据是否失效，如果未失效，直接使用；如果已失效，则到主内存中重新读取。
 
 从 volatile 的原理简单总结 volatile 的作用和注意事项：
 
@@ -644,19 +639,19 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 ### SingleThreadExecutor
 
 ```java
-    public static ExecutorService newSingleThreadExecutor() {
-        return new FinalizableDelegatedExecutorService
-            (new ThreadPoolExecutor(1, 1,
-                                    0L, TimeUnit.MILLISECONDS,
-                                    new LinkedBlockingQueue<Runnable>()));
-    }
+public static ExecutorService newSingleThreadExecutor() {
+    return new FinalizableDelegatedExecutorService
+        (new ThreadPoolExecutor(1, 1,
+                                0L, TimeUnit.MILLISECONDS,
+                                new LinkedBlockingQueue<Runnable>()));
+}
 ```
 
 创建一个固定数量为 1 的线程池。并用代理对象 FinalizableDelegatedExecutorService 对 ThreadPoolExecutor 进行了一层包装，只暴露部分 ThreadPoolExecutor 类中需要的方法，且该代理类重写了 finalize() 方法，待 GC 机制想回收该线程池时，调用线程池的 shutdown() 方法。
 
 ### 不推荐直接使用 Executors
 
-不推荐使用 Executors 去创建线程池，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
+不推荐使用 Executors 去创建线程池，而是通过实例化 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
 说明：Executors 返回的线程池对象的弊端如下：
 
 1. FixedThreadPool 和 SingleThreadPool:允许的请求队列长度为 Integer.MAX_VALUE，可能会堆积大量的请求，从而导致 OOM。

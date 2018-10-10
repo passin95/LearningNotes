@@ -219,7 +219,7 @@ final class ServiceMethod<R, T> {
 
 ```java
 public ServiceMethod build() {
-  // 根据网络请求接口返回类型和方法注解（不一定用到，例如 RxjavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器。
+  // 根据网络请求接口返回类型和方法注解（不一定用到，例如 RxJavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器。
   callAdapter = createCallAdapter();
   // responseType 为最终我们想要的结果，例如使用的 RxJava2CallAdapterFactory。
   // 假设接口方法返回值为 Observable<User>,则 responseType 为 User。
@@ -229,7 +229,7 @@ public ServiceMethod build() {
         + Utils.getRawType(responseType).getName()
         + "' is not a valid response body type. Did you mean ResponseBody?");
   }
-  // 根据 responseType 和方法上注解，从 Retrofit 对象中获取可用的数据转换器 。
+  // 根据 responseType 和方法上注解，从 Retrofit 对象中获取可用的数据转换器。
   responseConverter = createResponseConverter();
 
   // 解析网络请求接口方法的注解和注解值,获取该次请求的 httpMethod、hasBody、contentType 等数据。
@@ -242,7 +242,7 @@ public ServiceMethod build() {
     throw methodError("HTTP method annotation is required (e.g., @GET, @POST, etc.).");
   }
 
-  // 规范检查 不含有请求体时，不应该为@Multipart 注解或@FormEncoded 注解。
+  // 规范检查，不含有请求体时，不应该为 @Multipart 注解或 @FormEncoded 注解。
   if (!hasBody) {
     if (isMultipart) {
       throw methodError(
@@ -474,7 +474,6 @@ private ParameterHandler<?> parseParameterAnnotation(
         gotField = true;
         
         return new ParameterHandler.FieldMap<>(valueConverter, ((FieldMap) annotation).encoded());
-
       }
 }
 ```

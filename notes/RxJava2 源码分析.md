@@ -19,11 +19,11 @@
             - [observeOn](#observeon)
             - [小结](#%E5%B0%8F%E7%BB%93)
     - [终看 RxJava](#%E7%BB%88%E7%9C%8B-rxjava)
-        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C%EF%BC%9F)
-        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB%EF%BC%9F)
-        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84%EF%BC%9F)
-        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88%EF%BC%9F)
-        - [defer 到底有何作用？](#defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8%EF%BC%9F)
+        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C)
+        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB)
+        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84)
+        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88)
+        - [defer 到底有何作用？](#defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8)
         - [Demo 执行过程梳理](#demo-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E6%A2%B3%E7%90%86)
 
 <!-- /TOC -->
@@ -720,7 +720,7 @@ static final class DoFinallyObserver<T> extends AtomicInteger implements SingleO
     
     @Override
     public void onSuccess(T t) {
-        // downstream 为 ObserveOnSingleObserver
+        // downstream 为 ObserveOnSingleObserver。
         downstream.onSuccess(t);
         runFinally();
 
@@ -729,8 +729,8 @@ static final class DoFinallyObserver<T> extends AtomicInteger implements SingleO
         Disposable d = scheduler.scheduleDirect(this);
         DisposableHelper.replace(this, d);
                 
-        // 也就是说对于此时的DoFinallyObserver.onSuccess()，
-        // 他所做的事情仅仅是在调度新的线程去异步执行ObserveOnSingleObserver.run()，也就是异步执行观察者链的向下回调。
+        // 也就是说对于此时的 DoFinallyObserver.onSuccess()，
+        // 他所做的事情仅仅是在调度新的线程去异步执行 ObserveOnSingleObserver.run()，也就是异步执行观察者链的向下回调。
         // 从而直接执行到了runFinally()
         runFinally();
     }
@@ -874,7 +874,8 @@ Observable<List<User>> observable = retrofit.create(UserService.class).getUserLi
                         // 9. 该接口实现在 SingleFlatMapCallback.onSuccess() 中执行，且所处线程为 io 线程。
                         // 此处相当于丢弃了数据 integer 构建一个新的观察者链。
 
-                        // 11. Single.just(1) 被订阅后，在 subscribeActual() 中执行 observer.onXXX() 方法,// 所处线程为 newThread 线程。
+                        // 11. Single.just(1) 被订阅后，在 subscribeActual() 中执行 observer.onXXX() 方法,
+                        // 所处线程为 newThread 线程。
                         return Single.just("1")
                                 // 10. 当 return 的 SingleSource<String> 被订阅后，切换 newThread 线程。
                                 .subscribeOn(Schedulers.newThread())
@@ -907,7 +908,7 @@ Observable<List<User>> observable = retrofit.create(UserService.class).getUserLi
                     public void run() throws Exception {
                         // 15. doFinally，注意：所处线程为 Single 线程！因为该代码块是在 第 12 步骤切换到 single 线程执行的。
                         // 或者说 DoAfterTerminateObserver.onSuccess() 是在 single 线程执行的。
-                        // 注意：该调用链之下涉及到 observeOn() 方法，则 doFinally()会提前于最外层的Observer的onSuccess()执行
+                        // 注意：该调用链之下涉及到 observeOn() 方法，则 doFinally() 会提前于最外层的 Observer 的 onSuccess() 执行。
                         Log.i("rxjava", "doFinally - 1");
                     }
                 })
@@ -936,13 +937,13 @@ Observable<List<User>> observable = retrofit.create(UserService.class).getUserLi
 
                     @Override
                     public void onSuccess(Float aFloat) {
-                        // 18. onSuccess,所处线程为主线程
+                        // 18. onSuccess,所处线程为主线程。
                         Log.i("rxjava", "onSuccess");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        // 18. onError,所处线程为主线程
+                        // 18. onError,所处线程为主线程。
                         Log.i("rxjava", "onError");
                     }
                 });

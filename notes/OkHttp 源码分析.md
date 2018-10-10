@@ -5,19 +5,19 @@
 
 - [OkHttp 源码解析](#okhttp-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
   - [说明](#%E8%AF%B4%E6%98%8E)
-  - [一、OkHttp 的基本使用](#%E4%B8%80%E3%80%81okhttp-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
-  - [二、Request 和 Response](#%E4%BA%8C%E3%80%81request-%E5%92%8C-response)
+  - [一、OkHttp 的基本使用](#%E4%B8%80okhttp-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+  - [二、Request 和 Response](#%E4%BA%8Crequest-%E5%92%8C-response)
     - [Request](#request)
     - [Response](#response)
-  - [三、OkHttpClient](#%E4%B8%89%E3%80%81okhttpclient)
+  - [三、OkHttpClient](#%E4%B8%89okhttpclient)
     - [OkHttpClient 的成员变量](#okhttpclient-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
     - [OkHttpClient 对 Call.Factory 的实现](#okhttpclient-%E5%AF%B9-callfactory-%E7%9A%84%E5%AE%9E%E7%8E%B0)
-  - [四、RealCall](#%E5%9B%9B%E3%80%81realcall)
+  - [四、RealCall](#%E5%9B%9Brealcall)
     - [Dispatcher](#dispatcher)
     - [execute()](#execute)
     - [enqueue()](#enqueue)
     - [getResponseWithInterceptorChain()](#getresponsewithinterceptorchain)
-  - [五、Interceptor](#%E4%BA%94%E3%80%81interceptor)
+  - [五、Interceptor](#%E4%BA%94interceptor)
     - [RetryAndFollowUpInterceptor](#retryandfollowupinterceptor)
     - [BridgeInterceptor](#bridgeinterceptor)
     - [CacheInterceptor](#cacheinterceptor)
@@ -61,7 +61,7 @@ client.newCall(request).enqueue(new Callback() {
 
 ### Request
 
-Request 类比较简单，主要是对构建 Http 请求报文的变量进行赋值。
+Request 类比较简单，主要是对构建 Http 请求报文所需要的数据。
 
 ```java
 public final class Request {
@@ -307,7 +307,7 @@ execute() 和 enqueue() 的核心方法都在 getResponseWithInterceptorChain() 
   try {
     // dispatcher 为网络请求调度器。
     client.dispatcher().executed(this);
-    //进行网络请求并得到响应结果。
+    // 进行网络请求并得到响应结果。
     Response result = getResponseWithInterceptorChain();
     if (result == null) throw new IOException("Canceled");
     return result;
@@ -401,9 +401,13 @@ final class RealCall{
 
 ## 五、Interceptor
 
-Interceptor 也叫拦截器，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求和问题进行拆分。
-Interceptor.Chain 的原理类似于 android 的触摸事件分发机制，即先执行的拦截器，会拿到最后的 response。在每一个拦截器 Interceptor 的 intercept() 方法中，会调用
-chain.proceed() 方法中把它自己组装完的 Request 发给下一个拦截器，直至最后一个拦截器的 intercept() 方法 return 得到 response（除了最后一个拦截器外，调用完 chain.proceed() 得到的 response 并不一定马上返回，可能进行后续操作），再 return 返回给上一个拦截器，上一个拦截器得到 response 后继续向下执行至 return，返回该拦截器最终的 response，继续依次先上一个拦截器执行直至得到最终 response。同时，如果在特定条件下不想将 Request 向下传递，只需要在特定条件下构建一个新的 response 并在调用 chain.proceed()return 掉。
+Interceptor 也叫拦截器，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求和问题进行拆分处理。
+
+Interceptor.Chain 的原理类似于 Android 的触摸事件分发机制，即在拦截器不拦截的情况下，先执行的拦截器，会拿到最后的 response。
+
+在每一个拦截器 Interceptor 的 intercept() 方法中，会调用 chain.proceed() 方法中把它自己组装完的 Request 发给下一个拦截器，直至最后一个拦截器的 intercept() 方法 return 得到 response（除了最后一个拦截器外，调用完 chain.proceed() 得到的 response 并不一定马上返回，可能进行后续操作），上一个拦截器得到 response 后继续向下执行至 return，并一直反复递归至返回得到最终的 response。
+
+同时，如果在特定条件下不想将 Request 向下传递，只需要在特定条件下构建一个新的 response 并在调用 chain.proceed() 后 return 掉（拦截掉）。
 
 ### RetryAndFollowUpInterceptor
 
@@ -425,7 +429,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor {
     Response priorResponse = null;
     // 反复重试直到满足特定条件 return 结束循环。
     while (true) {
-      // 取消请求后，释放资源 抛出异常给调用方处理。
+      // 取消请求后，释放资源，抛出异常给调用方处理。
       if (canceled) {
         streamAllocation.release();
         throw new IOException("Canceled");
@@ -433,6 +437,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor {
 
       Response response;
       // 是否释放连接,用于判断在 finally 是否释放资源。
+      // 当遇到无法处理的异常时，释放所有资源。
       boolean releaseConnection = true;
       try {
         // 获取响应结果（可能会多次获取，因为可能存在多次重试）。
@@ -460,7 +465,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor {
       }
 
       // priorResponse 是重定向前的 response。
-      // 即 response 为重定向后请求后得到的 response 就不再需要原请求的 ResponseBody。
+      // 即 response 为重定向后请求后得到的 response 则不再需要原请求的 ResponseBody。
       if (priorResponse != null) {
         response = response.newBuilder()
             .priorResponse(priorResponse.newBuilder()
@@ -626,7 +631,6 @@ public final class BridgeInterceptor implements Interceptor {
 ```
 
 ### CacheInterceptor
-
 
 ```java
 public final class CacheInterceptor implements Interceptor {
