@@ -440,7 +440,7 @@ private ParameterHandler<?> parseParameterAnnotation(
        // p 为方法第 p 个参数；type 为变量类型；annotations 为该参数上所有注解; annotation 为 annotations[p]。
        // 这里假定 type 为一个 Map<String,String>。
        if (annotation instanceof FieldMap) {
-         // 没有添加@FormEncoded 抛异常。
+         // 没有添加 @FormEncoded 抛异常。
         if (!isFormEncoded) {
           throw parameterError(p, "@FieldMap parameters can only be used with form encoding.");
         }

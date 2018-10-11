@@ -42,6 +42,14 @@
 
   布局、内存、APK 瘦身、电量、性能检测工具。
 
+- [Hybrid 开发](https://github.com/passin95/LearningNotes/blob/master/notes/Hybrid%20开发.md)
+
+  WebView、JavaScript交互、JSBridge、Hybrid 开发。
+
+- [IO](https://github.com/passin95/LearningNotes/blob/master/notes/IO.md)
+
+  Java IO、Okio。
+
 ### :cloud: 网络 
 
 - [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
