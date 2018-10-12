@@ -434,7 +434,7 @@ volatile 的本质是使用机器指令 **lock** ，**lock**相当于一个内�
 
 ### 简单的死锁 Demo
 
-多线程操作时，交叉锁可能导致死锁的 Demo
+多线程操作时，交叉锁可能导致死锁的 Demo。
 
 ```java
 private final Object MONITOR_READ = new Object();

@@ -44,7 +44,7 @@
 
 - [Hybrid 开发](https://github.com/passin95/LearningNotes/blob/master/notes/Hybrid%20开发.md)
 
-  WebView、JavaScript交互、JSBridge、Hybrid 开发。
+  WebView、Android 和 JavaScript 的交互、WebView 存在的漏洞处理方式。
 
 - [IO](https://github.com/passin95/LearningNotes/blob/master/notes/IO.md)
 
@@ -64,7 +64,7 @@
 
 - [面向对象](https://github.com/passin95/LearningNotes/blob/master/notes/面向对象.md)
 
-  三大特性（封装、继承、多态）和五大原则（单一职责原则、开放封闭原则、里氏替换原则、依赖倒置原则、接口分离原则）。
+  三大特性（封装、继承、多态）和设计模式之六大原则。
 
 ### :pencil2: 算法 
 
@@ -87,6 +87,8 @@
 - [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
 
   Git 常用命令和本质分析。
+
+- [Gradle]()  
 
 ### :bulb: 编码规范 
 
@@ -114,7 +116,7 @@
 
 #### Logo
 
-Logo 通过 [logomakr](https://logomakr.com/) 进行设计.
+Logo 通过 [logomakr](https://logomakr.com/) 进行设计。
 
 #### License
 
