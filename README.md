@@ -42,7 +42,7 @@
 
   布局、内存、APK 瘦身、电量、性能检测工具。
 
-- [Hybrid 开发](https://github.com/passin95/LearningNotes/blob/master/notes/Hybrid%20开发.md)
+- [Hybrid 开发](https://github.com/passin95/LearningNotes/blob/master/notes/hybrid%20开发.md)
 
   WebView、Android 和 JavaScript 的交互、WebView 存在的漏洞处理方式。
 

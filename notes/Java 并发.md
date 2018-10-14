@@ -383,9 +383,9 @@ Java 内存模型指定了 Java 虚拟机在计算机的软硬件上的工作方
 
 synchronized 关键字提供了一种锁的机制，它设计的初衷是锁方法中的资源，而不是某个方法或代码块。从本质上说主要提供了 2 种作用：
 
-1.确保共享变量的线程间互斥访问，原理是对于从一个 Monitor 所监视的所有代码块，只能有一个线程可以访问（拿到 Monitor 的 lock），使得在这些代码块中每次只能有一个线程对变量进行读写。
+1. 确保共享变量的线程间互斥访问，原理是对于从一个 Monitor 所监视的所有代码块，只能有一个线程可以访问（拿到 Monitor 的 lock），使得在这些代码块中每次只能有一个线程对变量进行读写。
 
-2.synchronized 包括两个 monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到 monitor enter 成功之前都 **必须从主内存中获取数据**，而不是从缓存（CPU Cache）中取数据，在 monitor exit 运行成功之后，会将更新后的值刷入主内存中。
+2. synchronized 包括两个 monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到 monitor enter 成功之前都 **必须从主内存中获取数据**，而不是从缓存（CPU Cache）中取数据，在 monitor exit 执行之后，会将更新后的值刷入主内存中。
 
 ## volatile
 

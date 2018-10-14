@@ -7,7 +7,7 @@
 ## 程序计数器
 
 - 记录正在执行的虚拟机字节码指令的地址（如果正在执行的是本地方法则为空）。通过字节码解释器改变这个计数器的值来选择下一条需要执行的字节码指令。
-- 此内存区域在java的虚拟机规范当中是唯一一个没有规定 OutOfMemoryError 的区域。
+- 此内存区域在 Java 虚拟机规范当中是唯一一个没有规定 OutOfMemoryError 的区域。
 
 ## Java 虚拟机栈
 
@@ -127,7 +127,7 @@ public class ReferenceCountingGC {
 
 Java 虚拟机使用该算法来判断对象是否可被回收，在 Java 中 GC Roots 一般包含以下内容：
 
-- 虚拟机栈中引用的对象
+- Java 虚拟机栈中引用的对象
 - 本地方法栈中引用的对象
 - 方法区中类静态属性引用的对象
 - 方法区中的常量引用的对象
@@ -230,7 +230,7 @@ obj = null;
 
 主要不足是只使用了内存的一半。
 
-现在的商业虚拟机都采用这种收集算法来回收新生代，但是并不是将内存划分为大小相等的两块，而是分为一块较大的 Eden 空间和两块较小的 Survior 空间，每次使用 Eden 空间和其中一块 Survivor。在回收时，将 Eden 和 Survivor 中还存活着的对象一次性复制到另一块 Survivor 空间上，最后清理 Eden 和使用过的那一块 Survivor。HotSpot 虚拟机的 Eden 和 Survivor 的大小比例默认为 8:1，保证了内存的利用率达到 90 %。如果每次回收有多于 10% 的对象存活，那么一块 Survivor 空间就不够用了，此时需要依赖于老年代进行分配担保，也就是借用老年代的空间存储放不下的对象。
+现在的商业虚拟机都采用这种收集算法来回收新生代，但是并不是将内存划分为大小相等的两块，而是分为一块较大的 Eden 空间和两块较小的 Survivor 空间，每次使用 Eden 空间和其中一块 Survivor。在回收时，将 Eden 和 Survivor 中还存活着的对象一次性复制到另一块 Survivor 空间上，最后清理 Eden 和使用过的那一块 Survivor。HotSpot 虚拟机的 Eden 和 Survivor 的大小比例默认为 8:1，保证了内存的利用率达到 90 %。如果每次回收有多于 10% 的对象存活，那么一块 Survivor 空间就不够用了，此时需要依赖于老年代进行分配担保，也就是借用老年代的空间存储放不下的对象。
 
 ### 4. 分代收集
 
@@ -545,55 +545,6 @@ public abstract class ClassLoader {
 
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         throw new ClassNotFoundException(name);
-    }
-}
-```
-
-### 4. 自定义类加载器实现
-
-FileSystemClassLoader 是自定义类加载器，继承自 java.lang.ClassLoader，用于加载文件系统上的类。它首先根据类的全名在文件系统上查找类的字节代码文件（.class 文件），然后读取该文件内容，最后通过 defineClass() 方法来把这些字节代码转换成 java.lang.Class 类的实例。
-
-java.lang.ClassLoader 类的方法 loadClass() 实现了双亲委派模型的逻辑，因此自定义类加载器一般不去重写它，而是通过重写 findClass() 方法。
-
-```java
-public class FileSystemClassLoader extends ClassLoader {
-
-    private String rootDir;
-
-    public FileSystemClassLoader(String rootDir) {
-        this.rootDir = rootDir;
-    }
-
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        byte[] classData = getClassData(name);
-        if (classData == null) {
-            throw new ClassNotFoundException();
-        } else {
-            return defineClass(name, classData, 0, classData.length);
-        }
-    }
-
-    private byte[] getClassData(String className) {
-        String path = classNameToPath(className);
-        try {
-            InputStream ins = new FileInputStream(path);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int bufferSize = 4096;
-            byte[] buffer = new byte[bufferSize];
-            int bytesNumRead;
-            while ((bytesNumRead = ins.read(buffer)) != -1) {
-                baos.write(buffer, 0, bytesNumRead);
-            }
-            return baos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String classNameToPath(String className) {
-        return rootDir + File.separatorChar
-                + className.replace('.', File.separatorChar) + ".class";
     }
 }
 ```

@@ -1,27 +1,24 @@
 
-<!-- TOC -->
-
-    - [WebView](#webview)
-        - [WebView API](#webview-api)
-            - [加载](#加载)
-            - [状态](#状态)
-            - [操作](#操作)
-            - [清理](#清理)
-        - [WebSettings](#websettings)
-            - [缓存设置](#缓存设置)
-        - [WebViewClient](#webviewclient)
-        - [WebChromeClient](#webchromeclient)
-    - [Android 和 Js 的交互](#android-和-js-的交互)
-        - [Android 调用 Js](#android-调用-js)
-            - [WebView.loadUrl()](#webviewloadurl)
-            - [WebView.evaluateJavascript()](#webviewevaluatejavascript)
-        - [Js 调用 Android](#js-调用-android)
-            - [WebView.addJavascriptInterface() 及漏洞处理](#webviewaddjavascriptinterface-及漏洞处理)
-            - [WebViewClient 的 shouldOverrideUrlLoading()](#webviewclient-的-shouldoverrideurlloading)
-            - [WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()](#webchromeclient-的-onjsalertonjsconfirmonjsprompt)
-        - [VasSonic](#vassonic)
+- [WebView](#webview)
+    - [WebView API](#webview-api)
+        - [加载](#加载)
+        - [状态](#状态)
+        - [操作](#操作)
+        - [清理](#清理)
+    - [WebSettings](#websettings)
+        - [缓存设置](#缓存设置)
+    - [WebViewClient](#webviewclient)
+    - [WebChromeClient](#webchromeclient)
+- [Android 和 Js 的交互](#android-和-js-的交互)
+    - [Android 调用 Js](#android-调用-js)
+        - [WebView.loadUrl()](#webviewloadurl)
+        - [WebView.evaluateJavascript()](#webviewevaluatejavascript)
+    - [Js 调用 Android](#js-调用-android)
+        - [WebView.addJavascriptInterface() 及漏洞处理](#webviewaddjavascriptinterface-及漏洞处理)
+        - [WebViewClient 的 shouldOverrideUrlLoading()](#webviewclient-的-shouldoverrideurlloading)
+        - [WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()](#webchromeclient-的-onjsalertonjsconfirmonjsprompt)
+    - [VasSonic](#vassonic)
 - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
-
 
 ## WebView
 
@@ -29,12 +26,12 @@ WebView 是一个用来显示 Web 网页的控件，包含一个浏览器该有�
 
 在 Android 4.4 之前使用 WebKit 作为渲染内核，4.4 之后采用 chrome 内核。
 
+
 ### WebView API
 
 #### 加载
 
 ```java
-
 // 加载网页 url，也可以执行 js 函数。
 webView.loadUrl("http://www.jianshu.com/u/fa272f63280a");
 // 加载 apk 包中的 html 页面。
@@ -90,7 +87,6 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
     }
     return super.onKeyDown(keyCode, event);
 }
-
 ```
 
 #### 清理
@@ -143,6 +139,7 @@ webSettings.setDisplayZoomControls(false);
 ```
 
 #### 缓存设置
+
 ```java
 // 设置缓存方式。
 // LOAD_CACHE_ONLY: 不使用网络，只读取本地缓存数据。
@@ -407,7 +404,7 @@ public class AndroidtoJs extends Object {
 
 该方式使用简单，仅将 Android 对象和 JS 对象映射即可，但在 Android 4.2 及以下存在漏洞。
 漏洞产生原因：当 Js 拿到 Android 这个对象后，就可以调用这个 Android 对象中所有的方法，包括系统类（java.lang.Runtime 类），从而进行任意代码执行。
-推荐使用 [SafeWebView]{https://github.com/seven456/SafeWebView/tree/0f11155d38b765c3d832c4dab733f771610c73a3} 解决了 Android WebView 中 Js 注入漏洞问题，另外还包含了一些异常处理。除此之外还需注意（Android 4.0 以上）：
+推荐使用 [SafeWebView](https://github.com/seven456/SafeWebView/tree/0f11155d38b765c3d832c4dab733f771610c73a3) 解决了 Android WebView 中 Js 注入漏洞问题，另外还包含了一些异常处理。除此之外还需注意（Android 4.0 以上）：
 
 - 设置 webView.setSavePassword(false)，否则密码会被明文保到 /data/data/com.package.name/databases/webview.db 中。
 
@@ -535,7 +532,7 @@ public boolean onJsPrompt(WebView view, String url, String message, String defau
 
 ### VasSonic
 
-[VasSonic]{https://github.com/Tencent/VasSonic} 是腾讯出品的一个轻量级的高性能的Hybrid框架，专注于提升页面首屏加载速度，完美支持静态直出页面和动态直出页面，兼容离线包等方案。
+[VasSonic](https://github.com/Tencent/VasSonic) 是腾讯开源的一个轻量级的高性能的Hybrid框架，专注于提升页面首屏加载速度，完美支持静态直出页面和动态直出页面，兼容离线包等方案。
 
 具体使用参考 [WiKi](https://github.com/Tencent/VasSonic/blob/master/sonic-android/README.md)。
 

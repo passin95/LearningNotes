@@ -87,7 +87,7 @@ public Retrofit build() {
     }
 
     okhttp3.Call.Factory callFactory = this.callFactory;
-    // 默认使用 okhttp 提供的 OkHttpClient。
+    // 默认使用 OkHttp 提供的 OkHttpClient。
     if (callFactory == null) {
       callFactory = new OkHttpClient();
     }
@@ -99,7 +99,7 @@ public Retrofit build() {
     }
 
    
-    // 网络请求适配器工厂集合存储顺序：自定义 1 适配器工厂、自定义 2 适配器工厂...android 环境下默认适配器工厂（ExecutorCallAdapterFactory）
+    // 网络请求适配器工厂集合存储顺序：自定义 1 适配器工厂、自定义 2 适配器工厂...Android 环境下默认适配器工厂（ExecutorCallAdapterFactory）
     List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>(this.callAdapterFactories);
     
     callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));
@@ -108,7 +108,7 @@ public Retrofit build() {
     List<Converter.Factory> converterFactories =
         new ArrayList<>(1 + this.converterFactories.size());
         
-    // 数据转换器工厂集合存储的是：默认数据转换器工厂（ BuiltInConverters）、自定义 1 数据转换器工厂（GsonConverterFactory）、自定义 2 数据转换器工厂....
+    // 数据转换器工厂集合存储的是：默认数据转换器工厂（BuiltInConverters）、自定义 1 数据转换器工厂（GsonConverterFactory）、自定义 2 数据转换器工厂....
     converterFactories.add(new BuiltInConverters());
     converterFactories.addAll(this.converterFactories);
 
@@ -145,7 +145,7 @@ public <T> T create(final Class<T> service) {
             if (platform.isDefaultMethod(method)) {
               return platform.invokeDefaultMethod(method, service, proxy, args);
             }
-            // 通过解析网络请求接口方法的参数、返回值和注解类型获取网络请求所需的数据。
+            // 通过解析网络请求接口方法的参数、返回值和注解类型获取网络请求所需的数据、网络请求适配器工厂、数据转换器工厂。
             ServiceMethod<Object, Object> serviceMethod =
                 (ServiceMethod<Object, Object>) loadServiceMethod(method);
             // 提供 OkHttp 进行网络请求所需的数据并将 Retrofit 和 OkHttp 连接到一起。
@@ -254,7 +254,7 @@ public ServiceMethod build() {
     }
   }
 
-  // 获取该方法的参数数量。
+  // 获取该方法的所有有注解的参数数量。
   int parameterCount = parameterAnnotationsArray.length;
   parameterHandlers = new ParameterHandler<?>[parameterCount];
   for (int p = 0; p < parameterCount; p++) {
@@ -900,7 +900,7 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
   }
 ```
 
-这里直接以 RxJava2CallAdapter 看一下如何将 Call<R> 转换为 RxJava 的形式。
+这里直接以 RxJava2CallAdapter 为例看一下如何将 Call<R> 转换为 RxJava 的形式。
 
 ```java
 final class RxJava2CallAdapter<R> implements CallAdapter<R, Object> {
@@ -956,7 +956,7 @@ final class RxJava2CallAdapter<R> implements CallAdapter<R, Object> {
 }
 ```
 
-我们简单看一下如何将 RxJava 插入同步的网络请求
+我们简单看一下如何将 RxJava 插入同步的网络请求。
 
 ```java
 final class CallExecuteObservable<T> extends Observable<Response<T>> {
