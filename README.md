@@ -68,13 +68,9 @@
 
 ### :pencil2: 算法 
 
-- [基础排序算法](https://github.com/passin95/LearningNotes/blob/master/notes/基础排序算法.md)
+- [LeetCode](https://github.com/passin95/LearningNotes/blob/master/notes/leetcode.md)
 
-  快速排序、归并排序、堆排序、选择排序、冒泡排序、插入排序、希尔排序。
-
-- [Leetcode](https://github.com/passin95/LearningNotes/blob/master/notes/Leetcode.md)
-
-  Leetcode 题解。
+  LeetCode 题解。
 
 ### :speak_no_evil: Android Studio 
 
@@ -88,7 +84,7 @@
 
   Git 常用命令和本质分析。
 
-- [Gradle]()  
+- [Gradle](https://github.com/passin95/LearningNotes/blob/master/notes/Gradle.md)
 
 ### :bulb: 编码规范 
 
@@ -100,9 +96,9 @@
 
 #### About
 
-本仓库基于 [CS-Notes](https://github.com/CyC2018/CS-Notes) 进行排版，并根据自己的实际情况和理解进行编写，初衷是作为个人的读书笔记使用，也欢迎其它读者收阅、提供建议。
+本仓库基于 [CS-Notes](https://github.com/CyC2018/CS-Notes) 排版方式进行排版，并根据自己的实际情况和理解进行编写，初衷是作为个人的读书笔记使用，也欢迎其它读者收阅、提供建议。
 
-学习笔记不是从网上到处拼凑而来，除了少部分引用书上和技术文档的原文，其余都是笔者的原创。在您引用本仓库内容或者对内容进行修改演绎时，请遵循文末的开源协议，谢谢。
+学习笔记不是从网上到处拼凑而来，除了部分引用书上和技术文档的原文，其余都是笔者的原创。在您引用本仓库内容或者对内容进行修改演绎时，请遵循文末的开源协议，谢谢。
 
 该笔记暂时由笔者一个人维护，为了方便在不同 PC 端编写笔记，因此不再在 commit 的时候提供详细的说明。
 

@@ -78,7 +78,7 @@ public class IO {
         }
     }
 
-    private static void whiteOkio() {
+    private static void writeOkio() {
         try (BufferedSink sink = Okio.buffer(Okio.sink(new File("./app/text.txt")))){
             sink.writeUtf8("abab");
             sink.writeUtf8("333");
@@ -89,7 +89,7 @@ public class IO {
         }
     }
 
-    private static void whiteOkioOnlyBuffer() {
+    private static void writeOkioOnlyBuffer() {
         try (Buffer buffer = new Buffer();
                 DataOutputStream dataOutputStream = new DataOutputStream(buffer.outputStream());
                 DataInputStream inputStream = new DataInputStream(buffer.inputStream())) {
