@@ -68,7 +68,7 @@
 
 ### :pencil2: 算法 
 
-- [LeetCode](https://github.com/passin95/LearningNotes/blob/master/notes/leetcode.md)
+- [LeetCode](https://github.com/passin95/LearningNotes/blob/master/notes/LeetCode.md)
 
   LeetCode 题解。
 

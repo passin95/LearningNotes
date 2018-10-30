@@ -1,5 +1,5 @@
 
-<center>
+<p align = "center">
 
 《不宠无惊过一生》
 
@@ -17,7 +17,7 @@
 
 LeetCode，加油。
 
-</center>
+</p>
 
 
 ## LeetCode
