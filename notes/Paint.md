@@ -31,7 +31,7 @@
     - [尖角时延长线最大值 StrokeMiter](#%E5%B0%96%E8%A7%92%E6%97%B6%E5%BB%B6%E9%95%BF%E7%BA%BF%E6%9C%80%E5%A4%A7%E5%80%BC-strokemiter)
     - [双线性过滤 FilterBitmap](#%E5%8F%8C%E7%BA%BF%E6%80%A7%E8%BF%87%E6%BB%A4-filterbitmap)
     - [阴影 ShadowLayer](#%E9%98%B4%E5%BD%B1-shadowlayer)
-    - [过滤画面（特效） MaskFilter](#%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%EF%BC%88%E7%89%B9%E6%95%88%EF%BC%89-maskfilter)
+    - [过滤画面（特效） MaskFilter](#%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%E7%89%B9%E6%95%88-maskfilter)
       - [BlurMaskFilter](#blurmaskfilter)
       - [EmbossMaskFilter](#embossmaskfilter)
   - [图形轮廓 PathEffect](#%E5%9B%BE%E5%BD%A2%E8%BD%AE%E5%BB%93-patheffect)
@@ -418,7 +418,7 @@ DashPathEffect(float[] intervals, float phase)
 
  分别按照两种 PathEffect 分别对目标进行绘制。
 
-<img src= "../pictures//006tNc79ly1fig7ekjh7lj30dw05jq2z.jpg"/>
+<img src= "../pictures//006tNc79ly1fig7dobrizj30iv0agt8z.jpg"/>
 
 ### ComposePathEffect
 
@@ -443,4 +443,4 @@ canvas.drawPath(path, paint);
 # 参考资料
 
 - [绘制基础 - HenCoder](https://hencoder.com/ui-1-1/)
-- [Paint 详解 - HenCoder](https://hencoder.com/ui-1-1/)
+- [Paint 详解 - HenCoder](https://hencoder.com/ui-1-2/)
