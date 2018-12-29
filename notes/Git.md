@@ -3,43 +3,47 @@
 <!-- TOC -->
 
 - [Git](#git)
-    - [基本概念](#基本概念)
-    - [Git 常用命令](#git-常用命令)
-        - [全局配置](#全局配置)
-            - [git config](#git-config)
-        - [查看信息](#查看信息)
-            - [git status](#git-status)
-            - [git log](#git-log)
-            - [git diff](#git-diff)
-        - [远程操作](#远程操作)
-            - [git remote](#git-remote)
-            - [git clone](#git-clone)
-            - [git push](#git-push)
-            - [git fetch](#git-fetch)
-            - [git pull](#git-pull)
-        - [管理变动](#管理变动)
-            - [git add](#git-add)
-            - [git checkout (撤销文件修改)](#git-checkout-撤销文件修改)
-            - [git rm](#git-rm)
-            - [git commit](#git-commit)
-            - [git revert](#git-revert)
-        - [版本穿梭](#版本穿梭)
-            - [git reset](#git-reset)
-            - [git checkout](#git-checkout)
-            - [git stash](#git-stash)
-        - [分支操作](#分支操作)
-            - [git branch](#git-branch)
-            - [git merge](#git-merge)
-            - [git rebase](#git-rebase)
-        - [标签管理](#标签管理)
-    - [本质解析](#本质解析)
-        - [merge](#merge)
-        - [rebase](#rebase)
-        - [reset](#reset)
-        - [checkout](#checkout)
-    - [SSH 传输设置](#ssh-传输设置)
-    - [.gitignore 文件](#gitignore-文件)
-- [参考资料](#参考资料)
+  - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
+  - [Git 命令](#git-%E5%91%BD%E4%BB%A4)
+    - [全局配置](#%E5%85%A8%E5%B1%80%E9%85%8D%E7%BD%AE)
+      - [git config](#git-config)
+    - [查看信息](#%E6%9F%A5%E7%9C%8B%E4%BF%A1%E6%81%AF)
+      - [git status](#git-status)
+      - [git log](#git-log)
+      - [git diff](#git-diff)
+    - [远程操作](#%E8%BF%9C%E7%A8%8B%E6%93%8D%E4%BD%9C)
+      - [git remote](#git-remote)
+      - [git clone](#git-clone)
+      - [git push](#git-push)
+      - [git fetch](#git-fetch)
+      - [git pull](#git-pull)
+    - [管理变动](#%E7%AE%A1%E7%90%86%E5%8F%98%E5%8A%A8)
+      - [git add](#git-add)
+      - [git checkout (撤销文件修改)](#git-checkout-%E6%92%A4%E9%94%80%E6%96%87%E4%BB%B6%E4%BF%AE%E6%94%B9)
+      - [git rm](#git-rm)
+      - [git commit](#git-commit)
+      - [git revert](#git-revert)
+    - [版本穿梭](#%E7%89%88%E6%9C%AC%E7%A9%BF%E6%A2%AD)
+      - [git reset](#git-reset)
+      - [git checkout](#git-checkout)
+      - [git stash](#git-stash)
+    - [分支操作](#%E5%88%86%E6%94%AF%E6%93%8D%E4%BD%9C)
+      - [git branch](#git-branch)
+      - [git merge](#git-merge)
+      - [git rebase](#git-rebase)
+    - [标签管理](#%E6%A0%87%E7%AD%BE%E7%AE%A1%E7%90%86)
+    - [高级命令](#%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4)
+      - [git cherry-pick](#git-cherry-pick)
+      - [git describe](#git-describe)
+  - [本质解析](#%E6%9C%AC%E8%B4%A8%E8%A7%A3%E6%9E%90)
+    - [merge](#merge)
+    - [rebase](#rebase)
+    - [reset](#reset)
+    - [checkout](#checkout)
+  - [Git 练习题](#git-%E7%BB%83%E4%B9%A0%E9%A2%98)
+  - [SSH 传输设置](#ssh-%E4%BC%A0%E8%BE%93%E8%AE%BE%E7%BD%AE)
+  - [.gitignore 文件](#gitignore-%E6%96%87%E4%BB%B6)
+- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- /TOC -->
 
@@ -68,7 +72,12 @@ origin/HEAD：远程仓库 origin 的 HEAD 镜像，它永远指向分支 origin
 
 HEAD，master，origin/master，origin/HEAD 等概念都类似于内存中的指针，区别在于它们指向的是 commit。
 
-## Git 常用命令
+<div align="center">
+<img src="../pictures//a1198642-9159-4d88-8aec-c3b04e7a2563.jpg" />
+</div>
+
+
+## Git 命令
 
 ### 全局配置
 
@@ -411,11 +420,37 @@ git tag -a <tagname> -m <描述> <commit id>
 
 对 commit id 所对应的 commit 打一个名为 name 且有描述的的 tag。
 
+git tag -d <tagname>
+
+删除本地 tag。
+
 git show <tagname>
 
 查看名为 name 的标签信息。
 ```
 
+### 高级命令
+
+#### git cherry-pick
+
+```
+git cherry-pick <commit id> <commit id> ……
+
+将指定的多个 commit 复制后追加到 HEAD 指向的 commit(branch) 之后。
+```
+
+#### git describe 
+
+``` 
+git describe <ref>
+
+<ref> 可以是任何能被 Git 识别成提交记录的引用，如果你没有指定的话，Git 会以你目前所检出的位置（HEAD）。
+
+它会输出一段信息：<tag>_<numCommits>_g<hash>
+
+tag 表示的是离 ref 最近的标签， numCommits 是表示这个 ref 与 tag 相差有多少个提交记录， hash 表示的是你所给定的 ref 所表示的提交记录哈希值的前几位。
+
+```
 ## 本质解析
 
 ### merge
@@ -442,7 +477,7 @@ git checkout branch1
 git rebase master
 ```
 
-本质：将 commit 序列重新设置基础点也就是父 commit）, branch1 的路径上的所有 commit 的内容一并应用到当前分支 master，然后自动生成一个个新的 commit，HEAD 和 HEAD 所指向的分支 master 指向最新的 commit。
+本质：将当前分支 commit 序列重新设置基础点, branch1 的路径上至原基础点（图中为 2）的所有 commit 一并复制到指定分支 master，HEAD 和 HEAD 所指向的分支 指向最新的 commit。
 
 ### reset
 
@@ -477,6 +512,10 @@ git chekout branch2
 本质：将 HEAD 指向某个 commit 或者 branch（不携带所指向的分支一起移动）。
 git chekout 文件的本质是：回到所指向 commit 的该文件内容（视觉上便是清空了工作区的变动，因此暂存区内容是不清理的）。
 
+## Git 练习题
+
+[https://github.com/pcottle/learnGitBranching](https://github.com/pcottle/learnGitBranching)
+
 ## SSH 传输设置
 
 Git 仓库和 Github 中心仓库之间的传输是通过 SSH 加密。
@@ -497,5 +536,5 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 
 # 参考资料
 
-- [Git 教程 - 廖雪峰 ](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
-- [Git 原理详解及实用指南 - 扔物线 ](https://juejin.im/book/5a124b29f265da431d3c472e)
+- [Git 教程 - 廖雪峰](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
+- [Git 原理详解及实用指南 - 扔物线](https://juejin.im/book/5a124b29f265da431d3c472e)
