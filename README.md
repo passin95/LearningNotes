@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#android-computer) | 网络[:cloud:](#cloud-网络) | 编程思想[:couple:](#couple-编程思想) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 编程思想[:couple:](#couple-编程思想) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -85,6 +85,8 @@
   Git 常用命令和本质分析。
 
 - [Gradle](https://github.com/passin95/LearningNotes/blob/master/notes/Gradle.md)
+
+  Groovy 语法、Gradle 的解析和编写。
 
 ### :bulb: 编码规范 
 

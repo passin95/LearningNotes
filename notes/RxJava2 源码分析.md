@@ -17,7 +17,7 @@
         - [线程切换](#%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2)
             - [subscribeOn](#subscribeon)
             - [observeOn](#observeon)
-            - [小结](#%E5%B0%8F%E7%BB%93)
+            - [小结](#%E5%B0%8F%E7%BB%93-1)
     - [终看 RxJava](#%E7%BB%88%E7%9C%8B-rxjava)
         - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C)
         - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB)
@@ -499,7 +499,7 @@ public final class SingleObserveOn<T> extends Single<T> {
 
 ## 终看 RxJava
 
-该小节的 Demo 代码较长（该Demo是笔者自己给自己出的题目，个人认为理解透该 Demo 对 RxJava 有一个深入的了解），读者可对 Demo 的代码的执行顺序和所处线程尝试自行分析，再向下阅读（向下阅读时请拷贝 Demo 到 Android Studio 方便对比，因为都以 Demo 的代码为基础进行分析）。
+该小节的 Demo 代码较长（该 Demo 是笔者自己给自己出的题目，个人认为理解透该 Demo 对 RxJava 有一个深入的了解），读者可对 Demo 的代码的执行顺序和所处线程尝试自行分析，再向下阅读（向下阅读时请拷贝 Demo 到 Android Studio 方便对比，因为都以 Demo 的代码为基础进行分析）。
 
 接下来将按照 RxJava **链式调用结构**（自下向上的订阅以及自上向下的数据传递）的过程去对一些可能疑惑的地方展开分析，再对整个代码执行过程梳理。
 
@@ -684,11 +684,11 @@ static final class DoAfterTerminateObserver<T> implements SingleObserver<T>, Dis
 
 ### doFinally() 写在 observeOn() 之前和之后有何区别？
 
-先抛结论 doFinally() 如果写在 observeOn() 之前,则 observeOn() 往下的观察者的 onXXX() 方法（除了onSubscribe()）都会后于doFinally()执行。
+先抛结论 doFinally() 如果写在 observeOn() 之前,则 observeOn() 往下的观察者的 onXXX() 方法（除了 onSubscribe()）都会后于 doFinally() 执行。
 
 以下以 Demo 为例说明原因。
 
-先贴一下 ObserveOnSingleObserver的 onSuccess() 和 run() 方法
+先贴一下 ObserveOnSingleObserver 的 onSuccess() 和 run() 方法
 
 ```java
 static final class ObserveOnSingleObserver<T> extends AtomicReference<Disposable>
@@ -712,7 +712,7 @@ implements SingleObserver<T>, Disposable, Runnable {
 }
 ```
 
-再看DoFinallyObserver.onSuccess()所执行的代码
+再看 DoFinallyObserver.onSuccess() 所执行的代码
 
 ```java
 static final class DoFinallyObserver<T> extends AtomicInteger implements SingleObserver<T>, Disposable {
@@ -731,7 +731,7 @@ static final class DoFinallyObserver<T> extends AtomicInteger implements SingleO
                 
         // 也就是说对于此时的 DoFinallyObserver.onSuccess()，
         // 他所做的事情仅仅是在调度新的线程去异步执行 ObserveOnSingleObserver.run()，也就是异步执行观察者链的向下回调。
-        // 从而直接执行到了runFinally()
+        // 从而直接执行到了 runFinally()
         runFinally();
     }
 }
