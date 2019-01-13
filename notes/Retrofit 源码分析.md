@@ -1,9 +1,9 @@
 
-# Retrofit 源码解析
+# Retrofit 源码分析
 
 <!-- TOC -->
 
-- [Retrofit 源码解析](#retrofit-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90)
+- [Retrofit 源码分析](#retrofit-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [一、Retrofit 的基本使用](#%E4%B8%80retrofit-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
   - [二、Retrofit 的构建](#%E4%BA%8Cretrofit-%E7%9A%84%E6%9E%84%E5%BB%BA)
     - [Retrofit 的成员变量](#retrofit-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
@@ -31,7 +31,7 @@
 
 ## 一、Retrofit 的基本使用
 
-本文将直接结合 Gson 以及 RxJava 的使用以代码+注解的方式按运行流程解读源码，非粗读源码，而是对主流程进行深度剖析。
+本文将直接结合 Gson 以及 RxJava 的使用以代码+注解的方式按运行流程解读源码，主要对主流程进行源码剖析。
 本文基于 Retrofit 2.4.0。
 
 ```java
@@ -677,7 +677,7 @@ public interface Converter<F, T> {
 
 ### BuiltInConverters
 
-BuiltInConverters 是 Retrofit 默认提供的 Converter.Factory。
+BuiltInConverters 是 Retrofit 默认提供的 Converter.Factory（转换工厂）。
 
 ```java
 final class BuiltInConverters extends Converter.Factory {
@@ -688,7 +688,8 @@ final class BuiltInConverters extends Converter.Factory {
     if (type == ResponseBody.class) {
       // 方法注解 annotations 是否包含@Streaming 注解，
       // @Streaming 的一般用于大文件的传输，
-      // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，并生成了新的 ResponseBody，避免服务器再次传输数据。
+      // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，
+      // 并生成了新的 ResponseBody，避免服务器再次传输数据，但会大量占用客户端的内存。
       // 使用 Streaming 则是用于边接收数据边处理（不断更新Response）。
       return Utils.isAnnotationPresent(annotations, Streaming.class)
           ? StreamingResponseBodyConverter.INSTANCE
@@ -777,7 +778,7 @@ final class OkHttpCall<T> implements Call<T> {
     okhttp3.Call call;
 
     synchronized (this) {
-      // 不能多次调用
+      // 同一个请求对象不能多次调用，否则抛异常。
       if (executed) throw new IllegalStateException("Already executed.");
       executed = true;
 
@@ -829,7 +830,7 @@ private okhttp3.Call createRawCall() throws IOException {
 ```java
 okhttp3.Call toCall(@Nullable Object... args) throws IOException {
   
-  // 构建 RequestBuilder。
+  // 构建 RequestBuilder 对象，用于构建请求报文。
   RequestBuilder requestBuilder = new RequestBuilder(httpMethod, baseUrl, relativeUrl, headers,
       contentType, hasBody, isFormEncoded, isMultipart);
 
@@ -852,11 +853,13 @@ okhttp3.Call toCall(@Nullable Object... args) throws IOException {
 ```
 
 ### parseResponse()
+
 ```java
 Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
   ResponseBody rawBody = rawResponse.body();
 
-  // 构建一个一样的新的 ResponseBody(如果持有引用，可能出现服务器再次发送导致修改 ResponseBody)。
+  // 构建一个新的 ResponseBody 用于返回给调用者，
+  // 移除了请求体的数据源( byte 数据源)，调用方如果尝试拿便抛异常。
   rawResponse = rawResponse.newBuilder()
       .body(new NoContentResponseBody(rawBody.contentType(), rawBody.contentLength()))
       .build();

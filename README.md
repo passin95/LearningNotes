@@ -110,7 +110,7 @@
 
 笔记不使用 `![]()` 这种方式来引用图片，而是用 `<img>` 标签。一方面是为了能够控制图片以合适的大小显示，另一方面是因为 GFM 不支持 `<center> ![]() </center>` 让图片居中显示，只能使用 `<div align="center"> <img src=""/> </div>` 达到居中的效果。
 
-此外，向大家推荐一个 [CS-Notes](https://github.com/CyC2018/CS-Notes) 的作者的文档的排版工具 [Text-Typesetting](https://cyc2018.github.io/Text-Typesetting/)。
+此外，向大家推荐一个文档的排版工具 [TypesettingTool](https://github.com/passin95/TypesettingTool)。
 
 #### Logo
 
