@@ -78,6 +78,10 @@
 
   Android Studio Plugins。
 
+- [Android Studio 实用相关](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20Studio%20技巧相关.md)
+
+  自动换行、bean 类变量自动判 null、代码模板、文件模板
+
 ### :hammer: 工具 
 
 - [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
@@ -88,13 +92,21 @@
 
   Groovy 语法、Gradle 的解析和编写。
 
+- [正则表达式](https://github.com/passin95/LearningNotes/blob/master/notes/正则表达式.md)
+  正则表达式语法以及常用合集。
+
 ### :bulb: 编码规范 
 
 - [代码风格规范](https://github.com/passin95/LearningNotes/blob/master/notes/代码风格规范.md)
 
-  阿里巴巴Java开发手册、阿里巴巴Android开发手册。
+  阿里巴巴 Java 开发手册、阿里巴巴 Android 开发手册。
 
 ### :memo: 后记 
+
+#### 博客推荐
+
+- [美团点评技术团队](https://tech.meituan.com/)：美团各个技术岗位的分享
+- [Android 达摩院 - Gityuan](http://gityuan.com/tags/)：Android 系统源码解析
 
 #### About
 
@@ -108,9 +120,7 @@
 
 笔记内容按照 [中文文案排版指北](https://mazhuang.org/wiki/chinese-copywriting-guidelines/) 进行排版，以保证内容的可读性。
 
-笔记不使用 `![]()` 这种方式来引用图片，而是用 `<img>` 标签。一方面是为了能够控制图片以合适的大小显示，另一方面是因为 GFM 不支持 `<center> ![]() </center>` 让图片居中显示，只能使用 `<div align="center"> <img src=""/> </div>` 达到居中的效果。
-
-此外，向大家推荐一个文档的排版工具 [TypesettingTool](https://github.com/passin95/TypesettingTool)。
+向大家推荐一个文档的排版工具 [TypesettingTool](https://github.com/passin95/TypesettingTool)。
 
 #### Logo
 
