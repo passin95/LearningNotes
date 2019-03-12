@@ -1,30 +1,7 @@
 
 # OkHttp 源码分析
 
-<!-- TOC -->
-
-- [OkHttp 源码分析](#okhttp-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [说明](#%E8%AF%B4%E6%98%8E)
-  - [一、OkHttp 的基本使用](#%E4%B8%80okhttp-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
-  - [二、Request 和 Response](#%E4%BA%8Crequest-%E5%92%8C-response)
-    - [Request](#request)
-    - [Response](#response)
-  - [三、OkHttpClient](#%E4%B8%89okhttpclient)
-    - [OkHttpClient 的成员变量](#okhttpclient-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
-    - [OkHttpClient 对 Call.Factory 的实现](#okhttpclient-%E5%AF%B9-callfactory-%E7%9A%84%E5%AE%9E%E7%8E%B0)
-  - [四、RealCall](#%E5%9B%9Brealcall)
-    - [Dispatcher](#dispatcher)
-    - [execute()](#execute)
-    - [enqueue()](#enqueue)
-    - [getResponseWithInterceptorChain()](#getresponsewithinterceptorchain)
-  - [五、Interceptor](#%E4%BA%94interceptor)
-    - [RetryAndFollowUpInterceptor](#retryandfollowupinterceptor)
-    - [BridgeInterceptor](#bridgeinterceptor)
-    - [CacheInterceptor](#cacheinterceptor)
-    - [ConnectInterceptor](#connectinterceptor)
-    - [CallServerInterceptor](#callserverinterceptor)
-
-<!-- /TOC -->
+<!-- TOC -->autoauto- [OkHttp 源码分析](#okhttp-源码分析)auto    - [说明](#说明)auto    - [一、OkHttp 的基本使用](#一okhttp-的基本使用)auto    - [二、Request 和 Response](#二request-和-response)auto        - [Request](#request)auto        - [Response](#response)auto    - [三、OkHttpClient](#三okhttpclient)auto        - [OkHttpClient 的成员变量](#okhttpclient-的成员变量)auto        - [OkHttpClient 对 Call.Factory 的实现](#okhttpclient-对-callfactory-的实现)auto    - [四、RealCall](#四realcall)auto        - [Dispatcher](#dispatcher)auto        - [execute()](#execute)auto        - [enqueue()](#enqueue)auto        - [getResponseWithInterceptorChain()](#getresponsewithinterceptorchain)auto    - [五、Interceptor](#五interceptor)auto        - [RetryAndFollowUpInterceptor](#retryandfollowupinterceptor)auto        - [BridgeInterceptor](#bridgeinterceptor)auto        - [CacheInterceptor](#cacheinterceptor)auto        - [ConnectInterceptor](#connectinterceptor)auto        - [CallServerInterceptor](#callserverinterceptor)autoauto<!-- /TOC -->
 
 ## 说明
 
@@ -137,7 +114,7 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   final @Nullable Proxy proxy;
   // 具体使用的哪一版本的应用层协议，例如 http1.0、http1.1，http2.0
   final List<Protocol> protocols;
-  // Http 和 Https 的 TLS 版本和 密码件的选择，okhttp 默认优先使用 MODERN_TLS。
+  // Http 和 Https 的 TLS 版本和 密码件的选择，OkHttp 默认优先使用 MODERN_TLS。
   // MODERN_TLS 是连接到最新的 HTTPS 服务器的安全配置
   // COMPATIBEL_TLS 是连接到过时的 HTTPS 服务器的安全配置。
   // CLEARTEXT 是用于 http://开头的 URL 的非安全配置。
@@ -145,7 +122,7 @@ public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory 
   // 拦截器（这 2 个的区别下面会讲）
   final List<Interceptor> interceptors;
   final List<Interceptor> networkInterceptors;
-  // 网络请求时间监听工厂
+  // 网络请求过程监听工厂
   final EventListener.Factory eventListenerFactory;
   // 针对存在使用多个代理时，选择下一次网络请求使用的代理方式。
   final ProxySelector proxySelector;
