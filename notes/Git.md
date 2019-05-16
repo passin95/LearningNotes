@@ -288,13 +288,21 @@ git reset <commid id>
 
 将 HEAD 指向指定 commit。
 
+git reset --soft HEAD^
+
+将 HEAD 指向上一个 commit，保留工作目录，并把所有的文件差异放置暂存区。
+
+git reset --mixed HEAD^
+
+将 HEAD 指向上一个 commit，保留工作目录，并把所有的文件差异放置工作区。
+
 git reset --hard HEAD^
 
 将 HEAD 指向上一个 commit，并清空工作区和暂存区的修改。
 
-git reset --soft HEAD^
+git reset --keep HEAD^
 
-将 HEAD 指向上一个 commit，保留工作目录，并把因为保留工作目录内容所带来的新的文件差异放进暂存区。
+将 HEAD 指向上一个 commit，清空暂存区，保留工作区，并处理工作区和指向 commit 的文件差异。
 ```
 
 #### git checkout
@@ -341,6 +349,18 @@ git stash -u
 git stash pop
 
 恢复当前分支临时存放的变动。
+
+git stash list 
+
+查看 stash 列表。
+
+git stash pop stash@{id}
+
+pop 指定的 stash。
+
+git stash clear
+
+清空所有 stash。
 ```
 
 ### 分支操作

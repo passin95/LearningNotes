@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 编程思想[:couple:](#couple-编程思想) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 归纳整理[:couple:](#couple-归纳整理) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -64,11 +64,13 @@
 
   Base64、序列化、Hash。
 
-### :couple: 编程思想 
+### :couple: 归纳整理
 
-- [面向对象](https://github.com/passin95/LearningNotes/blob/master/notes/面向对象.md)
+- [面经]
 
-  三大特性（封装、继承、多态）和设计模式之六大原则。
+- [归纳整理](https://github.com/passin95/LearningNotes/blob/master/notes/归纳整理.md)
+
+  对优秀文章归纳整理，包括又不局限于源码解析、机型适配、疑难杂症等。
 
 ### :pencil2: 算法 
 
