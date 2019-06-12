@@ -95,6 +95,10 @@ git config --global user.email "email@example.com"
 git config -l
 
 查看 git 所有配置信息。
+
+git config --system --unset credential.helper
+
+清空 git 账号密码的缓存。
 ```
 
 ### 查看信息

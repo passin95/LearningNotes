@@ -1,34 +1,36 @@
 <!-- TOC -->
 
-- [一、String](#%E4%B8%80string)
-  - [概览](#%E6%A6%82%E8%A7%88)
-  - [String 不可变的好处](#string-%E4%B8%8D%E5%8F%AF%E5%8F%98%E7%9A%84%E5%A5%BD%E5%A4%84)
-  - [String, StringBuffer and StringBuilder](#string-stringbuffer-and-stringbuilder)
-  - [String.intern()](#stringintern)
-- [三、运算](#%E4%B8%89%E8%BF%90%E7%AE%97)
-  - [参数传递](#%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92)
-- [四、继承](#%E5%9B%9B%E7%BB%A7%E6%89%BF)
-  - [访问权限](#%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90)
-  - [抽象类与接口](#%E6%8A%BD%E8%B1%A1%E7%B1%BB%E4%B8%8E%E6%8E%A5%E5%8F%A3)
-  - [super](#super)
-  - [重写与重载](#%E9%87%8D%E5%86%99%E4%B8%8E%E9%87%8D%E8%BD%BD)
-- [五、Object 通用方法](#%E4%BA%94object-%E9%80%9A%E7%94%A8%E6%96%B9%E6%B3%95)
-  - [概览](#%E6%A6%82%E8%A7%88-1)
-  - [equals()](#equals)
-  - [hashCode()](#hashcode)
-  - [toString()](#tostring)
-  - [clone()](#clone)
-- [六、关键字](#%E5%85%AD%E5%85%B3%E9%94%AE%E5%AD%97)
-  - [final](#final)
-  - [static](#static)
-- [七、反射](#%E4%B8%83%E5%8F%8D%E5%B0%84)
-- [八、异常](#%E5%85%AB%E5%BC%82%E5%B8%B8)
-- [九、泛型](#%E4%B9%9D%E6%B3%9B%E5%9E%8B)
-- [十、注解](#%E5%8D%81%E6%B3%A8%E8%A7%A3)
-- [十一、特性](#%E5%8D%81%E4%B8%80%E7%89%B9%E6%80%A7)
-  - [Java 各版本的新特性](#java-%E5%90%84%E7%89%88%E6%9C%AC%E7%9A%84%E6%96%B0%E7%89%B9%E6%80%A7)
-  - [JRE or JDK](#jre-or-jdk)
-- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+- [一、String](#一string)
+    - [概览](#概览)
+    - [String 不可变的好处](#string-不可变的好处)
+    - [String, StringBuffer and StringBuilder](#string-stringbuffer-and-stringbuilder)
+    - [String.intern()](#stringintern)
+- [三、运算](#三运算)
+    - [参数传递](#参数传递)
+- [四、继承](#四继承)
+    - [访问权限](#访问权限)
+    - [抽象类与接口](#抽象类与接口)
+    - [super](#super)
+    - [重写与重载](#重写与重载)
+- [五、Object 通用方法](#五object-通用方法)
+    - [概览](#概览-1)
+    - [equals()](#equals)
+    - [hashCode()](#hashcode)
+    - [toString()](#tostring)
+    - [clone()](#clone)
+- [六、关键字](#六关键字)
+    - [final](#final)
+    - [static](#static)
+- [七、反射](#七反射)
+- [八、异常](#八异常)
+- [九、泛型](#九泛型)
+- [十、注解](#十注解)
+- [十一、Type](#十一type)
+        - [Class](#class)
+        - [ParameterizedType](#parameterizedtype)
+        - [GenericArrayType](#genericarraytype)
+        - [TypeVariable](#typevariable)
+- [参考资料](#参考资料)
 
 <!-- /TOC -->
 
@@ -57,7 +59,7 @@ public final class String
 
 如果一个 String 对象已经被创建过了，那么就会从 String Pool 中取得引用。只有 String 是不可变的，才可能使用 String Pool。
 
-<div align="center"> <img src="../pictures//f76067a5-7d5f-4135-9549-8199c77d8f1c.jpg" width=""/> </div><br>
+<div align ="center"> <img src ="../pictures//f76067a5-7d5f-4135-9549-8199c77d8f1c.jpg" width =""/> </div><br>
 
 **3. 安全性** 
 
@@ -846,7 +848,7 @@ public InitialOrderTest() {
 
 # 七、反射
 
-反射(Reflection)是Java 程序开发语言的特征之一，它允许运行中的 Java 程序获取自身的信息，并且可以操作类或对象的内部属性。
+反射 (Reflection) 是 Java 程序开发语言的特征之一，它允许运行中的 Java 程序获取自身的信息，并且可以操作类或对象的内部属性。
 通过反射，我们可以在运行时获得程序或程序集中每一个类型的成员和成员的信息。
 
 - [深入解析 Java 反射（1）- 基础](http://www.sczyh30.com/posts/Java/java-reflection-1/)
@@ -858,7 +860,7 @@ Throwable 可以用来表示任何可以作为异常抛出的类，分为两种�
 1.  **受检异常** ：需要用 try...catch... 语句捕获并进行处理，并且可以从异常中恢复；
 2.  **非受检异常** ：是程序运行时错误，例如除 0 会引发 Arithmetic Exception，此时程序奔溃并且无法恢复。
 
-<div align="center"> <img src="../pictures//PPjwP.png" width="600"/> </div><br>
+<div align ="center"> <img src ="../pictures//PPjwP.png" width ="600"/> </div><br>
 
 - [Java 入门之异常处理](https://www.tianmaying.com/tutorial/Java-Exception)
 
@@ -882,40 +884,87 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 
 [注解 Annotation 实现原理与自定义注解例子](https://www.cnblogs.com/acm-bingzi/p/javaAnnotation.html)
 
-# 十一、特性
+# 十一、Type
 
-## Java 各版本的新特性
+Type 是 Java 中所有类型的公共超级接口。
+Type 体系包括的类型：**原始类型**(raw types) 对应 Class、**参数化类型**(parameterized types) 对应 ParameterizedType、**数组类型**(array types) 对应 GenericArrayType、**类型变量**(type variables) 对应 TypeVariable、**基本类型**(primitive types) 对应 Class。
+- 原始类型：不仅仅包含我们平常所指的类，还包括枚举、数组、注解等。
+- 参数化类型：List<T>、Map<K,V> 等带有参数化的容器。
+- 数组类型：不是 String[] 、byte[] 等数组，而是带有泛型的数组 T[]。
+- 类型变量：泛型中的变量，例如 public class Demo<T>{} ，则 T 是类型变量。
+- 基本类型：java 的基本类型，即 int,float,double 等。
 
-**New highlights in Java SE 8** 
+### Class
 
-1. Lambda Expressions
-2. Pipelines and Streams
-3. Date and Time API
-4. Default Methods
-5. Type Annotations
-6. Nashhorn JavaScript Engine
-7. Concurrent Accumulators
-8. Parallel operations
-9. PermGen Error Removed
+Class 不是一个接口，而是对 Type 的一个实现类,是 Java 反射的基础，对 Java 类的抽象。
 
-**New highlights in Java SE 7** 
+### ParameterizedType
 
-1. Strings in Switch Statement
-2. Type Inference for Generic Instance Creation
-3. Multiple Exception Handling
-4. Support for Dynamic Languages
-5. Try with Resources
-6. Java nio Package
-7. Binary Literals, Underscore in literals
-8. Diamond Syntax
+参数化类型，即使用了泛型的类，并且没有使用通配符。
 
-- [Difference between Java 1.8 and Java 1.7?](http://www.selfgrowth.com/articles/difference-between-java-18-and-java-17)
-- [Java 8 特性](http://www.importnew.com/19345.html)
+```java
+public interface ParameterizedType extends Type {
+    /**
+     * 以 Type[] 形式返回所有泛型的实际类型。
+     * 例如 Map<String,User> ，调用该方法则返回数组 Type[2]
+     * 其中 Type[0] 为 String，Type[1] 为 User。
+     */
+    Type[] getActualTypeArguments();
 
-## JRE or JDK
+    /**
+     * 返回表示类或接口的对象 {@code Type}。
+     * 例如 Map<K,V> 调用该方法，则返回接口 Map 。
+     */
+    Type getRawType();
 
-- JRE is the JVM program, Java application need to run on JRE.
-- JDK is a superset of JRE, JRE + tools for developing java programs. e.g, it provides the compiler "javac"
+    /**
+     * 返回该 Type 的所属者，也可以理解为内部类的所属者即为外部类。
+     * 例如 Map.Entry<String,Integer> 调用该方法，则返回接口 Map
+     */
+    Type getOwnerType();
+}
+```
+
+### GenericArrayType
+
+泛型数组类型，例如 List<String>[],T[],而 List<String> 不属于 GenericArrayType（属于 ParameterizedType），String[] 不属于 GenericArrayType（属于原始类型）。
+
+```java
+public interface GenericArrayType extends Type {
+    /**
+     * 返回泛型数组元素的 Type 类型。
+     * 例如 List<String>[]，元素为 List<String>，List<String> 属于 ParameterizedType，该方法则返回 ParameterizedType。
+     */
+    Type getGenericComponentType();
+}
+```
+
+### TypeVariable
+
+TypeVariable 指的是泛型的类型变量，指的是 List<T>、Map<K,V> 的 T、K、V 值，实际的 Java 类型是 TypeVariableImpl（TypeVariable 的子类）。
+
+```java
+public interface TypeVariable<D extends GenericDeclaration> extends Type {
+    /**
+     * 返回一个 Type[]，它的内容是该类型变量的上限集，也就是泛型中 extend 右边的值，如果没有使用 extend，则默认为 {@code Object}
+     * 例如 public class Demo <T extends Number & Serializable>{T t}，则返回数组 Type[2]，其中 Type[0] 为 Number，Type[1] 为 Serializable。
+    */
+    Type[] getBounds();
+
+    /**
+     * 获取声明该类型变量实体。
+     * 例如 public class Demo<T> 中的 Demo。
+     */
+    D getGenericDeclaration();
+
+    /**
+     * 获取类型变量在源码中定义的名称。
+     * 例如 public class Demo<T> 中的 "T"。
+     */
+    String getName();
+
+}
+```
 
 # 参考资料
 
