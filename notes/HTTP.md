@@ -1,7 +1,7 @@
 <!-- TOC -->
 
 - [一、基础概念](#一基础概念)
-    - [URL](#url)
+    - [URI 和 URL](#uri-和-url)
     - [TCP/IP](#tcpip)
     - [应用层](#应用层)
     - [运输层](#运输层)
@@ -94,13 +94,36 @@
 
 # 一、基础概念
 
-## URL
+## URI 和 URL
 
 - URI（Uniform Resource Identifier，统一资源标识符）
 - URL（Uniform Resource Locator，统一资源定位符）
 - URN（Uniform Resource Name，统一资源名称），例如 urn:isbn:0-486-27557-4。
 
 URI 包含 URL 和 URN，目前 WEB 只有 URL 比较流行，所以见到的基本都是 URL。
+
+
+URI 的结构如下，它们都是等价的，只不过是划分的区域不同：
+```
+[scheme:]scheme-specific-part[#fragment]
+[scheme:][//authority][path][?query][#fragment]
+[scheme:][//host:port][path][?query][#fragment]
+```
+
+以下用一个 URI 字符串来横向对比各部分结构的区别。
+
+```
+http://www.demo.com:8080/path/path1?key=value&key1=value1&key2=value2#demofragment
+```
+
+- scheme：URI的模式，例如 http、file、content 等，Deme 中为http；
+- scheme-specific-part：//www.demo.com:8080/path/path1?key=value&key1=value1&key2=value2
+- authority：www.demo.com:8080；
+- host：URI的主机域名或IP地址，Demo 中为 www.demo.com；
+- Part：端口号，Demo 中为 8080；
+- path：路径信息，Demo 中为 /yourpath/fileName.htm；
+- query：键对值，Deme 中为 key=value&key1=value1&key2=value2;
+- fragment：用来标识次级资源，Demo 中为 demofragment。
 
 <div align="center"> <img src="../pictures//f716427a-94f2-4875-9c86-98793cf5dcc3.jpg" width="400"/> </div>
 

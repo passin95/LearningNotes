@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 编程思想[:couple:](#couple-编程思想) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 归纳整理[:couple:](#couple-归纳整理) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -29,6 +29,10 @@
   主要参考深入理解 Java 虚拟机。
 
 ### :computer: Android 
+
+- [Android 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20基础.md)
+
+  四大组件、
 
 - [源码分析](https://github.com/passin95/LearningNotes/blob/master/notes/源码分析.md)
 
@@ -64,11 +68,11 @@
 
   Base64、序列化、Hash。
 
-### :couple: 编程思想 
+### :couple: 归纳整理
 
-- [面向对象](https://github.com/passin95/LearningNotes/blob/master/notes/面向对象.md)
+- [归纳整理](https://github.com/passin95/LearningNotes/blob/master/notes/归纳整理.md)
 
-  三大特性（封装、继承、多态）和设计模式之六大原则。
+  对优秀文章归纳整理，包括又不局限于源码解析、机型适配、疑难杂症等。
 
 ### :pencil2: 算法 
 
@@ -115,21 +119,11 @@
 
 #### About
 
-本仓库基于 [CS-Notes](https://github.com/CyC2018/CS-Notes) 排版方式进行排版，并根据自己的实际情况和理解进行编写，初衷是作为个人的读书笔记使用，也欢迎其它读者收阅、提供建议。
+笔记是根据自己的实际情况和理解进行编写、整理，欢迎其它读者收阅、提供建议。
 
 学习笔记不是从网上到处拼凑而来，除了部分引用书上和技术文档的原文，其余都是笔者的原创。在您引用本仓库内容或者对内容进行修改演绎时，请遵循文末的开源协议，谢谢。
 
 该笔记暂时由笔者一个人维护，为了方便在不同 PC 端编写笔记，因此不再在 commit 的时候提供详细的说明。
-
-#### Typesetting
-
-笔记内容按照 [中文文案排版指北](https://mazhuang.org/wiki/chinese-copywriting-guidelines/) 进行排版，以保证内容的可读性。
-
-向大家推荐一个文档的排版工具 [TypesettingTool](https://github.com/passin95/TypesettingTool)。
-
-#### Logo
-
-Logo 通过 [logomakr](https://logomakr.com/) 进行设计。
 
 #### License
 
