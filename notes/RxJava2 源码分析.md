@@ -3,28 +3,28 @@
 
 <!-- TOC -->
 
-- [RxJava2 源码分析](#rxjava2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-    - [前言](#%E5%89%8D%E8%A8%80)
-    - [初探 RxJava](#%E5%88%9D%E6%8E%A2-rxjava)
+- [RxJava2 源码分析](#rxjava2-源码分析)
+    - [前言](#前言)
+    - [初探 RxJava](#初探-rxjava)
         - [Single.just()](#singlejust)
         - [single.subscribe(observer)](#singlesubscribeobserver)
-        - [小结](#%E5%B0%8F%E7%BB%93)
-    - [再探 RxJava](#%E5%86%8D%E6%8E%A2-rxjava)
-        - [RxJava 链式调用结构的本质](#rxjava-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%9C%AC%E8%B4%A8)
-        - [Map 和 FlapMap](#map-%E5%92%8C-flapmap)
+        - [小结](#小结)
+    - [再探 RxJava](#再探-rxjava)
+        - [RxJava 链式调用结构的本质](#rxjava-链式调用结构的本质)
+        - [Map 和 FlapMap](#map-和-flapmap)
             - [map](#map)
             - [flatMap](#flatmap)
-        - [线程切换](#%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2)
+        - [线程切换](#线程切换)
             - [subscribeOn](#subscribeon)
             - [observeOn](#observeon)
-            - [小结](#%E5%B0%8F%E7%BB%93-1)
-    - [终看 RxJava](#%E7%BB%88%E7%9C%8B-rxjava)
-        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C)
-        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB)
-        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84)
-        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88)
-        - [defer 到底有何作用？](#defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8)
-        - [Demo 执行过程梳理](#demo-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E6%A2%B3%E7%90%86)
+            - [小结](#小结-1)
+    - [终看 RxJava](#终看-rxjava)
+        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-和-doafterterminate-有何不同)
+        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-写在-observeon-之前和之后有何区别)
+        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
+        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#为什么连用两个-subscribeon-操作符只有第一个有效)
+        - [defer 到底有何作用？](#defer-到底有何作用)
+        - [Demo 执行过程梳理](#demo-执行过程梳理)
 
 <!-- /TOC -->
 
@@ -724,14 +724,15 @@ static final class DoFinallyObserver<T> extends AtomicInteger implements SingleO
         downstream.onSuccess(t);
         runFinally();
 
-        // 也就是说上面的代码等价于
+
+
+        // 也就是说上面的代码等价于下面这些代码
         this.value = value;
         Disposable d = scheduler.scheduleDirect(this);
         DisposableHelper.replace(this, d);
-                
         // 也就是说对于此时的 DoFinallyObserver.onSuccess()，
         // 他所做的事情仅仅是在调度新的线程去异步执行 ObserveOnSingleObserver.run()，也就是异步执行观察者链的向下回调。
-        // 从而直接执行到了 runFinally()
+        // 从而直接执行到了 runFinally().
         runFinally();
     }
 }
@@ -842,7 +843,7 @@ Observable<List<User>> observable = retrofit.create(UserService.class).getUserLi
 
 这是一个以 RxJava 结合 Retrofit 得到的一个被观察者对象过程，但是由于反射的机制，在我们调用 getUserList() 方法时，便会在当前线程（一般此时为 main 线程）去执行 retrofit.create() 中代理对象的 invoke() 方法，而该方法的 ServiceMethod 的实例化是较为耗时的，此时便会堵塞 main 线程。
 
-此时我们便可以使用 defer 操作符，在构建该 observable 前（SingleDefer 被订阅前）对线程进行切换，从而防止堵塞 main 线程。关于 Retrofit 的处理可[点击查看详情 ](https://github.com/passin95/P-MVP/blob/master/pmvp/src/main/java/com/passin/pmvp/http/repository/RepositoryManager.java)。
+此时我们便可以使用 defer 操作符，在构建该 observable 前（SingleDefer 被订阅前）对线程进行切换，从而防止堵塞 main 线程。
 
 ### Demo 执行过程梳理
 
