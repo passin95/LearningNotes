@@ -1,35 +1,34 @@
 
 <!-- TOC -->
 
-- [Android 基础](#android-基础)
-    - [生命周期](#生命周期)
-        - [Activity 的生命周期](#activity-的生命周期)
-        - [Fragment 的生命周期](#fragment-的生命周期)
-            - [Fragment 之间切换时](#fragment-之间切换时)
-        - [onSaveInstanceState() 和 onRestoreInstanceState()](#onsaveinstancestate-和-onrestoreinstancestate)
-        - [其余情况补充](#其余情况补充)
-        - [Application 的生命周期](#application-的生命周期)
-    - [activity 标签属性](#activity-标签属性)
-    - [Activity LaunchMode](#activity-launchmode)
-        - [FLAG](#flag)
-    - [IntentFilter 的匹配规则](#intentfilter-的匹配规则)
-        - [action 的匹配规则](#action-的匹配规则)
-        - [category 的匹配规则](#category-的匹配规则)
-        - [data 的匹配规则](#data-的匹配规则)
-        - [注意事项](#注意事项)
-- [参考资料](#参考资料)
+- [一、生命周期](#一生命周期)
+    - [1.1 Activity 的生命周期](#11-activity-的生命周期)
+    - [1.2 Fragment 的生命周期](#12-fragment-的生命周期)
+        - [1.2.1 Fragment 之间切换](#121-fragment-之间切换)
+    - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-和-onrestoreinstancestate)
+    - [1.4 其余情况补充](#14-其余情况补充)
+    - [1.5 Application 的生命周期](#15-application-的生命周期)
+- [二、Activity 标签属性](#二activity-标签属性)
+- [三、Activity LaunchMode](#三activity-launchmode)
+    - [3.1 FLAG](#31-flag)
+    - [补充说明](#补充说明)
+- [四、IntentFilter 的匹配规则](#四intentfilter-的匹配规则)
+    - [4.1 action 的匹配规则](#41-action-的匹配规则)
+    - [4.2 category 的匹配规则](#42-category-的匹配规则)
+    - [4.3 data 的匹配规则](#43-data-的匹配规则)
+    - [4.4 注意事项](#44-注意事项)
+- [五、参考资料](#五参考资料)
 
 <!-- /TOC -->
 
-# Android 基础
 
-## 生命周期
+# 一、生命周期
 
 以下描述是正常情况下 Fragment 直接写在 Activity xml 文件下的生命周期图：
 
 <div align ="center"> <img src ="../pictures/Activity和Fragment生命周期.png"/> </div><br>
 
-### Activity 的生命周期
+## 1.1 Activity 的生命周期
 
 正常情况下，Activity 会经历以下生命周期。
 
@@ -50,7 +49,7 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
  
 （7）onDestroy：Activity 即将销毁，回收工作以及资源释放。
 
-### Fragment 的生命周期
+## 1.2 Fragment 的生命周期
 
 （1）onAttach：Fragment 和 Activity 相关联时回调。
 
@@ -82,7 +81,12 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 其它时候的调用，同理按照 Fragment action 执行的时机去变化相应 Fragment 的生命周期执行时机。
 
-#### Fragment 之间切换时
+- isAdded：Fragment 被添加到 Activity 中时，返回 true。
+- isDetached：Fragment 从 UI 中分离，返回 true。（注：此字段只在 commit FragmentTransaction.detach 中被置为 true）。
+- isRemoving：Fragment 从 Activity 中移除，返回 true，（注：此字段只在 commit FragmentTransaction.remove 中被置为 true，源码逻辑和 detach 几乎一模一样）。
+- isHidden（onHiddenChanged）：只在 FragmentTransaction.show（hide）修改或回调。
+
+### 1.2.1 Fragment 之间切换
 
 （1）通过 add、show、hide 方式切换 Fragment。
 
@@ -94,32 +98,32 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onStop -> FragmentA onDestroyView ->FragmentA onDestroy -> FragmentA onDetach -> FragmentB onCreateView -> FragmentB onViewCreated -> FragmentB onActivityCreated 
 
-若 FragmentA 不加入 Fragment 栈 (构建时调用 addToBackStack())，不会调用 FragmentA onDestroy() 和 onDetach()，replace 回 FragmentA 时则从 onCreateView() 开始。
+若将该次事务加入 Fragment 栈 (调用 addToBackStack())，不会调用 FragmentA onDestroy() 和 onDetach()，replace 回 FragmentA 时则从 onCreateView() 开始。
 
 （3）通过 ViewPager 切换 Fragment。
 
 在 Fragment 没有被销毁的情况切换（需使用 FragmentPagerAdapter），只会回调 setUserVisVleHint(boolean isVisibleToUser) 方法。
 
-### onSaveInstanceState() 和 onRestoreInstanceState()
+## 1.3 onSaveInstanceState() 和 onRestoreInstanceState()
 
 当 Activity 被意外终止时或容易被销毁时，Activity 调用 onSaveInstanceState() 去保存数据，然后 Activity 委托 Window 去保存数据，接着 Window 再委托它上面的顶级容器去保存数据，一般是 DecordView。顶层容器再去一一通知它的子元素保存数据（写在 super 上面先于子元素保存，反之后于）。
 
-onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。例如：
+onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause()之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
+
+例如以下情况皆会调用：
 
 - 按下 Home 键 : Activity 进入了后台, 此时会调用该方法;
 - 按下电源键 : 屏幕关闭, Activity 进入后台;
 - 启动其它 Activity : Activity 被压入了任务栈的栈底;
 - 横竖屏切换 : 会销毁当前 Activity 并重新创建;
 
-### 其余情况补充
+## 1.4 其余情况补充
 
 （1）异常重建（包括系统配置发送改变）的生命周期：
 
 onPause -> onStop-> onSaveInstanceState -> onDestroy -> onCreate -> onStart -> onRestoreInstanceState -> onResume
 
 若不想在某个系统配置发生变化时重建 Activity，可给指定 Activity 配置 **configChanges**。并在配置发生变化时回调 onConfigurationChanged。
-
-onSaveInstanceState 执行时机不固定，一定在 onDestroy() 之前，一般在 onStop() 之后。
 
 （2）除了 Fragment 通过设置 setRetainInstance(true) 可以在 **系统配置发送改变** 导致的重建时保留原来的实例对象之外。其它情况（例如被系统杀死或系统配置发生变化）的 Activity 和 Fragment 发生的重建，都是生成新的实例对象，这些情况若要对数据进行恢复，依旧需要使用 onSaveInstanceState() 和 onRestoreInstanceState()。此外若想在 **系统配置发送改变** 导致的重建保留想要的数据还可以通过 ViewModel 去实现。
 
@@ -129,9 +133,9 @@ onSaveInstanceState 执行时机不固定，一定在 onDestroy() 之前，一�
 
 onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> onRestart -> onStart -> onRestoreInstanceState -> onActivityResult（B）-> onResume
 
-使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理。若 Intent 添加 FLAG_ACTIVITY_NEW_TASK ，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity。其它正常使用的情况皆为 onActivityResult（B）。
+使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理。若 Intent 添加 FLAG_ACTIVITY_NEW_TASK ，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity。其它正常使用的情况皆为 onActivityResult（B），注意若 Activity 是重建后的 Activity，则需要针对重建后加载的数据处理或恢复数据。
 
-### Application 的生命周期
+## 1.5 Application 的生命周期
 
 （1）onCreate：程序创建的时候执行。
 
@@ -153,7 +157,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 - TRIM_MEMORY_RUNNING_LOW：设备内存不足。您的运行进程应释放不需要的资源，以便在其他地方使用内存。
 - TRIM_MEMORY_RUNNING_MODERATE：该设备的内存开始紧缺。您的正在运行的进程可能希望释放一些不需要的资源以便在其他地方使用。
 
-## activity 标签属性
+# 二、Activity 标签属性
 
 以下是常用的 Activity 标签属性。
 
@@ -181,7 +185,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 - exported：是否支持其它应用调用当前组件。 默认值根据是否有 IntentFilter 来决定，包含为 true，反之为 false。
 
-## Activity LaunchMode
+# 三、Activity LaunchMode
 
 以下把每一个 Task 比作为一个任务栈。而 TaskAffinity 可以用来标识 Activity 所属的任务栈。默认情况下，Activity 的所属任务栈为应用包名，该值主要与 singleTask 或 allowTaskPeparenting 配对使用。
 
@@ -193,8 +197,9 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 （4）singleInstance：单实例模式，该 Activity（它自身）独自在一个栈内，若不存在则创建一个新的任务栈，且 **所有栈** 都复用这一个 Activity，除非这个任务栈或 Activity 销毁了。
 
-### FLAG
+## 3.1 FLAG
 
+- FLAG_ACTIVITY_SINGLE_TOP：同启动模式 singleTop。
 - FLAG_ACTIVITY_NEW_TASK：目标 Activity 放入一个新的任务栈。启动模式 singleTask 自带该 FLAG 的效果，反之不然。添加该 FLAG 在不同 taskAffinity 的 Activity 跳转时（没有设置启动模式），若目标 Activity 已在栈内存在，不会创建新实例，但也不会执行 onNewIntent()，而在同属一个 taskAffinity 的 Activity 跳转时（没有设置启动模式），则该 FLAG 没有效果。
 - FLAG_ACTIVITY_CLEAR_TASK：启动 Activity 时，将目标 Activity 所属的的任务栈清空，再启动新的任务栈，并将该 Activity 放入新的任务栈。该 FLAG 需跟 FLAG_ACTIVITY_NEW_TASK 配合使用。
 - FLAG_ACTIVITY_CLEAR_TOP：若目标 Activity 在栈内没有实例，则按照它的启动模式启动；若目标 Activity 在栈内有实例，则分以下三种清空：
@@ -203,21 +208,29 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
   3. singleInstance 按照 singleInstance 的逻辑处理。
 - FLAG_ACTIVITY_SINGLE_TOP：和启动模式 singleTop 效果一致。
 
-## IntentFilter 的匹配规则 
+## 补充说明
+
+1. 当任务栈不同时，启动不同栈内的实例，会导致任务栈之间的切换，原后台任务栈会位于前台。
+
+2. 若按手机的 Home 键，然后再次点击 Icon 启动应用，则会启动默认的任务栈。
+
+3. 如果使用系统默认的出栈方式，则当前任务栈的所有 Activity 出栈完毕时，才切换到其他的任务栈。
+
+# 四、IntentFilter 的匹配规则 
 
 启动 Activity 分为两种，显示调用和隐式调用，两者如果共存的话以显示调用为主。隐式调用主要是匹配目标 Activity 的 IntentFilter，一个 Activity 可以有多个 IntentFilter。
 
 IntentFilter 的过滤信息有 action、category、data，只有一个 Intent 同时匹配 action、category、data 的匹配规则才算完全匹配从而成功启动目标 Activity。
 
-### action 的匹配规则
+## 4.1 action 的匹配规则
 
 aciton 是一个字符串，一个过滤规则可以有多个 action，只要 Intent 中的 action 与过滤规则中的任何一个 action 相同（区分大小写）即匹配成功。一般情况下 Intent 必须设置 action，如果设置了 data，可不用设置 action，则匹配所有 action。
 
-### category 的匹配规则
+## 4.2 category 的匹配规则
 
 category 是一个字符串，一个 Intent 或 过滤规则中可以添加多个 category，如果 Intent 添加了 category，那么它的所有 category 都应该在过滤规则中添加，才算完全匹配从而成功启动目标 Activity；如果 Intent 中没有添加 category，则在 startActivity 的时候会默认添加 “android.intent.category.DEFAULT” 这个 category。
 
-### data 的匹配规则
+## 4.3 data 的匹配规则
 
 如果过滤规则定义了 data，那么 Intent 中必须也要添加至少一个匹配过滤规则的 data。过滤规则的默认 data 的默认 URI 的 scheme 为 content 和 file
 
@@ -226,7 +239,7 @@ category 是一个字符串，一个 Intent 或 过滤规则中可以添加多�
 data 标签的结构如下：
 ```xml
 <data
-    android:scheme="string"
+    android:scheme="string" 
     android:host="string"
     android:port="int"
     android:path="string"
@@ -251,10 +264,10 @@ URI 也叫统一资源标识符，它在 data 的结构如下：
 - pathPattern：完整的路径信息，不过可包含通配符 “*”，它可以表示 0 个或多个任意字符，若想表示真实的字符串需在字符前加 “\\”。
 - pathPrefix：路径的前缀信息。
 
-### 注意事项
+## 4.4 注意事项
 
 当我们通过隐式方式启动一个 Activity 时，若找不到匹配的 Activity，会抛出 ActivityNotFoundException，可以通过 PackageManager 的 resolveActivity() 或者 Intent 的 resolveActivity() 去提前验证是否存在匹配的 Activity，若不存在则返回值会为 null。
 
-# 参考资料
+# 五、参考资料
 
 - Android 开发艺术探索 - 任玉刚
