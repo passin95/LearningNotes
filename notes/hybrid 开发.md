@@ -124,8 +124,6 @@ webSettings.setSavePassword(false);
 // 设置允许 JS 弹窗
 settings.setJavaScriptCanOpenWindowsAutomatically(true);
 
-
-
 // 将图片调整到适合 webview 的大小。
 websettings.setUseWideViewPort(true);
 // 将页面缩放至屏幕的大小
@@ -147,7 +145,6 @@ webSettings.setDisplayZoomControls(false);
 // LOAD_NO_CACHE: 不使用缓存，只从网络获取数据。
 // LOAD_CACHE_ELSE_NETWORK，只要本地有，无论是否过期，或者 no-cache，都使用缓存中的数据。
 webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
 
 if (NetStatusUtil.isConnected(getApplicationContext())) {
     // 根据 cache-control 决定是否从网络上取数据。
@@ -374,8 +371,8 @@ webView.addJavascriptInterface(new AndroidtoJs(), "test");
 
 public class AndroidtoJs extends Object {
 
-    // 定义 JS 需要调用的方法
-    // 被 JS 调用的方法必须加入@JavascriptInterface 注解 
+    // 定义 Js 需要调用的方法
+    // 被 Js 调用的方法必须加入 @JavascriptInterface 注解 
     @JavascriptInterface
     public void hello(String msg) {
         System.out.println("Js 调用了 Android 的 hello 方法");
@@ -428,14 +425,14 @@ if (url.startsWith("file://") {
 
 #### WebViewClient 的 shouldOverrideUrlLoading()
 
-Android通过 WebViewClient 的回调方法shouldOverrideUrlLoading ()拦截 url，再解析该 url 的协议，如果检测到是预先约定好的协议，就调用相应方法。
+Android 通过 WebViewClient 的回调方法 shouldOverrideUrlLoading () 拦截 url，再解析该 url 的协议，如果检测到是预先约定好的协议，就调用相应方法。
 
 ```java
 public boolean shouldOverrideUrlLoading(WebView view, String url) {
     Uri uri = Uri.parse(url);
     if (uri.getScheme().equals("js")) {
         if (uri.getAuthority().equals("webview")) {
-            System.out.println("js调用了Android的方法");
+            System.out.println("js 调用了 Android 的方法");
             Set<String> collection = uri.getQueryParameterNames();
             for (String s : collection) {
                 System.out.println(s);
@@ -468,7 +465,7 @@ public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
 #### WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()
 
-通过 WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt（）方法回调分别拦截 Js 对话框。该方式不存在漏洞问题。
+通过 WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt() 方法回调分别拦截 Js 对话框。该方式不存在漏洞问题。
 
 ```java
 @Override
@@ -532,7 +529,7 @@ public boolean onJsPrompt(WebView view, String url, String message, String defau
 
 ### VasSonic
 
-[VasSonic](https://github.com/Tencent/VasSonic) 是腾讯开源的一个轻量级的高性能的Hybrid框架，专注于提升页面首屏加载速度，完美支持静态直出页面和动态直出页面，兼容离线包等方案。
+[VasSonic](https://github.com/Tencent/VasSonic) 是腾讯开源的一个轻量级的高性能的 Hybrid 框架，专注于提升页面首屏加载速度，完美支持静态直出页面和动态直出页面，兼容离线包等方案。
 
 具体使用参考 [WiKi](https://github.com/Tencent/VasSonic/blob/master/sonic-android/README.md)。
 
