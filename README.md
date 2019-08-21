@@ -38,9 +38,9 @@
 
   Android 常用框架的源码分析。
 
-- [自定义 View](https://github.com/passin95/LearningNotes/blob/master/notes/自定义%20View.md)
+- [View](https://github.com/passin95/LearningNotes/blob/master/notes/View.md)
 
-  主要参考 **Hencoder** 的 **自定义 View** 系列以及 **GcsSloop** 的 **自定义控件** 系列。
+  View 的工作流程、自定义 View、动画。
 
 - [性能相关](https://github.com/passin95/LearningNotes/blob/master/notes/性能相关.md)
 
@@ -124,8 +124,6 @@
 #### About
 
 笔记是根据自己的实际情况和理解进行编写、整理，欢迎其它读者收阅、提供建议。
-
-学习笔记不是从网上到处拼凑而来，除了部分引用书上和技术文档的原文，其余都是笔者的原创。在您引用本仓库内容或者对内容进行修改演绎时，请遵循文末的开源协议，谢谢。
 
 该笔记暂时由笔者一个人维护，为了方便在不同 PC 端编写笔记，因此不再在 commit 的时候提供详细的说明。
 
