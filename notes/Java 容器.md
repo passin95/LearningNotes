@@ -1,22 +1,22 @@
 <!-- TOC -->
 
-- [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
-  - [1.1 说明](#11-%E8%AF%B4%E6%98%8E)
-  - [1.1 Collection](#11-collection)
-    - [1.1.1 List](#111-list)
-    - [1.1.2 Set](#112-set)
-    - [1.1.3 Queue](#113-queue)
-  - [1.2 Map](#12-map)
-  - [1.3 Arrays.asList()](#13-arraysaslist)
-- [二、源码分析](#%E4%BA%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [2.1 ArrayList](#21-arraylist)
-    - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-vectorcopyonwritearraylistcollectionssynchronizedlist-%E5%AF%B9%E6%AF%94)
-  - [2.2 LinkedList](#22-linkedlist)
-  - [2.3 HashMap](#23-hashmap)
-    - [2.3.1 成员变量和构造函数](#231-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
-    - [2.3.2 存储结构](#232-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
-    - [2.3.3 put、get、resize](#233-putgetresize)
-    - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-hashtableconcurrenthashmapcollectionssynchronizedmap-%E5%AF%B9%E6%AF%94)
+- [一、概述](#一概述)
+    - [1.1 说明](#11-说明)
+    - [1.1 Collection](#11-collection)
+        - [1.1.1 List](#111-list)
+        - [1.1.2 Set](#112-set)
+        - [1.1.3 Queue](#113-queue)
+    - [1.2 Map](#12-map)
+    - [1.3 Arrays.asList()](#13-arraysaslist)
+- [二、源码分析](#二源码分析)
+    - [2.1 ArrayList](#21-arraylist)
+        - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
+    - [2.2 LinkedList](#22-linkedlist)
+    - [2.3 HashMap](#23-hashmap)
+        - [2.3.1 成员变量和构造函数](#231-成员变量和构造函数)
+        - [2.3.2 存储结构](#232-存储结构)
+        - [2.3.3 put、get、resize](#233-putgetresize)
+        - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-线程安全方案-hashtableconcurrenthashmapcollectionssynchronizedmap-对比)
 
 <!-- /TOC -->
 
@@ -1598,7 +1598,7 @@ public V put(K key, V value) {
 static final int hash(Object key) {
     int h;
     // 通过 key 的 hashCode() 计算 hash 值。
-    // 当 key == null 时，hash 值 为 0，在 putVal() 可由 (n - 1) & hash 可得值为0，因此 null key 一定在数组的第一个桶内（索引为 0）。
+    // 当 key == null 时，hash 值 为 0，在 putVal() 可由 (n - 1) & hash 可得值为 0，因此 null key 一定在数组的第一个桶内（索引为 0）。
     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
 }
 

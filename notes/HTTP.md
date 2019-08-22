@@ -1,100 +1,92 @@
+
 <!-- TOC -->
 
 - [一、基础概念](#一基础概念)
-    - [URI 和 URL](#uri-和-url)
-    - [TCP/IP](#tcpip)
-    - [应用层](#应用层)
-    - [运输层](#运输层)
-        - [TCP](#tcp)
-        - [UDP](#udp)
-    - [网络层](#网络层)
-    - [数据链路层](#数据链路层)
-    - [TCP 连接过程](#tcp-连接过程)
+    - [1.1 URI 和 URL](#11-uri-和-url)
+    - [1.2 TCP/IP](#12-tcpip)
+    - [1.3 计算机网络结构](#13-计算机网络结构)
+        - [1.3.1 应用层](#131-应用层)
+        - [1.3.2 运输层](#132-运输层)
+            - [1.3.2.1 TCP](#1321-tcp)
+            - [1.3.2.2 UDP](#1322-udp)
+        - [1.3.3 网络层](#133-网络层)
+        - [1.3.4 数据链路层](#134-数据链路层)
+        - [1.3.5 物理层](#135-物理层)
+    - [1.4 TCP 连接过程](#14-tcp-连接过程)
 - [二、HTTP](#二http)
-    - [请求和响应报文](#请求和响应报文)
-        - [1. 请求报文](#1-请求报文)
-        - [2. 响应报文](#2-响应报文)
-    - [请求方法](#请求方法)
-        - [GET](#get)
-        - [HEAD](#head)
-        - [POST](#post)
-        - [PUT](#put)
-        - [DELETE](#delete)
-    - [HTTP 状态码](#http-状态码)
-        - [1XX 信息](#1xx-信息)
-        - [2XX 成功](#2xx-成功)
-        - [3XX 重定向](#3xx-重定向)
-        - [4XX 客户端错误](#4xx-客户端错误)
-        - [5XX 服务器错误](#5xx-服务器错误)
-    - [HTTP 首部](#http-首部)
-        - [通用首部字段](#通用首部字段)
-        - [请求首部字段](#请求首部字段)
-        - [响应首部字段](#响应首部字段)
-        - [实体首部字段](#实体首部字段)
-    - [Content-Type](#content-type)
-        - [1. text/html](#1-texthtml)
-        - [2. x-www-form-urlencoded](#2-x-www-form-urlencoded)
-        - [3. multitype/form-data](#3-multitypeform-data)
-        - [4. application/json，image/jpeg,……](#4-applicationjsonimagejpeg)
-- [三、具体应用](#三具体应用)
-    - [Cookie](#cookie)
-        - [1. 用途](#1-用途)
-        - [2. 创建过程](#2-创建过程)
-        - [3. 分类](#3-分类)
-        - [4. JavaScript 获取 Cookie](#4-javascript-获取-cookie)
-        - [5. Secure 和 HttpOnly](#5-secure-和-httponly)
-        - [6. Session](#6-session)
-        - [7. 浏览器禁用 Cookie](#7-浏览器禁用-cookie)
-        - [8. Cookie 与 Session 选择](#8-cookie-与-session-选择)
-    - [缓存](#缓存)
-        - [1. 优点](#1-优点)
-        - [2. 实现方法](#2-实现方法)
-        - [3. Cache-Control](#3-cache-control)
-        - [4. 缓存验证](#4-缓存验证)
-    - [Authorization](#authorization)
-        - [Basic](#basic)
-        - [Bearer](#bearer)
-            - [OAuth2 授权流程](#oauth2-授权流程)
-            - [OAuth2 微信登陆流程](#oauth2-微信登陆流程)
-            - [在自家 App 中使用 Bearer token](#在自家-app-中使用-bearer-token)
-            - [为什么引入 Authorization code](#为什么引入-authorization-code)
-            - [Refresh token](#refresh-token)
-    - [连接管理](#连接管理)
-        - [1. 短连接与长连接](#1-短连接与长连接)
-        - [2. 流水线](#2-流水线)
-    - [内容协商](#内容协商)
-        - [1. 类型](#1-类型)
-        - [2. Vary](#2-vary)
-    - [内容编码](#内容编码)
-    - [范围请求](#范围请求)
-        - [1. Range](#1-range)
-        - [2. Accept-Ranges](#2-accept-ranges)
-        - [3. 响应状态码](#3-响应状态码)
-    - [分块传输编码](#分块传输编码)
-    - [多部分对象集合](#多部分对象集合)
+    - [2.1 请求报文和响应报文](#21-请求报文和响应报文)
+    - [2.2 请求方法](#22-请求方法)
+    - [2.3 HTTP 状态码](#23-http-状态码)
+        - [2.3.1 1XX 信息](#231-1xx-信息)
+        - [2.3.2 2XX 成功](#232-2xx-成功)
+        - [2.3.3 3XX 重定向](#233-3xx-重定向)
+        - [2.3.4 4XX 客户端错误](#234-4xx-客户端错误)
+        - [2.3.5 5XX 服务器错误](#235-5xx-服务器错误)
+    - [2.4 HTTP 首部（请求头）](#24-http-首部请求头)
+        - [2.4.1 通用首部字段](#241-通用首部字段)
+        - [2.4.2 请求首部字段](#242-请求首部字段)
+        - [2.4.3 响应首部字段](#243-响应首部字段)
+        - [2.4.4 实体首部字段](#244-实体首部字段)
+    - [2.5 Content-Type](#25-content-type)
+- [三、实际应用](#三实际应用)
+    - [3.1 Cookie](#31-cookie)
+        - [3.1.1 用途](#311-用途)
+        - [3.1.2 创建过程](#312-创建过程)
+        - [3.1.3 分类](#313-分类)
+        - [3.1.4 JavaScript 获取 Cookie](#314-javascript-获取-cookie)
+        - [3.1.5 Secure 和 HttpOnly](#315-secure-和-httponly)
+        - [3.1.6 Session](#316-session)
+        - [3.1.7 浏览器禁用 Cookie](#317-浏览器禁用-cookie)
+        - [3.1.8 Cookie 与 Session 选择](#318-cookie-与-session-选择)
+    - [3.2 缓存](#32-缓存)
+        - [3.2.1 作用](#321-作用)
+        - [3.2.2 实现方法](#322-实现方法)
+        - [3.2.3 Cache-Control](#323-cache-control)
+        - [3.2.4 缓存验证](#324-缓存验证)
+    - [3.3 Authorization](#33-authorization)
+        - [3.3.1 Basic](#331-basic)
+        - [3.3.2 Bearer](#332-bearer)
+            - [3.3.2.1 OAuth2 授权流程](#3321-oauth2-授权流程)
+            - [3.3.2.2 OAuth2 微信授权登陆流程](#3322-oauth2-微信授权登陆流程)
+            - [3.3.2.3 在自家 App 中使用 Bearer token](#3323-在自家-app-中使用-bearer-token)
+            - [3.3.2.4 为什么引入 Authorization code](#3324-为什么引入-authorization-code)
+            - [3.3.2.5 Refresh token](#3325-refresh-token)
+    - [3.4 连接管理](#34-连接管理)
+        - [3.4.1 短连接与长连接](#341-短连接与长连接)
+        - [3.4.2 流水线](#342-流水线)
+    - [3.5 内容协商](#35-内容协商)
+        - [3.5.1 类型](#351-类型)
+        - [3.5.2 Vary](#352-vary)
+    - [3.6 内容编码](#36-内容编码)
+    - [3.7 范围请求](#37-范围请求)
+        - [3.7.1 Range](#371-range)
+        - [3.7.2 Accept-Ranges](#372-accept-ranges)
+        - [3.7.3 响应状态码](#373-响应状态码)
+    - [3.8 分块传输编码](#38-分块传输编码)
+    - [3.9 多部分对象集合](#39-多部分对象集合)
 - [四、HTTPs](#四https)
-    - [加密](#加密)
-        - [1.对称密钥加密](#1对称密钥加密)
-        - [2.非对称密钥加密](#2非对称密钥加密)
-    - [证书（认证）](#证书认证)
-        - [证书包含的信息](#证书包含的信息)
-        - [证书的验证过程](#证书的验证过程)
-    - [完整性保护](#完整性保护)
-    - [HTTPs 的缺点](#https-的缺点)
-    - [HTTPs 连接建立过程](#https-连接建立过程)
+    - [4.1 加密](#41-加密)
+        - [4.1.1 对称密钥加密](#411-对称密钥加密)
+        - [4.1.2 非对称密钥加密](#412-非对称密钥加密)
+    - [4.2 证书（认证）](#42-证书认证)
+        - [4.2.1 证书包含的信息](#421-证书包含的信息)
+        - [4.2.2 证书的验证过程](#422-证书的验证过程)
+    - [4.3 完整性保护](#43-完整性保护)
+    - [4.4 HTTPs 的缺点](#44-https-的缺点)
+    - [4.5 HTTPs 连接建立过程](#45-https-连接建立过程)
 - [五、GET 和 POST 的区别](#五get-和-post-的区别)
-    - [作用](#作用)
-    - [参数](#参数)
-    - [安全](#安全)
-    - [幂等性](#幂等性)
-    - [可缓存](#可缓存)
+    - [5.1 作用](#51-作用)
+    - [5.2 参数](#52-参数)
+    - [5.3 安全](#53-安全)
+    - [5.4 幂等性](#54-幂等性)
+    - [5.5 可缓存](#55-可缓存)
 - [参考资料](#参考资料)
 
 <!-- /TOC -->
 
 # 一、基础概念
 
-## URI 和 URL
+## 1.1 URI 和 URL
 
 - URI（Uniform Resource Identifier，统一资源标识符）
 - URL（Uniform Resource Locator，统一资源定位符）
@@ -103,7 +95,9 @@
 URI 包含 URL 和 URN，目前 WEB 只有 URL 比较流行，所以见到的基本都是 URL。
 
 
-URI 的结构如下，它们都是等价的，只不过是划分的区域不同：
+<div align="center"> <img src="../pictures//URI%20和%20URL%20的关系.webp" /> </div>
+
+URI 的结构如下，它们都是等价的，只不过划分的区域不同：
 ```
 [scheme:]scheme-specific-part[#fragment]
 [scheme:][//authority][path][?query][#fragment]
@@ -125,88 +119,91 @@ http://www.demo.com:8080/path/path1?key=value&key1=value1&key2=value2#demofragme
 - query：键对值，Deme 中为 key=value&key1=value1&key2=value2;
 - fragment：用来标识次级资源，Demo 中为 demofragment。
 
-<div align="center"> <img src="../pictures//f716427a-94f2-4875-9c86-98793cf5dcc3.jpg" width="400"/> </div>
-
-## TCP/IP
+## 1.2 TCP/IP
 
 <div align="center"> <img src="../pictures//TCPIP.png" width="400"/> </div>
 
-TCP/IP 是互联网相关的各类协议族的总称。TCP/IP 协议族尽量按单一职责原则分别分为以下 4 层：应用层、运输层、网络层和数据链路层。避免因网络的不稳定导致整个连接的重新尝试。
+TCP/IP 是互联网相关的各类协议族的总称。
 
-## 应用层
+## 1.3 计算机网络结构
 
-各种应用层协议，例如 HTTP、DNS 等，数据单位为报文。
+<div align="center"> <img src="../pictures//计算机网络体系结构.webp"/> </div>
 
-作用：为特定应用程序提供数据传输服务。
+### 1.3.1 应用层
 
-## 运输层
+应用层(application-layer）的任务是通过应用进程间的交互来完成特定网络应用。应用层协议定义的是应用进程（进程：主机中正在运行的程序）间的通信和交互的规则。对于不同的网络应用需要不同的应用层协议，例如域名系统 DNS，支持万维网应用的 HTTP 协议，支持电子邮件的 SMTP 协议等等。数据单元称为报文。
 
-提供的是进程间的通用数据传输服务。由于应用层协议很多，定义通用的运输层协议就可以支持不断增多的应用层协议。运输层包括两种协议：传输控制协议 TCP 和用户数据报协议 UDP。
+### 1.3.2 运输层
 
-### TCP
+提供的是进程间的通用数据传输服务。由于应用层协议很多，定义通用的运输层协议就可以支持不断增多的应用层协议。运输层主要使用两种协议：传输控制协议 TCP 和用户数据报协议 UDP。
+
+#### 1.3.2.1 TCP
 
 提供面向连接、可靠的数据传输服务，数据单位为报文段。对收到的数据（例如 HTTP 请求报文）进行分割，并在各个报文上打上标记序号及端口号后转发给网络层。每一条 TCP 连接只能是点到点的。
 
-### UDP
+#### 1.3.2.2 UDP
 
 提供无连接、尽最大努力的数据传输服务，数据单位为用户数据报。UDP 具有较好的实时性，工作效率比 TCP 高，适用于对高速传输和实时性有较高的通信或广播通信。UDP 支持一对一，一对多，多对一和多对多的交互通信（多用于实时游戏）。
 
-## 网络层
+### 1.3.3 网络层
 
-为主机间提供数据传输服务，而运输层协议是为主机中的进程提供服务。网络层把运输层传递下来的报文段或者用户数据报封装成分组。该层一般是 IP 协议。
+为两个主机之间提供数据传输服务，与运输层协议的差别在于运输层为主机中的进程提供服务。网络层把运输层传递下来的报文段或者用户数据报封装成分组。该层一般是 IP 协议。
 
-## 数据链路层 
+### 1.3.4 数据链路层 
 
-用来处理连接网络的硬件部分。包括控制操作系统、硬件的设备驱动、NIC（
-Network Interface Card，网络适配器，即网卡），及光纤等物理可见部分（还包括连接器等一切传输媒介）。硬件上的范畴均在链路层的作用范围之内。
+两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻节点之间传送数据时，数据链路层将网络层交下来的 IP 数据报组装成帧。
 
-## TCP 连接过程
+### 1.3.5 物理层
 
-<div align="center"> <img src="../pictures//TCPConnect.png" /> </div>
+在物理层上所传送的数据单位是比特。物理层的作用是实现相邻计算机节点之间比特流的透明传送，尽可能屏蔽掉具体传输介质和物理设备的差异。
+
+## 1.4 TCP 连接过程
+
+<div align="center"> <img src="../pictures//TCP%20连接过程.webp"/> </div>
 
 # 二、HTTP
 
 - 超文本传输协议，现用于作为网络请求以及传输 HTML 内容、二进制数据等。
 - HTTP 位于 TCP/IP 协议族中的最顶层———应用层
 
-## 请求和响应报文
+## 2.1 请求报文和响应报文
 
-### 1. 请求报文
+**（1）请求报文**
 
-<div align="center"> <img src="../pictures//HTTP_RequestMessageExample.png" width=""/> </div><br>
+<div align="center"> <img src="../pictures//HTTP%20请求报文.png"/> </div><br>
 
-### 2. 响应报文
+**（2）响应报文**
 
-<div align="center"> <img src="../pictures//HTTP_ResponseMessageExample.png" width=""/> </div><br>
+<div align="center"> <img src="../pictures//HTTP%20响应报文.png"/> </div><br>
 
-## 请求方法
+## 2.2 请求方法
 
-### GET
+**（1）GET**
 
 - 用于获取资源。
 - 不会修改服务器数据。
 - 不发送 Body。
 
-### HEAD
+**（2）HEAD**
 
 - 用于获取报文首部，即返回的响应没有 Body。
 
-### POST
+**（3）POST**
 
 - 用于增加或修改资源。
 - 传输内容写在 Body 中。
 
-### PUT
+**（4）PUT**
 
 - 向指定资源位置上传其最新内容。
 - 传输内容写在 Body 中。
 
-### DELETE
+**（4）DELETE**
 
-- 用于删除指定资源位置的资源。
-- 不发送 Body。
+- 删除指定资源位置的资源。
+- 请求报文没有请求体。
 
-## HTTP 状态码
+## 2.3 HTTP 状态码
 
 服务器返回的 **响应报文** 中第一行为状态行，包含了状态码以及原因短语，用来告知客户端请求的结果。
 
@@ -218,11 +215,11 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 | 4XX | Client Error（客户端错误状态码） | 服务器无法处理请求 |
 | 5XX | Server Error（服务器错误状态码） | 服务器处理请求出错 |
 
-### 1XX 信息
+### 2.3.1 1XX 信息
 
 -  **100 Continue** ：表明到目前为止都很正常，客户端可以继续发送请求 (例如传输文件过大，需要分段传输，服务器返回 100 表示已经接受到客户端的需要，让客户端继续传输) 或者忽略这个响应。
 
-### 2XX 成功
+### 2.3.2 2XX 成功
 
 -  **200 OK** 
 
@@ -230,7 +227,7 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 
 -  **206 Partial Content** ：表示客户端进行了范围请求。响应报文包含由 Content-Range 指定范围的实体内容。
 
-### 3XX 重定向
+### 2.3.3 3XX 重定向
 
 -  **301 Moved Permanently** ：永久性重定向
 
@@ -244,7 +241,7 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 
 -  **307 Temporary Redirect** ：临时重定向，与 302 的含义类似，但是 307 要求浏览器不会把重定向请求的 POST 方法改成 GET 方法。
 
-### 4XX 客户端错误
+### 2.3.4 4XX 客户端错误
 
 -  **400 Bad Request** ：请求报文中存在语法错误。
 
@@ -256,19 +253,19 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 
 -  **407 Proxy Authentication Required** ：需要代理授权，和 401 类似，但指定请求者应当授权使用代理。
 
-### 5XX 服务器错误
+### 2.3.5 5XX 服务器错误
 
 -  **500 Internal Server Error** ：服务器正在执行请求时发生错误。
 
 -  **503 Service Unavailable** ：服务器暂时处于超负载或正在进行停机维护，现在无法处理请求。
 
-## HTTP 首部
+## 2.4 HTTP 首部（请求头）
 
 有 4 种类型的首部字段：通用首部字段、请求首部字段、响应首部字段和实体首部字段。
 
 各种首部字段及其含义如下（不需要全记，仅供查阅）：
 
-### 通用首部字段
+### 2.4.1 通用首部字段
 
 | 首部字段名 | 说明 |
 | :--: | :--: |
@@ -282,7 +279,7 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 | Via | 代理服务器的相关信息 |
 | Warning | 错误通知 |
 
-### 请求首部字段
+### 2.4.2 请求首部字段
 
 | 首部字段名 | 说明 |
 | :--: | :--: |
@@ -306,7 +303,7 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 | TE | 传输编码的优先级 |
 | User-Agent | 用户代理 |
 
-### 响应首部字段
+### 2.4.3 响应首部字段
 
 | 首部字段名 | 说明 |
 | :--: | :--: |
@@ -320,7 +317,7 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 | Vary | 代理服务器缓存的管理信息 |
 | WWW-Authenticate | 服务器对客户端的认证信息 |
 
-### 实体首部字段
+### 2.4.4 实体首部字段
 
 | 首部字段名 | 说明 |
 | :--: | :--: |
@@ -335,54 +332,52 @@ Network Interface Card，网络适配器，即网卡），及光纤等物理可�
 | Expires | 实体主体过期的日期时间 |
 | Last-Modified | 资源的最后修改日期时间 |
 
-## Content-Type
+## 2.5 Content-Type
 
-### 1. text/html
+**（1）text/html**
 
 Body 中返回 html 文本。
 
-### 2. x-www-form-urlencoded
+**（2）x-www-form-urlencoded**
 
 纯文本表单的提交方式。
 
-### 3. multitype/form-data
+**（3）multitype/form-data**
 
 含二进制文件时的提交方式。
 
-### 4. application/json，image/jpeg,……
+**（4）application/json，image/jpeg,……**
 
 单项（专项）内容提交，例如 application/json 可直接以 Body 形式传输相应 bean 类。
 
-# 三、具体应用
+# 三、实际应用
 
-## Cookie
+## 3.1 Cookie
 
-HTTP 协议是无状态的，主要是为了让 HTTP 协议尽可能简单，使得它能够处理大量事务。HTTP/1.1 引入 Cookie 来保存状态信息。
+HTTP 协议是无状态的，主要是为了让 HTTP 协议尽可能简单。为了让它能够处理大量事务，在 HTTP/1.1 中引入 Cookie 来保存状态信息。
 
-Cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器之后向同一服务器再次发起请求时被携带上，用于告知服务端两个请求是否来自同一浏览器。由于之后每次请求都会需要携带 Cookie 数据，因此会带来额外的性能开销（尤其是在移动环境下）。
+Cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，浏览器向同一服务器再次发起请求时 Cookie 会被携带上，用于告知服务端两个请求是否来自同一浏览器。由于之后每次请求都会需要携带 Cookie 数据，因此会带来额外的性能开销（尤其是在移动环境下）。
 
-Cookie 曾一度用于客户端数据的存储，因为当时并没有其它合适的存储办法而作为唯一的存储手段，但现在随着现代浏览器开始支持各种各样的存储方式，Cookie 渐渐被淘汰。新的浏览器 API 已经允许开发者直接将数据存储到本地，如使用 Web storage API （本地存储和会话存储）或 IndexedDB。
+Cookie 曾一度用于客户端数据的存储，因为当时并没有其它合适的存储办法而作为唯一的存储手段，但现在随着现代浏览器开始支持各种各样的存储方式，Cookie 渐渐被淘汰，但 Cookie 在其它用途上面仍有用武之地。
 
-### 1. 用途
+### 3.1.1 用途
 
 - 会话状态管理（如用户登录状态、购物车、游戏分数或其它需要记录的信息）
 - 个性化设置（如用户自定义设置、主题等）
 - 浏览器行为跟踪（如跟踪分析用户行为等）
 
-### 2. 创建过程
+### 3.1.2 创建过程
 
-服务器发送的响应报文包含 Set-Cookie 首部字段，客户端得到响应报文后把 Cookie 内容保存到浏览器中。
+服务器发送的响应报文包含 Set-Cookie 首部字段，客户端得到响应报文后把 Cookie 内容保存到浏览器（客户端）中。
 
 ```html
-HTTP/1.0 200 OK
+HTTP/1.1 200 OK
 Content-type: text/html
 Set-Cookie: yummy_cookie=choco
 Set-Cookie: tasty_cookie=strawberry
-
-[page content]
 ```
 
-客户端之后对同一个服务器发送请求时，会从浏览器中读出 Cookie 信息通过 Cookie 请求首部字段发送给服务器。
+客户端之后对同一个服务器发送请求时，从浏览器中读出 Cookie 信息通过添加 Cookie 请求首部字段发送给服务器。
 
 ```html
 GET /sample_page.html HTTP/1.1
@@ -390,16 +385,16 @@ Host: www.example.org
 Cookie: yummy_cookie=choco; tasty_cookie=strawberry
 ```
 
-### 3. 分类
+### 3.1.3 分类
 
 - 会话期 Cookie：浏览器关闭之后它会被自动删除，也就是说它仅在会话期内有效。
-- 持久性 Cookie：指定一个特定的过期时间（Expires）或有效期（max-age）之后就成为了持久性的 Cookie。
+- 持久性 Cookie：指定一个特定的过期时间（Expires）或有效期（max-age）。
 
 ```html
 Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
 ```
 
-### 4. JavaScript 获取 Cookie
+### 3.1.4 JavaScript 获取 Cookie
 
 通过 `Document.cookie` 属性可创建新的 Cookie，也可通过该属性访问非 HttpOnly 标记的 Cookie。
 
@@ -409,9 +404,9 @@ document.cookie = "tasty_cookie=strawberry";
 console.log(document.cookie);
 ```
 
-### 5. Secure 和 HttpOnly
+### 3.1.5 Secure 和 HttpOnly
 
-标记为 Secure 的 Cookie 只应通过被 HTTPS 协议加密过的请求发送给服务端。但即便设置了 Secure 标记，敏感信息也不应该通过 Cookie 传输，因为 Cookie 有其固有的不安全性，Secure 标记也无法提供确实的安全保障。
+标记为 Secure 的 Cookie 只应通过被 HTTPS 请求发送给服务端。但即便设置了 Secure 标记，敏感信息也不应该通过 Cookie 传输，因为 Cookie 有其固有的不安全性，Secure 标记也无法提供绝对的安全保障。
 
 标记为 HttpOnly 的 Cookie 不能被 JavaScript 脚本调用。因为跨站脚本攻击 (XSS) 常常使用 JavaScript 的 `Document.cookie` API 窃取用户的 Cookie 信息，因此使用 HttpOnly 标记可以在一定程度上避免 XSS 攻击。
 
@@ -419,9 +414,9 @@ console.log(document.cookie);
 Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly
 ```
 
-### 6. Session
+### 3.1.6 Session
 
-除了可以将用户信息通过 Cookie 存储在用户浏览器中，也可以利用 Session 存储在服务器端，存储在服务器端的信息更加安全。
+除了可以将用户信息通过 Cookie 存储在用户浏览器中，也可以利用 Session 存储在服务器端，存储在服务器端的信息也会更加安全。
 
 Session 可以存储在服务器上的文件、数据库或者内存中。也可以将 Session 存储在内存型数据库中，比如 Redis。
 
@@ -433,43 +428,43 @@ Session 可以存储在服务器上的文件、数据库或者内存中。也可
 - 服务器返回的响应报文的 Set-Cookie 首部字段包含了这个 Session ID，客户端收到响应报文之后将该 Cookie 值存入浏览器中；
 - 客户端之后对同一个服务器进行请求时会包含该 Cookie 值，服务器收到之后提取出 Session ID，从 Redis 中取出用户信息，继续之后的业务操作。
 
-应该注意 Session ID 的安全性问题，不能让它被恶意攻击者轻易获取，那么就不能产生一个容易被猜到的 Session ID 值。此外，还需要经常重新生成 Session ID。在对安全性要求极高的场景下，例如转账等操作，除了使用 Session 管理用户状态之外，还需要对用户进行重新验证，比如重新输入密码，或者使用短信验证码等方式。
+应该注意 Session ID 的安全性问题，不能让它被恶意攻击者轻易获取。因此 Session ID 的生成规则应当是不规律的，且还需要经常重新生成 Session ID。在对安全性要求极高的场景下，例如转账等操作，除了使用 Session 管理用户状态之外，还需要对用户进行重新验证，比如重新输入密码，或者使用短信验证码等方式。
 
-### 7. 浏览器禁用 Cookie
+### 3.1.7 浏览器禁用 Cookie
 
 此时无法使用 Cookie 来保存用户信息，只能使用 Session。除此之外，不能再将 Session ID 存放到 Cookie 中，而是使用 URL 重写技术，将 Session ID 作为 URL 的参数进行传递。
 
-### 8. Cookie 与 Session 选择
+### 3.1.8 Cookie 与 Session 选择
 
 - Cookie 只能存储 ASCII 码字符串，而 Session 则可以存取任何类型的数据，因此在考虑数据复杂性时首选 Session；
 - Cookie 存储在浏览器中，容易被恶意查看。如果非要将一些隐私数据存在 Cookie 中，可以将 Cookie 值进行加密，然后在服务器进行解密；
 - 对于大型网站，如果用户所有的信息都存储在 Session 中，那么开销是非常大的，因此不建议将所有的用户信息都存储到 Session 中。
 
-## 缓存
+## 3.2 缓存
 
-### 1. 优点
+### 3.2.1 作用
 
 - 缓解服务器压力；
-- 降低客户端获取资源的延迟（缓存资源比服务器上的资源离客户端更近）。
+- 降低客户端获取资源的延迟。
 
-### 2. 实现方法
+### 3.2.2 实现方法
 
 - 让代理服务器进行缓存；
 - 让客户端浏览器进行缓存。
 
-### 3. Cache-Control
+### 3.2.3 Cache-Control
 
 HTTP/1.1 通过 Cache-Control 首部字段来控制缓存。
 
-**（一）禁止进行缓存** 
+**（1）禁止进行缓存** 
 
-no-store 指令规定不能对请求或响应的任何一部分进行缓存。
+no-store 指令规定不能对请求或响应的任何数据进行缓存。
 
 ```html
 Cache-Control: no-store
 ```
 
-**（二）强制确认缓存** 
+**（2）强制确认缓存** 
 
 no-cache 指令规定缓存服务器需要先向源服务器验证缓存资源的有效性，只有当缓存资源有效才将能使用该缓存对客户端的请求进行响应。
 
@@ -477,7 +472,7 @@ no-cache 指令规定缓存服务器需要先向源服务器验证缓存资源�
 Cache-Control: no-cache
 ```
 
-**（三）私有缓存和公共缓存** 
+**（3）私有缓存和公共缓存** 
 
 private 指令规定了将资源作为私有缓存，只能被单独用户所使用，一般存储在用户浏览器中。
 
@@ -507,9 +502,9 @@ Expires 首部字段也可以用于告知缓存服务器该资源什么时候会
 Expires: Wed, 04 Jul 2012 08:26:05 GMT
 ```
 
-### 4. 缓存验证
+### 3.2.4 缓存验证
 
-需要先了解 ETag 首部字段的含义，它是资源的唯一标识。URL 不能唯一表示资源，例如 `http://www.google.com/` 有中文和英文两个资源，只有 ETag 才能对这两个资源进行唯一标识。
+ETag 它是资源的唯一标识。URL 不能唯一表示资源，例如 `http://www.google.com/` 有中文和英文两个资源，只有 ETag 才能对这两个资源进行唯一标识。
 
 ```html
 ETag: "82e22293907ce725faf67773957acd12"
@@ -531,22 +526,25 @@ Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT
 If-Modified-Since: Wed, 21 Oct 2015 07:28:00 GMT
 ```
 
-## Authorization
+## 3.3 Authorization
 
-分为两种主流方式 Basic 和 Bearer 。
+第三方授权分为两种主流方式： Basic 和 Bearer 。
 
-### Basic
+### 3.3.1 Basic
 
-- 格式：Authorization: Basic Base64 (username:password)
+- 首部字段格式：Authorization: Basic Base64 (username:password)
 > 例如：用户名为 passin ，密码为 123456 ，连起来则是 passin:123456 ,再对该字符串进行 Base64 编码，结果为 cGFzc2luOjEyMzQ1Ng==。即，最终添加进请求头的内容是：
+
+```html
 Authorization: Basic cGFzc2luOjEyMzQ1Ng==
+```
 
-### Bearer
+### 3.3.2 Bearer
 
-- 格式：Authorization: Bearer <bearer token>
+- 首部字段格式：Authorization: Bearer <bearer token>
 - bearer token 的获取方式：通过 OAuth2 的授权流程。
 
-#### OAuth2 授权流程
+#### 3.3.2.1 OAuth2 授权流程
 
 > 1. 第三方网站向授权方网站申请第三方授权合作，目的是拿到 client id 和 client secret。
 > 2. 用户在使用第三方网站时，点击授权（登陆）按钮后，跳转授权方网站，并传入 client id（第三方网站提供）作为用户的身份标识。
@@ -556,7 +554,7 @@ Authorization: Basic cGFzc2luOjEyMzQ1Ng==
 > 6. 服务器将 Authorization code 和自己的 client secret 一并发送给授权方的服务器，授权方服务器验证通过后，返回 access token。
 > 7. 第三方网站（客户端）就可以使用 access token 作为用户授权的令牌，向授权方发送请求来获取用户信息或操作用户账号。
 
-#### OAuth2 微信登陆流程
+#### 3.3.2.2 OAuth2 微信授权登陆流程
 
 > 1. 第三方 App 向微信开放平台申请第三方授权登陆，拿到 client id 和 client secret。
 > 2. 用户在使用第三方 App 时，点击微信登陆按钮后，将通过微信 SDK 跳转至微信，并传入自己的 client id 作为用户的身份标识。
@@ -569,17 +567,17 @@ Authorization: Basic cGFzc2luOjEyMzQ1Ng==
 > 9. 用户创建完成后，向客户端返回成功的响应以及创建的用户信息。
 > 10. 客户端收到响应，利用返回的用户数据进行操作，最终用户登录成功。
 
-#### 在自家 App 中使用 Bearer token
+#### 3.3.2.3 在自家 App 中使用 Bearer token
 
 简化掉获取 Authorization code 的过程，登录接口请求成功后，直接返回 access token。
 
-#### 为什么引入 Authorization code
+#### 3.3.2.4 为什么引入 Authorization code
 
 为了安全，OAuth 并不强制使用 Https，因此需要尽量保证当通信时被窃听时，依旧具有足够的安全性。
 - 服务器之间的通信以及服务器自身的数据一般是较为安全的。
 - 需要 Authorization code 以及第三方服务器自身才有的 client secret 才能拿到 access token。
 
-#### Refresh token
+#### 3.3.2.5 Refresh token
 
 ```
 {
@@ -590,35 +588,35 @@ Authorization: Basic cGFzc2luOjEyMzQ1Ng==
 }
 ```
 
-用法：accress token 只在一定时间内有效，在它失效后，可调用 refresh_token 接口，并参入 refresh_token 中的参数获取新的 access token。
+用法：accress token 只在一定时间内有效，在它失效后，可调用 refresh_token 接口，并传入 refresh_token 中的参数获取新的 access token。
 
-目的：为了更安全。当 accress  token 失窃时，窃取人只有较短时间的去利用它模拟请求接口，而 refresh_token 的值则永远存放于第三方服务器中，不容易失窃。
+目的：为了更安全。当 accress token 失窃时，窃取人只有较短时间的去利用它模拟请求接口，而 refresh_token 的值则永远存放于第三方服务器中，不容易失窃。
 
-## 连接管理
+## 3.4 连接管理
 
-### 1. 短连接与长连接
+### 3.4.1 短连接与长连接
 
 当浏览器访问一个包含多张图片的 HTML 页面时，除了请求访问 HTML 页面资源，还会请求图片资源，如果每进行一次 HTTP 通信就要断开一次 TCP 连接，连接建立和断开的开销会很大。长连接只需要建立一次 TCP 连接就能进行多次 HTTP 通信。
 
-从 HTTP/1.1 开始默认是长连接的，如果要断开连接，需要由客户端或者服务器端提出断开，使用 Connection : close；而在 HTTP/1.1 之前默认是短连接的，如果需要长连接，则使用 Connection : Keep-Alive。
+从 HTTP/1.1 开始默认是长连接的，如果要断开连接，需要由客户端或者服务器端提出断开，添加头部 Connection : close；而在 HTTP/1.1 之前默认是短连接的，如果需要长连接，则添加头部 Connection : Keep-Alive。
 
 长连接的实现方式：每间隔一定时间,使用 TCP 连接发送很短且无意义的消息,让服务器网关不将自己定义为“空闲连接”,从而防止网关关闭连接。
 
-### 2. 流水线
+### 3.4.2 流水线
 
 默认情况下，HTTP 请求是按顺序发出的，下一个请求只有在当前请求收到相应之后才会被发出。由于会受到网络延迟和带宽的限制，在下一个请求被发送到服务器之前，可能需要等待很长时间。
 
 流水线是在同一条长连接上发出连续的请求，而不用等待响应返回，这样可以避免连接延迟。
 
-## 内容协商
+## 3.5 内容协商
 
 通过内容协商返回最合适的内容，例如根据浏览器的默认语言选择返回中文界面还是英文界面。
 
-### 1. 类型
+### 3.5.1 类型
 
 **（一）服务端驱动型内容协商** 
 
-客户端设置特定的 HTTP 首部字段，例如 Accept、Accept-Charset、Accept-Encoding、Accept-Language、Content-Languag，服务器根据这些字段返回特定的资源。
+客户端请求报文设置特定的 HTTP 首部字段，例如 Accept、Accept-Charset、Accept-Encoding、Accept-Language、Content-Languag，服务器根据这些字段返回特定的资源。
 
 它存在以下问题：
 
@@ -630,7 +628,7 @@ Authorization: Basic cGFzc2luOjEyMzQ1Ng==
 
 服务器返回 300 Multiple Choices 或者 406 Not Acceptable，客户端从中选出最合适的那个资源。
 
-### 2. Vary
+### 3.5.2 Vary
 
 ```html
 Vary: Accept-Language
@@ -640,17 +638,17 @@ Vary: Accept-Language
 
 例如，一个客户端发送了一个包含 Accept-Language 首部字段的请求之后，源服务器返回的响应包含 `Vary: Accept-Language` 内容，缓存服务器对这个响应进行缓存之后，在客户端下一次访问同一个 URL 资源，并且 Accept-Language 与缓存中的对应的值相同时才会返回该缓存。
 
-## 内容编码
+## 3.6 内容编码
 
 内容编码将实体主体进行压缩，从而减少传输的数据量。常用的内容编码有：gzip、compress、deflate、identity。
 
 浏览器发送 Accept-Encoding 首部，其中包含有它所支持的压缩算法，以及各自的优先级，服务器则从中选择一种，使用该算法对响应的消息主体进行压缩，并且发送 Content-Encoding 首部来告知浏览器它选择了哪一种算法。由于该内容协商过程是基于编码类型来选择资源的展现形式的，在响应中，Vary 首部中至少要包含 Content-Encoding，这样的话，缓存服务器就可以对资源的不同展现形式进行缓存。
 
-## 范围请求
+## 3.7 范围请求
 
 如果网络出现中断，服务器只发送了一部分数据，范围请求可以使得客户端只请求服务器未发送的那部分数据，从而避免服务器重新发送所有数据。
 
-### 1. Range
+### 3.7.1 Range
 
 在请求报文中添加 Range 首部字段指定请求的范围。
 
@@ -670,7 +668,7 @@ Content-Length: 1024
 (binary content)
 ```
 
-### 2. Accept-Ranges
+### 3.7.2 Accept-Ranges
 
 响应首部字段 Accept-Ranges 用于告知客户端是否能处理范围请求，可以处理使用 bytes，否则使用 none。
 
@@ -678,16 +676,17 @@ Content-Length: 1024
 Accept-Ranges: bytes
 ```
 
-### 3. 响应状态码
+### 3.7.3 响应状态码
 
 - 在请求成功的情况下，服务器会返回 206 Partial Content 状态码。
 - 在请求的范围越界的情况下，服务器会返回 416 Requested Range Not Satisfiable 状态码。
 - 在不支持范围请求的情况下，服务器会返回 200 OK 状态码。
 
-## 分块传输编码
+## 3.8 分块传输编码
 
 分块传输编码（Chunked Transfer EnCoding） 可以把一个 Http 连接的数据分割成多块，边传输边接收。
-例如：
+
+作用：
 
 - 服务器向客户端发送数据：让浏览器逐步显示页面，尽早给出响应，减少用户等待。
 - 客户端向服务器发送数据：请求体的 Body 长度无法确定，Content-Length 不能使用。
@@ -705,7 +704,7 @@ Body 格式：
 (最后传输 0 表示内容结束)
 ```
 
-## 多部分对象集合
+## 3.9 多部分对象集合
 
 一份报文主体内可含有多种类型的实体同时发送，每个部分之间用 boundary 字段定义的分隔符进行分隔，每个部分都可以有首部字段。
 
@@ -737,18 +736,18 @@ HTTPs 并不是新协议，而是让 HTTP 先和 SSL（Secure Sockets Layer）�
 
 通过使用 SSL，HTTPs 具有了加密（防窃听）、认证（防伪装）和完整性保护（防篡改）的特性。
 
-## 加密
+## 4.1 加密
 
 加密的目的，是不希望第三者看到当前两个通讯用户的通讯内容。
 
-### 1.对称密钥加密
+### 4.1.1 对称密钥加密
 
 对称密钥加密（Symmetric-Key Encryption），加密和解密使用同一密钥。
 
 - 优点：运算速度快；
 - 缺点：无法安全地将密钥传输给通信方。
 
-### 2.非对称密钥加密
+### 4.1.2 非对称密钥加密
 
 非对称密钥加密，又称公开密钥加密（Public-Key Encryption），加密和解密使用不同的密钥，公钥可被都可以获得，并且私钥和公钥是互相可解的。
 
@@ -760,6 +759,9 @@ HTTPs 并不是新协议，而是让 HTTP 先和 SSL（Secure Sockets Layer）�
 4. 若 B 想向 A 回复消息，则 B 用自己的私钥加密信息，发送给 A；
 5. A 收到消息后，用公钥解密信息。
 
+- 优点：可以更安全地将公开密钥传输给通信发送方。
+- 缺点：运算速度慢。
+
 非对称密钥加密除了用来加密，还可以用来进行签名。此处以 B 给 A 回信为例说明这个过程：
 
 1. B 对信息使用 Hash 算法，生成信件摘要；
@@ -769,17 +771,14 @@ HTTPs 并不是新协议，而是让 HTTP 先和 SSL（Secure Sockets Layer）�
 
 不怀好意的人也可以修改信息内容的同时也修改 hash 值，从而让它们可以相匹配，为了防止这种情况，hash 值一般都会加密后(也就是数字签名)再和信息一起发送。
 
-- 优点：可以更安全地将公开密钥传输给通信发送方。
-- 缺点：运算速度慢。
-
-## 证书（认证）
+## 4.2 证书（认证）
 
 由于客户端无法确定给它公钥的就是真正的服务器，此时则需要通过使用 **证书** 来对通信方进行认证。
 
 数字证书认证机构（CA，Certificate Authority）是客户端与服务器双方都可信赖的第三方机构。
 CA 用自己的私钥对用户的身份信息(包含用户的公钥)进行数字签名，该签名和用户的身份信息一起就形成了证书。
 
-### 证书包含的信息
+### 4.2.1 证书包含的信息
 
 - 签发机构的公钥：用于数字签名解密。
 - 证书有效期。证书过了有效期限，证书就会作废。
@@ -789,7 +788,7 @@ CA 用自己的私钥对用户的身份信息(包含用户的公钥)进行数字
 - 证书签名：用于保证证书的完整性，确保证书没有被修改过。其原理就是在发布证书时，发布者根据指纹算法计算证书信息得到指纹（hash 值）再使用私钥加密得到数字签名，并和证书放在一起。使用者在打开证书时，使用公钥对证书签名解密得到指纹，并使用指纹算法计算证书信息得到新的指纹，再进行对比是否一致，若一致就说明证书没有被修改过。
 - 签发机构的签发机构的......(上面包含的信息)：由于签发机构可以通过另外一个更高级别的签发机构对该证书机构的公钥颁发一个证书（一般是不超过 3 级），这样形成了一个公钥证书的嵌套循环。
 
-### 证书的验证过程 
+### 4.2.2 证书的验证过程 
 
 - 对比证书吊销列表，检查 SSL 证书是否被证书颁发机构吊销。
 - 检查 SSL 证书是否过期。
@@ -797,7 +796,7 @@ CA 用自己的私钥对用户的身份信息(包含用户的公钥)进行数字
 - 检查 SSL 证书是否是由系统 **受信任的根证书颁发机构** 颁发。
 - 利用签发机构的公钥对证书签名进行验证，如果验证过后所得的信息和证书签名一致，则验证通过。依次逐级对签发机构进行验证，直至本地所信任的根签发机构验证通过。
 
-## 完整性保护
+## 4.3 完整性保护
 
 SSL 提供报文摘要功能来进行完整性保护。
 
@@ -805,12 +804,12 @@ HTTP 也提供了 MD5 报文摘要功能，但不是安全的。例如报文内�
 
 HTTPs 的报文摘要功能之所以安全，是因为它结合了加密和认证这两个操作。因为加密之后的报文，遭到篡改之后，也很难重新计算为一致的报文摘要，因为无法轻易获取明文。
 
-## HTTPs 的缺点
+## 4.4 HTTPs 的缺点
 
 - 因为需要进行加密解密等过程，因此速度会更慢。
 - 需要支付证书授权的费用。
 
-## HTTPs 连接建立过程
+## 4.5 HTTPs 连接建立过程
 
   1. 客户端向服务器发送一条消息 **Client Hello**，Client Hello 包含的内容：客户端所能接受的（多个） SSL/TLS 版本、加密算法、hash 算法（密码套件），一个客户端随机数、Server Name（表明是客户端与服务器下哪一个具体的子服务器建立链接）。
   2. 服务器接收到 Client Hello 后，将客户端随机数保存下来，并从中确定将要使用的 SSL/TLS 版本 、加密算法、 hash 算法。
@@ -825,13 +824,13 @@ HTTPs 的报文摘要功能之所以安全，是因为它结合了加密和认�
 
 # 五、GET 和 POST 的区别
 
-## 作用
+## 5.1 作用
 
 GET 用于获取资源，而 POST 用于传输实体主体。
 
-## 参数
+## 5.2 参数
 
-GET 和 POST 的请求都能使用额外的参数，但是 GET 的参数是以查询字符串出现在 URL 中，而 POST 的参数存储在实体主体中。
+GET 和 POST 的请求都能使用额外的参数，但是 GET 的参数是拼接在 URL 中，而 POST 的参数存储在请求体中。
 
 ```
 GET /test/demo_form.asp?name1=value1&name2=value2 HTTP/1.1
@@ -847,17 +846,17 @@ name1=value1&name2=value2
 
 因为 URL 只支持 ASCII 码，因此 GET 的参数中如果存在中文等字符就需要先进行编码，例如`中文`会转换为`%E4%B8%AD%E6%96%87`，而空格会转换为`%20`。POST 支持标准字符集。
 
-## 安全
+## 5.3 安全
 
-安全的 HTTP 方法不会改变服务器状态，也就是说它只是可读的。
+这里所说的安全是相对的，主要指数据不会被篡改。
 
-GET 方法是安全的，而 POST 却不是，因为 POST 的目的是传送实体主体内容，这个内容可能是用户上传的表单数据，上传成功之后，服务器可能把这个数据存储到数据库中，因此状态也就发生了改变。
+安全的 HTTP 方法不会改变服务器状态，也就是说它只是可读的。因此 GET 方法是安全的，而 POST 是不安全的，因为 POST 的目的是传送实体主体内容，这个内容可能是用户上传的表单数据，上传成功之后，服务器可能把这个数据存储到数据库中，因此状态也就发生了改变。
 
 安全的方法除了 GET 之外还有：HEAD、OPTIONS。
 
 不安全的方法除了 POST 之外还有 PUT、DELETE。
 
-## 幂等性
+## 5.4 幂等性
 
 幂等的 HTTP 方法，同样的请求被执行一次与连续执行多次的效果是一样的，服务器的状态也是一样的。换句话说就是，幂等方法不应该具有副作用（统计用途除外）。在正确实现的条件下，GET，HEAD，PUT 和 DELETE 等方法都是幂等的，而 POST 方法不是。所有的安全方法也都是幂等的。
 
@@ -886,21 +885,19 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404 as it just got deleted
 DELETE /idX/delete HTTP/1.1   -> Returns 404
 ```
 
-## 可缓存
+## 5.5 可缓存
 
 如果要对响应进行缓存，需要满足以下条件：
 
 - 请求报文的 HTTP 方法本身是可缓存的，包括 GET 和 HEAD，但是 PUT 和 DELETE 不可缓存，POST 在多数情况下不可缓存的。
 - 响应报文的状态码是可缓存的，包括：200, 203, 204, 206, 300, 301, 404, 405, 410, 414, and 501。
-- 响应报文的 Cache-Control 首部字段没有指定不进行缓存。
-
-
+- 响应报文的 Cache-Control 首部字段没有指定则不缓存。
 
 # 参考资料
 
 - 上野宣. 图解 HTTP[M]. 人民邮电出版社, 2014.
 - [HTTP - CS-Notes](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/HTTP.md)
 - [浅谈 HTTP 中 Get 与 Post 的区别 ](https://www.cnblogs.com/hyddd/archive/2009/03/31/1426026.html)
-- [The Difference Between URLs and URIs](https://danielmiessler.com/study/url-uri/)
 - [Cookie 与 Session 的区别 ](https://juejin.im/entry/5766c29d6be3ff006a31b84e#comment)
 - [What is the difference between a URI, a URL and a URN?](https://stackoverflow.com/questions/176264/what-is-the-difference-between-a-uri-a-url-and-a-urn)
+
