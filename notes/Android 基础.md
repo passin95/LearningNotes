@@ -199,6 +199,8 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 （4）singleInstance：单实例模式，该 Activity（它自身）独自在一个栈内，若不存在则创建一个新的任务栈，且 **所有栈** 都复用这一个 Activity，除非这个任务栈或 Activity 销毁了。
 
+注：以 startActivityForResult 启动目标 activity 时，会忽略目标 activity 的 lanchMode。
+
 ## 3.1 FLAG
 
 - FLAG_ACTIVITY_SINGLE_TOP：同启动模式 singleTop。

@@ -32,7 +32,7 @@
 
 - [Android 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20基础.md)
 
-  四大组件、
+  四大组件
 
 - [源码分析](https://github.com/passin95/LearningNotes/blob/master/notes/源码分析.md)
 
