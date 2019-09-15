@@ -34,7 +34,7 @@ Java 平台为我们提供了 Proguard 混淆工具来帮助我们快速地对�
 
 # 二、 混淆配置
 
-proguard 包括四个功能，shrinker（压缩）, optimizer（优化）,obfuscator（混淆）,preverifier（预校验）。
+proguard 包括四个功能：shrinker（压缩）、optimizer（优化）、obfuscator（混淆）、preverifier（预校验）。
 
 <img src="../pictures//混淆流程图.webp"/> 
 
@@ -242,46 +242,47 @@ APK 在经过代码混淆处理后，包名、类名、成员名被转化为无�
 
 ### 2.2.9 混淆黑名单
 
-（1）枚举
+**（1）枚举**
 
 枚举类内部存在 values 和 valueOf 方法，混淆后该方法会被重新命名，并抛出 NoSuchMethodException（反射）。
 
-（2）被反射的元素
+**（2）被反射的元素**
 
 被反射使用的类（不包括 newInstance()）、变量、方法、包名等不应该被混淆。
 
 原因在于：代码混淆过程中，被反射使用的元素会被重命名，然而反射依旧是按照混淆前的字符串路径去寻找元素，所以混淆后会抛出 NoSuchMethodException 和 NoSuchFiledException 等异常。
 
-（3）部分实体类
+**（3）部分实体类**
 
 涉及到序列化的实体类不能被混淆。混淆后，序列化之后的 key 变为没有意义的字段，与服务器下发的 key 不一致,导致反序列化失败。
 
 同时，反序列化的过程实例化对象的原理是反射，混淆之后 key 会被改变，所以也会违背我们预期的效果。
 
-（4）四大组件
+**（4）四大组件**
 
-- 四大组件使用前都需要在 AndroidManifest.xml 文件中进行注册声明，然而混淆处理之后，四大组件的类名就会被篡改，实际使用的类与 manifest 中注册的类并不匹配，故而出错。
-- 其他应用程序访问组件时可能会用到类的包名加类名，如果经过混淆，可能会无法找到对应组件或者产生异常。
+四大组件使用前都需要在 AndroidManifest.xml 文件中进行注册声明，然而混淆处理之后，四大组件的类名就会被篡改，实际使用的类与 manifest 中注册的类并不匹配，故而出错。
 
-（5）JNI 调用的 Java 方法
+其他应用程序访问组件时可能会用到类的包名加类名，如果经过混淆，可能会无法找到对应组件或者产生异常。
+
+**（5）JNI 调用的 Java 方法**
 
 当 JNI 调用的 Java 方法被混淆后，方法名会变成无意义的名称，这就与 C++ 中原本的 Java 方法名不匹配，因而会无法找到所调用的方法。
 
-（6）JavaScript 调用 Java 的方法
+**（6）JavaScript 调用 Java 的方法**
 
-（7）Parcelable 或 Serializable 的实现类
+**（7）Parcelable 或 Serializable 的实现类**
 
 Parcelable 的实现类和 Creator 静态成员变量不混淆，否则会产生 Android.os.BadParcelableException 异常
 
 Serializable 在序列化的过程需存储 key-value 到文件中，不可被混淆。
 
-（8）第三方框架、SDK 的混淆说明。
+**（8）第三方框架、SDK 的混淆说明。**
 
-（9）Gson 转换的 bean 类。
+**（9）Gson 转换的 bean 类。**
 
-（10）Layout 布局使用的 View 构造函数（自定义控件）、android:onClick、属性动画对应的方法等。
+**（10）Layout 布局使用的 View 构造函数（自定义控件）、android:onClick、属性动画对应的方法等。**
 
-（11）WebView 的 JS 调用的接口方法。
+**（11）WebView 的 JS 调用的接口方法。**
 
 ### 2.2.10 Android 混淆模板以及其它常用指令
 
@@ -409,11 +410,11 @@ android {
 
 先将崩溃信息复制到 txt 格式的文件（如：proguard_stacktrace.txt）中保存。
 
-然后在终端输入 retrace.bat -verbose mapping.txt proguard_stacktrace.txt
+然后在终端输入 retrace.bat -verbose mapping.txt proguard_stacktrace.txt 。
 
 ## 3.2 反编译工具 jadx
  
-[jadx](https://github.com/skylot/jadx/releases) 是一个 Java 层面的反编译工具。它主要具体以下有点：
+[jadx](https://github.com/skylot/jadx/releases) 是一个 Java 层面的反编译工具。它主要具体以下特点：
 
 1. 图形化的界面，简单明了。
 2. 支持拖拽操作，可直接拖拽 APK 到界面便自动反编译。
@@ -421,5 +422,5 @@ android {
 4. 强大的搜索能力，支 持Class、Method、Field、Code 四种维度进行匹配搜索，快捷键为 Ctrl+Shift+F。
 5. 双击变量或方法自动高亮引用的地方。
 6. 右键变量或方法->Find Usage 可索引整个项目引用的地方。
-7. 反混淆，通过 Tools -> deobfusation 可激活反混淆，将方法名、类名
+7. 反混淆，通过 Tools -> deobfusation 可激活反混淆，将方法名、类名修改为相对可视化的唯一名称。
 

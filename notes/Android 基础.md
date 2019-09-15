@@ -1,23 +1,30 @@
-
 <!-- TOC -->
 
-- [一、生命周期](#一生命周期)
-    - [1.1 Activity 的生命周期](#11-activity-的生命周期)
-    - [1.2 Fragment 的生命周期](#12-fragment-的生命周期)
-        - [1.2.1 Fragment 之间切换](#121-fragment-之间切换)
-    - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-和-onrestoreinstancestate)
-    - [1.4 其余情况补充](#14-其余情况补充)
-    - [1.5 Application 的生命周期](#15-application-的生命周期)
-- [二、Activity 标签属性](#二activity-标签属性)
-- [三、Activity LaunchMode](#三activity-launchmode)
-    - [3.1 FLAG](#31-flag)
-    - [补充说明](#补充说明)
-- [四、IntentFilter 的匹配规则](#四intentfilter-的匹配规则)
-    - [4.1 action 的匹配规则](#41-action-的匹配规则)
-    - [4.2 category 的匹配规则](#42-category-的匹配规则)
-    - [4.3 data 的匹配规则](#43-data-的匹配规则)
-    - [4.4 注意事项](#44-注意事项)
-- [五、参考资料](#五参考资料)
+- [一、生命周期](#%E4%B8%80%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+  - [1.1 Activity 的生命周期](#11-activity-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+  - [1.2 Fragment 的生命周期](#12-fragment-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+    - [1.2.1 Fragment 之间切换](#121-fragment-%E4%B9%8B%E9%97%B4%E5%88%87%E6%8D%A2)
+  - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-%E5%92%8C-onrestoreinstancestate)
+  - [1.4 其余情况补充](#14-%E5%85%B6%E4%BD%99%E6%83%85%E5%86%B5%E8%A1%A5%E5%85%85)
+  - [1.5 Application 的生命周期](#15-application-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+- [二、Activity 标签属性](#%E4%BA%8Cactivity-%E6%A0%87%E7%AD%BE%E5%B1%9E%E6%80%A7)
+- [三、Activity LaunchMode](#%E4%B8%89activity-launchmode)
+  - [3.1 FLAG](#31-flag)
+  - [3.2 补充说明](#32-%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E)
+- [四、IntentFilter 的匹配规则](#%E5%9B%9Bintentfilter-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.1 action 的匹配规则](#41-action-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.2 category 的匹配规则](#42-category-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.3 data 的匹配规则](#43-data-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.4 注意事项](#44-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
+- [五、Service](#%E4%BA%94service)
+  - [5.1 Androidmanifest Serivce 属性说明](#51-androidmanifest-serivce-%E5%B1%9E%E6%80%A7%E8%AF%B4%E6%98%8E)
+  - [5.2 前台 Service 和后台 Service](#52-%E5%89%8D%E5%8F%B0-service-%E5%92%8C%E5%90%8E%E5%8F%B0-service)
+  - [5.3 远程 Service](#53-%E8%BF%9C%E7%A8%8B-service)
+  - [5.4 IntentSerivce](#54-intentserivce)
+- [六、BroadcastReceiver](#%E5%85%ADbroadcastreceiver)
+  - [6.1 BroadcastReceiver 的使用](#61-broadcastreceiver-%E7%9A%84%E4%BD%BF%E7%94%A8)
+  - [6.2 广播类型](#62-%E5%B9%BF%E6%92%AD%E7%B1%BB%E5%9E%8B)
+- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- /TOC -->
 
@@ -48,6 +55,8 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 （6）onStop：Activity 即将停止，Activity 处于 **不可见** 的。
  
 （7）onDestroy：Activity 即将销毁，回收工作以及资源释放。
+
+而非正常情况下（App 被系统强杀），onStop()，onDestory() 就不会执行。
 
 ## 1.2 Fragment 的生命周期
 
@@ -108,7 +117,7 @@ FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onSto
 
 当 Activity 被意外终止时或容易被销毁时，Activity 调用 onSaveInstanceState() 去保存数据，然后 Activity 委托 Window 去保存数据，接着 Window 再委托它上面的顶级容器去保存数据，一般是 DecordView。顶层容器再去一一通知它的子元素保存数据（写在 super 上面先于子元素保存，反之后于）。
 
-onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause()之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
+onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause() 之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
 
 例如以下情况皆会调用：
 
@@ -212,7 +221,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
   3. singleInstance 按照 singleInstance 的逻辑处理。
 - FLAG_ACTIVITY_SINGLE_TOP：和启动模式 singleTop 效果一致。
 
-## 补充说明
+## 3.2 补充说明
 
 1. 当任务栈不同时，启动不同栈内的实例，会导致任务栈之间的切换，原后台任务栈会位于前台。
 
@@ -272,6 +281,376 @@ URI 也叫统一资源标识符，它在 data 的结构如下：
 
 当我们通过隐式方式启动一个 Activity 时，若找不到匹配的 Activity，会抛出 ActivityNotFoundException，可以通过 PackageManager 的 resolveActivity() 或者 Intent 的 resolveActivity() 去提前验证是否存在匹配的 Activity，若不存在则返回值会为 null。
 
-# 五、参考资料
+# 五、Service
 
-- Android 开发艺术探索 - 任玉刚
+Service 用于需要在后台长期运行的业务，它可以不与相应的界面所绑定。
+
+服务的启动方式有两种：startService 和 bindService。
+
+生命周期如下图所示：
+
+ <div align="center"> <img src="../pictures//Service%20生命周期.webp" /> </div>
+
+```java
+
+/**
+ * 服务的方法都在主线程执行，因此有时需要在非主线程执行。
+ */
+public class MyService extends Service {
+    // 
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // 若一个 Service 被 startService() 或 bindServivce() 多次启动或绑定，onCreate() 也只会调用一次。
+        // 即在回调 onDestroy() 前，onCreate() 只会在启动时调用一次。
+    }
+    
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // 每次调用 startService 都会回调 onStartCommand()。
+        // 调用 bindService 不会回调 onStartCommand()。
+
+        // 返回值用来描述系统在杀死服务后如何继续运行。
+        // START_STICKY：重建服务并调用 onStartCommand()，但 intent 会为 null，未发送完的 intent 也会依次发送。该方式是默认的策略。
+        // START_NOT_STICKY：不重建服务，除非还有启动服务的 Intent 未发送完。
+        // START_REDELIVER_INTENT：重建服务并且用上一个已接受的 intent 作为参数调用 onStartCommand()，未发送完的 intent 也会依次发送。
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // 调用 stopService 后或 onUnbind 回调（绑定该 Service 的组件只有一个时才会顺便销毁 Service）。
+        // 对已被绑定的 Service 调用 stopSerivce 是无法停止服务的。
+    }
+
+    private MyBinder mBinder = new MyBinder();
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        // 调用 bindService 后回调 onBind()，但同一个 Intent 类型只会回调一次 onBind()。
+        return null;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        // 调用 unBindService 后回调。
+        return false;
+    }
+
+    class MyBinder extends Binder {
+
+        public void service_connect_Activity() {
+            System.out.println("Service 关联了 Activity,并在 Activity 执行了 Service 的方法");
+        }
+    }
+}
+```
+
+绑定服务代码示例：
+
+```java
+private ServiceConnection connection = new ServiceConnection() {
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        // 取消关联的时候调用。 
+    }
+
+    //在 Activity 与 Service 解除关联的时候调用
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        // 建立关联的时候调用（异步回调）。
+        myBinder = (MyService.MyBinder) service;
+        //在 Activity 调用 Service 类的方法
+        myBinder.service_connect_Activity();
+    }
+};
+
+
+Intent bindIntent = new Intent(this, MyService.class);
+bindService(bindIntent,connection,BIND_AUTO_CREATE);
+```
+
+## 5.1 Androidmanifest Serivce 属性说明
+
+- name：Service 的类名
+- icon：Service 的图标
+- permission：申明此 Service 的权限。
+- process：申明该服务是否在另一个进程中运行（远程服务)。不设置默认为本地服务，设置为 :remote 则设置成远程服务。
+- enable：true：Service 将会默认被系统启动；不设置则默认为 false。
+- exported：该服务是否能够被其他应用程序所控制或连接，默认为 false。
+
+## 5.2 前台 Service 和后台 Service
+
+前台 Service 和 后台 Service（普通）最大的区别就在于：前台服务在通知栏中有显示通知。
+
+除此之外，前台 Service 优先级较高，很难由于系统内存不足而被回收；后台 Service 优先级较低，当系统出现内存不足情况时，很有可能会被回收。
+
+前台服务的使用方式：
+
+```java
+public class MyService extends Service {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // 构建"点击通知后打开 MainActivity"的 Intent 对象。
+        Intent notificationIntent = new Intent(this,MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,0);
+
+        // 新建 Builder 对象。
+        Notification.Builder builer = new Notification.Builder(this);
+        builer.setContentTitle("前台服务通知的标题");// 设置通知的标题
+        builer.setContentText("前台服务通知的内容");// 设置通知的内容
+        builer.setSmallIcon(R.mipmap.ic_launcher);// 设置通知的图标
+        builer.setContentIntent(pendingIntent);// 设置点击通知后的操作
+
+        Notification notification = builer.getNotification();
+        // 让 Service 变成前台 Service,并在系统的状态栏显示出来。
+        startForeground(1, notification);
+    }
+}
+```
+
+## 5.3 远程 Service
+
+远程服务与本地服务最大的区别是：远程 Service 与调用者不在同一个进程里（即远程 Service 是运行在另外一个进程），而本地服务则是与调用者运行在同一个进程里。
+
+<img src="../pictures/远程服务和本地服务的区别.webp"/>
+
+即一个远程 Service 与多个应用程序的组件（四大组件）使用跨进程通信方式（IPC、ALDL 等）进行跨进程通信。
+
+## 5.4 IntentSerivce
+
+```java
+public abstract class IntentService extends Service {
+    private volatile Looper mServiceLooper;
+    private volatile ServiceHandler mServiceHandler;
+    private String mName;
+
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // 抽象方法，处理启动时的 Intent，即只要在 onHandleIntent() 执行完毕之前又调了 startService 便会继续执行。
+            onHandleIntent((Intent)msg.obj);
+            // 执行完调用 stopSelf() 结束服务。只有 startId 和最后启动该 service 的 startId 一致时停止服务。
+            stopSelf(msg.arg1);
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // 实例化 HandlerThread 中新建一个新线程并开启 Looper 循环。
+        HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+        thread.start();
+
+        mServiceLooper = thread.getLooper();
+        // 新线程所对应的 Looper 对象，只维护 mServiceHandler 一个对象。
+        mServiceHandler = new ServiceHandler(mServiceLooper);
+    }
+
+    @Override
+    public void onStart(@Nullable Intent intent, int startId) {
+        // 每调一次 startSerivce 就执行一次该方法，即发送一次 Message。
+        // startId 为启动服务的唯一整数。与 {@link #stopSelfResult（int）} 一起使用。
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        // 把 Intent 参数 包装到 message 的 obj 发送消息中，这里的 Intent 为启动服务时 startService(Intent) 里传入的 Intent。
+        msg.obj = intent;
+        // 发送消息，添加到消息队列里。
+        mServiceHandler.sendMessage(msg);
+    }
+
+    @Override
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        onStart(intent, startId);
+        return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        mServiceLooper.quit();
+    }
+
+    @Override
+    @Nullable
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @WorkerThread
+    protected abstract void onHandleIntent(@Nullable Intent intent);
+}
+```
+
+# 六、BroadcastReceiver
+
+广播用于 监听 / 接收 App、系统发出的广播消息，并做出响应。
+
+因此广播常用于：
+
+1. Android 应用内通信。
+2. Android 进程间（多进程、应用间）通信。
+3. 监听系统广播，例如网络变化。
+
+## 6.1 BroadcastReceiver 的使用
+
+```java
+public class MyBroadcastReceiver extends BroadcastReceiver {
+
+    /**
+     * 复写 onReceive() 方法，接收到广播后，则自动调用该方法。
+     * @param context 启动广播时的 Context（context.registerReceiver()）。
+     * @param intent 启动广播时的 Context。
+     */
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // 执行逻辑
+    }   
+}
+```
+
+**动态注册**：
+
+```java
+protected void onCreate(){
+    super.onCreate();
+    // 1. 实例化广播，该广播对象可以在界面内复用。
+     MyBroadcastReceiver mMyBroadcastReceiver = new MyBroadcastReceiver();
+     IntentFilter intentFilter = new IntentFilter();
+
+    // 2. 设置接收广播的类型。
+    intentFilter.addAction(android.net.conn.CONNECTIVITY_CHANGE);
+
+    // 3. 动态注册：调用 Context.registerReceiver()。
+     registerReceiver(mBroadcastReceiver, intentFilter);
+ }
+
+
+// 
+ @Override
+protected void onPause() {
+     super.onPause();
+      // 注册广播后，要在合适的位置销毁广播，以避免造成内存泄漏。
+     unregisterReceiver(mMyBroadcastReceiver);
+     }
+}
+```
+
+**静态注册**：
+
+若被注册了的广播接收者中注册时 intentFilter 的 action 与上述匹配，则会接收此广播（即回调 onReceive()）。
+
+若发送广播有相应权限，那么广播接收者也需要相应权限。
+
+```
+<receiver 
+    android:name=".MyBroadcastReceiver" >
+    // 用于接收网络状态改变时发出的广播
+    <intent-filter>
+        <action android:name="BROADCAST_ACTION" />
+    </intent-filter>
+</receiver>
+```
+
+## 6.2 广播类型
+
+广播的类型主要分为 5 类：
+
+1. 普通广播（Normal Broadcast）
+2. 系统广播（System Broadcast）
+3. 有序广播（Ordered Broadcast）
+4. App 应用内广播（Local Broadcast）
+5. 粘性广播（Sticky Broadcast）
+
+**（1）普通广播**
+
+普通广播也是我们最常用的方式，在 **6.1** 节便是普通广播的使用方式。
+
+**（2）系统广播**
+
+Android 中内置了多个系统广播：只要涉及到手机的基本操作（如开机、网络状态变化、拍照等等），系統都会发出相应的广播，每个广播都有特定的 Intent - Filter（包括具体的 action），Android 系统广播 action 如下：
+
+- 监听网络变化：android.net.conn.CONNECTIVITY_CHANGE
+- 关闭或打开飞行模式：Intent.ACTION_AIRPLANE_MODE_CHANGED
+- 充电时或电量发生变化：Intent.ACTION_BATTERY_CHANGED
+- 电池电量低：Intent.ACTION_BATTERY_LOW
+- 电池电量充足（即从电量低变化到饱满时会发出广播：Intent.ACTION_BATTERY_OKAY
+- 系统启动完成后 (仅广播一次)：Intent.ACTION_BOOT_COMPLETED
+- 按下照相时的拍照按键 (硬件按键) 时：Intent.ACTION_CAMERA_BUTTON
+- 屏幕锁屏：Intent.ACTION_CLOSE_SYSTEM_DIALOGS
+- 设备当前设置被改变时 (界面语言、设备方向等)：Intent.ACTION_CONFIGURATION_CHANGED
+- 插入耳机时：Intent.ACTION_HEADSET_PLUG
+- 未正确移除 SD 卡但已取出来时 (正确移除方法:设置--SD 卡和设备内存--卸载 SD 卡)：Intent.ACTION_MEDIA_BAD_REMOVAL
+- 插入外部储存装置（如 SD 卡）：Intent.ACTION_MEDIA_CHECKING
+- 成功安装 APK：Intent.ACTION_PACKAGE_ADDED
+- 成功删除 APK：Intent.ACTION_PACKAGE_REMOVED
+- 重启设备：Intent.ACTION_REBOOT
+- 屏幕被关闭：Intent.ACTION_SCREEN_OFF
+- 屏幕被打开：Intent.ACTION_SCREEN_ON
+- 关闭系统时：Intent.ACTION_SHUTDOWN
+- 重启设备：Intent.ACTION_REBOOT
+
+**（3）有序广播**
+
+有序广播的顺序规则：
+
+- 发送出去的广播被广播接收者按照 Priority 属性值从大-小的排序先后顺序接收，Priority 属性相同者，动态注册的广播优先。
+
+有序广播的特点：
+
+- 先接收的广播接收者可以对广播进行截断，即后接收的广播接收者不再接收到此广播；
+- 先接收的广播接收者可以对广播进行修改，那么后接收的广播接收者将接收到被修改后的广播。
+
+**（4）应用内广播**
+
+当广播只打算在应用内使用时，推荐使用应用内广播，因为它的效率和安全性更高。因为其它广播可以被其它 APP 监听（exported 对于有 intent-filter 情况下默认值为 true）。
+
+应用内广播，有 2 种实现方式，分别如下：
+
+**1. 全局广播设置成局部广播**：
+
+1. 注册广播时将 exported 属性设置为 false，使得非本 App 内部发出的此广播不被接收；
+2. 在广播发送和接收时，增设相应权限 permission，用于权限验证；
+3. 发送广播时指定该广播接收器所在的包名，此广播将只会发送到此包中的 App 内与之相匹配的有效广播接收器中。
+
+**2. LocalBroadcastManager**
+
+```java
+MyBroadcastReceiver mMyBroadcastReceiver = new MyBroadcastReceiver();
+IntentFilter intentFilter = new IntentFilter();
+
+// 获取 LocalBroadcastManager 的实例（单例）。
+LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+// 设置接收广播的类型。
+intentFilter.addAction(android.net.conn.CONNECTIVITY_CHANGE);
+
+// 调用 LocalBroadcastManager 的 registerReceiver（）方法进行动态注册（也只支持动态注册）。
+localBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
+
+// 取消注册应用内广播接收器。
+localBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+
+// 发送应用内广播。
+Intent intent = new Intent();
+intent.setAction(BROADCAST_ACTION);
+localBroadcastManager.sendBroadcast(intent);
+```
+
+**（5）粘性广播**
+
+在 Android5.0 & API 21 中已经失效，所以不建议使用，在这里也不作过多的总结。
+
+# 参考资料
+
+- [Carson_Ho 的笔记](https://www.jianshu.com/u/383970bef0a0)
