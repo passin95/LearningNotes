@@ -12,29 +12,29 @@
 
 ### :coffee: Java 
 
-- [Java 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20基础.md)
+- [Java 基础](./notes/Java%20基础.md)
 
-  针对一些 Java 的基础类和特性介绍。
+  Java 关键字、特性以及 Object 类等。
 
-- [Java 容器](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20容器.md)
+- [Java 容器](./notes/Java%20容器.md)
 
-  Java 常用容器的介绍以及源码分析。
+  Java 常用容器小结以及源码分析。
 
-- [Java 并发](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20并发.md)
+- [Java 并发](./notes/Java%20并发.md)
 
-  线程、线程池、线程安全、线程锁、Java 内存模型。
+  线程、线程池、线程安全、线程锁、锁优化、Java 内存模型。
 
-- [Java 虚拟机](https://github.com/passin95/LearningNotes/blob/master/notes/Java%20虚拟机.md)
+- [Java 虚拟机](./notes/Java%20虚拟机.md)
 
-  主要参考深入理解 Java 虚拟机。
+  运行时数据区域、垃圾回收（GC）、类加载机制、类加载器。
 
 ### :computer: Android 
 
-- [Android 基础](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20基础.md)
+- [Android 基础](./notes/Android%20基础.md)
 
-  四大组件
+  生命周期、启动模式、四大组件等（覆盖了各类异常情况补充）。
 
-- [源码分析](https://github.com/passin95/LearningNotes/blob/master/notes/源码分析.md)
+- [源码分析](./notes/源码分析.md)
 
   Android 常用框架的源码分析。
 
@@ -72,12 +72,6 @@
 
   Base64、序列化、Hash。
 
-### :couple: 归纳整理
-
-- [归纳整理](https://github.com/passin95/LearningNotes/blob/master/notes/归纳整理.md)
-
-  对优秀文章归纳整理，包括又不局限于源码解析、机型适配、疑难杂症等。
-
 ### :pencil2: 算法 
 
 - [LeetCode](https://github.com/passin95/LearningNotes/blob/master/notes/LeetCode.md)
@@ -113,6 +107,12 @@
 - [代码风格规范](https://github.com/passin95/LearningNotes/blob/master/notes/代码风格规范.md)
 
   阿里巴巴 Java 开发手册、阿里巴巴 Android 开发手册。
+
+### :couple: 归纳整理
+
+- [归纳整理](https://github.com/passin95/LearningNotes/blob/master/notes/归纳整理.md)
+
+  对优秀文章归纳整理，包括又不局限于源码解析、机型适配、疑难杂症等。
 
 ### :memo: 后记 
 
