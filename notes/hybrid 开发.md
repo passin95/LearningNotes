@@ -1,35 +1,31 @@
 
-- [WebView](#webview)
-    - [WebView API](#webview-api)
-        - [加载](#加载)
-        - [状态](#状态)
-        - [操作](#操作)
-        - [清理](#清理)
-    - [WebSettings](#websettings)
-        - [缓存设置](#缓存设置)
-    - [WebViewClient](#webviewclient)
-    - [WebChromeClient](#webchromeclient)
-- [Android 和 Js 的交互](#android-和-js-的交互)
-    - [Android 调用 Js](#android-调用-js)
-        - [WebView.loadUrl()](#webviewloadurl)
-        - [WebView.evaluateJavascript()](#webviewevaluatejavascript)
-    - [Js 调用 Android](#js-调用-android)
-        - [WebView.addJavascriptInterface() 及漏洞处理](#webviewaddjavascriptinterface-及漏洞处理)
-        - [WebViewClient 的 shouldOverrideUrlLoading()](#webviewclient-的-shouldoverrideurlloading)
-        - [WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()](#webchromeclient-的-onjsalertonjsconfirmonjsprompt)
-    - [VasSonic](#vassonic)
+- [一、WebView](#%E4%B8%80webview)
+  - [1.1 加载](#11-%E5%8A%A0%E8%BD%BD)
+  - [1.2 状态](#12-%E7%8A%B6%E6%80%81)
+  - [1.3 操作](#13-%E6%93%8D%E4%BD%9C)
+  - [1.4 清理](#14-%E6%B8%85%E7%90%86)
+  - [1.5 WebSettings](#15-websettings)
+    - [1.5.1 缓存设置](#151-%E7%BC%93%E5%AD%98%E8%AE%BE%E7%BD%AE)
+  - [1.6 WebViewClient](#16-webviewclient)
+  - [1.7 WebChromeClient](#17-webchromeclient)
+- [二、Android 和 Js 的交互](#%E4%BA%8Candroid-%E5%92%8C-js-%E7%9A%84%E4%BA%A4%E4%BA%92)
+  - [2.1 Android 调用 Js](#21-android-%E8%B0%83%E7%94%A8-js)
+    - [2.1.1 WebView.loadUrl()](#211-webviewloadurl)
+    - [2.1.2 WebView.evaluateJavascript()](#212-webviewevaluatejavascript)
+  - [2.2 Js 调用 Android](#22-js-%E8%B0%83%E7%94%A8-android)
+    - [2.2.1 WebView.addJavascriptInterface() 及漏洞处理](#221-webviewaddjavascriptinterface-%E5%8F%8A%E6%BC%8F%E6%B4%9E%E5%A4%84%E7%90%86)
+    - [2.2.2 WebViewClient 的 shouldOverrideUrlLoading()](#222-webviewclient-%E7%9A%84-shouldoverrideurlloading)
+    - [2.2.3 WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()](#223-webchromeclient-%E7%9A%84-onjsalertonjsconfirmonjsprompt)
+  - [2.3 VasSonic](#23-vassonic)
 - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
-## WebView
+# 一、WebView
 
 WebView 是一个用来显示 Web 网页的控件，包含一个浏览器该有的基本功能，例如：滚动、缩放、前进、后退下一页、搜索、执行 Js 等功能。
 
 在 Android 4.4 之前使用 WebKit 作为渲染内核，4.4 之后采用 chrome 内核。
 
-
-### WebView API
-
-#### 加载
+## 1.1 加载
 
 ```java
 // 加载网页 url，也可以执行 js 函数。
@@ -44,7 +40,7 @@ webView.stopLoading();
 webView.reload():
 ```
 
-#### 状态
+## 1.2 状态
 
 ```java
 // 激活 WebView 为活跃状态，能正常执行网页的响应。
@@ -61,7 +57,7 @@ webView.resumeTimers();
 webView.destroy();
 ```
 
-#### 操作
+## 1.3 操作
 
 ```java
 // 是否可以后退。
@@ -89,7 +85,7 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 }
 ```
 
-#### 清理
+## 1.4 清理
 
 ```java
 // 清空网页访问留下的缓存数据。需要注意的时，由于缓存是全局的，所以只要是 WebView 用到的缓存都会被清空，即便其他地方也会使用到。若设为 false，则只清空内存里的资源缓存，而不清空磁盘里的。
@@ -102,7 +98,7 @@ webView.clearSslPreferences();
 webView.clearMatches();
 ```
 
-### WebSettings
+## 1.5 WebSettings
 
 ```java
 // 支持 Javascript。
@@ -136,7 +132,7 @@ webSettings.setBuiltInZoomControls(true);
 webSettings.setDisplayZoomControls(false);
 ```
 
-#### 缓存设置
+### 1.5.1 缓存设置
 
 ```java
 // 设置缓存方式。
@@ -164,7 +160,7 @@ webSettings.setAppCacheEnabled(true);
 webSettings.setAppCachePath(WebCacheDirPath);
 ```
 
-### WebViewClient
+## 1.6 WebViewClient
 
 ```java
 WebViewClient webViewClient = new WebViewClient(){
@@ -217,7 +213,7 @@ WebViewClient webViewClient = new WebViewClient(){
 webView.setWebViewClient(webViewClient);
 ```
 
-### WebChromeClient
+## 1.7 WebChromeClient
 
 用于辅助 WebView 处理 Javascript 的对话框,网站图标,网站标题等。
 
@@ -310,11 +306,11 @@ WebChromeClient webChromeClient = new WebChromeClient() {
 webView.setWebChromeClient(webChromeClient);
 ```
 
-## Android 和 Js 的交互
+# 二、Android 和 Js 的交互
 
-### Android 调用 Js
+## 2.1 Android 调用 Js
 
-#### WebView.loadUrl()
+### 2.1.1 WebView.loadUrl()
 
 将需要调用的 JS 代码以.html 格式放到 src/main/assets 文件夹里（更多的是调用远程 JS 代码）。
 
@@ -344,7 +340,7 @@ webView.loadUrl("javascript:callJS()");
 </html> 
 ```
 
-#### WebView.evaluateJavascript()
+### 2.1.2 WebView.evaluateJavascript()
 
 该方法比第一种方法效率更高、使用更简洁，因为因为该方法的执行不会使页面刷新。但需要 Android4.4 版本以上。
 
@@ -361,9 +357,9 @@ if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
 }
 ```
 
-### Js 调用 Android
+## 2.2 Js 调用 Android
 
-#### WebView.addJavascriptInterface() 及漏洞处理
+### 2.2.1 WebView.addJavascriptInterface() 及漏洞处理
 
 ```java
 // Android 类对象映射到 Js 的 test 对象
@@ -423,7 +419,7 @@ if (url.startsWith("file://") {
 }
 ```
 
-#### WebViewClient 的 shouldOverrideUrlLoading()
+### 2.2.2 WebViewClient 的 shouldOverrideUrlLoading()
 
 Android 通过 WebViewClient 的回调方法 shouldOverrideUrlLoading () 拦截 url，再解析该 url 的协议，如果检测到是预先约定好的协议，就调用相应方法。
 
@@ -463,7 +459,7 @@ public boolean shouldOverrideUrlLoading(WebView view, String url) {
 </html>
 ```
 
-#### WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()
+### 2.2.3 WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt()
 
 通过 WebChromeClient 的 onJsAlert()、onJsConfirm()、onJsPrompt() 方法回调分别拦截 Js 对话框。该方式不存在漏洞问题。
 
@@ -527,7 +523,7 @@ public boolean onJsPrompt(WebView view, String url, String message, String defau
 </html>
 ```
 
-### VasSonic
+## 2.3 VasSonic
 
 [VasSonic](https://github.com/Tencent/VasSonic) 是腾讯开源的一个轻量级的高性能的 Hybrid 框架，专注于提升页面首屏加载速度，完美支持静态直出页面和动态直出页面，兼容离线包等方案。
 

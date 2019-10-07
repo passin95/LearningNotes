@@ -1115,7 +1115,7 @@ TypeVariable 指的是泛型的类型变量，指的是 List<T>、Map<K,V> 的 T
 ```java
 public interface TypeVariable<D extends GenericDeclaration> extends Type {
     /**
-     * 返回一个 Type[]，它的内容是该类型变量的上限集，也就是泛型中 extend 右边的值，如果没有使用 extend，则默认为 {@code Object}
+     * 返回一个 Type[]，它的内容是该类型变量的上限集，也就是泛型中 extend 右边的值，如果没有使用 extend，则默认为 {@code Object}，
      * 例如 public class Demo <T extends Number & Serializable>{T t}，则返回数组 Type[2]，其中 Type[0] 为 Number，Type[1] 为 Serializable。
     */
     Type[] getBounds();

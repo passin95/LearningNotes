@@ -263,7 +263,7 @@ data 标签的结构如下：
 
 data 由两部分组成，URI 和 mimeType。
 
-mimeType 指媒体类型，例如 image/jpeg、text/plain、audio/mpeg4-generic、vidio/*等，用来表示图片、文本、视频等不同的媒体格式。
+mimeType 指媒体类型，例如 image/jpeg、text/plain、audio/mpeg4-generic、video/*等，用来表示图片、文本、视频等不同的媒体格式。
 
 URI 也叫统一资源标识符，它在 data 的结构如下：
 ```

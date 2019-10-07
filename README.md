@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 归纳整理[:couple:](#couple-归纳整理) | 算法[:pencil2:](#pencil2-算法) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 工具[:hammer:](#hammer-工具) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 算法[:pencil2:](#pencil2-算法) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 归纳整理[:couple:](#couple-归纳整理) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -28,89 +28,89 @@
 
   运行时数据区域、垃圾回收（GC）、类加载机制、类加载器。
 
+- [IO](./notes/IO.md)
+
+  Java IO、Okio。
+
 ### :computer: Android 
 
 - [Android 基础](./notes/Android%20基础.md)
 
   生命周期、启动模式、四大组件等（覆盖了各类异常情况补充）。
 
-- [源码分析](./notes/源码分析.md)
+- [Android 框架](./notes/Android%20常用框架.md)
 
-  Android 常用框架的源码分析。
+  Android 常用框架的介绍和源码分析。
 
-- [View](https://github.com/passin95/LearningNotes/blob/master/notes/View.md)
+- [View](./notes/View.md)
 
-  View 的工作流程、自定义 View、动画。
+  View 的工作流程、自定义 View、动画、触摸反馈、NestedScrolling。
 
-- [性能相关](https://github.com/passin95/LearningNotes/blob/master/notes/性能相关.md)
+- [性能相关](./notes/性能相关.md)
 
   布局、内存、APK 瘦身、电量、性能检测工具。
 
-- [Hybrid 开发](https://github.com/passin95/LearningNotes/blob/master/notes/hybrid%20开发.md)
+- [AOP](./notes/AOP.md)
+
+  APT、AspectJ、Javaassit、ASM。
+
+- [Hybrid 开发](./notes/hybrid%20开发.md)
 
   WebView、Android 和 JavaScript 的交互、WebView 存在的漏洞处理方式。
 
-- [IO](https://github.com/passin95/LearningNotes/blob/master/notes/IO.md)
-
-  Java IO、Okio。
-
-- [编译时注解](https://github.com/passin95/LearningNotes/blob/master/notes/编译时注解.md)
-
-  开发编译时注解框架的基础。
-
-- [Android 混淆](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20混淆.md)
+- [Android 混淆](./notes/Android%20混淆.md)
   
   Android 混淆相关。
 
 ### :cloud: 网络 
 
-- [HTTP](https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md)
+- [HTTP](./notes/HTTP.md)
 
   TCP/IP 协议族简介、HTTP、HTTPS、HTTP 相关功能的具体应用。
 
-- [编码和解码](https://github.com/passin95/LearningNotes/blob/master/notes/编码和解码.md)
+- [编码和解码](./notes/编码和解码.md)
 
   Base64、序列化、Hash。
 
 ### :pencil2: 算法 
 
-- [LeetCode](https://github.com/passin95/LearningNotes/blob/master/notes/LeetCode.md)
+- [LeetCode](./notes/LeetCode.md)
 
   LeetCode 题解。
 
-### :speak_no_evil: Android Studio 
-
-- [常用插件](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20Studio%20Plugins.md)
-
-  Android Studio Plugins。
-
-- [Android Studio 实用相关](https://github.com/passin95/LearningNotes/blob/master/notes/Android%20Studio%20技巧相关.md)
-
-  自动换行、bean 类变量自动判 null、代码模板、文件模板
-
 ### :hammer: 工具 
 
-- [Git](https://github.com/passin95/LearningNotes/blob/master/notes/Git.md)
+- [Git](./notes/Git.md)
 
   Git 常用命令和本质分析。
 
-- [Gradle](https://github.com/passin95/LearningNotes/blob/master/notes/Gradle.md)
+- [Gradle](./notes/Gradle.md)
 
-  Groovy 语法、Gradle 的解析和编写。
+  Gradle 原理、内置 Task。
 
-- [正则表达式](https://github.com/passin95/LearningNotes/blob/master/notes/正则表达式.md)
+- [正则表达式](./notes/正则表达式.md)
 
   正则表达式语法以及常用合集。
 
-### :bulb: 编码规范 
+### :speak_no_evil: Android Studio 
 
-- [代码风格规范](https://github.com/passin95/LearningNotes/blob/master/notes/代码风格规范.md)
+- [常用插件](./notes/Android%20Studio%20Plugins.md)
+
+  Android Studio Plugins。
+
+- [Android Studio 技巧](./notes/Android%20Studio%20实用技巧.md)
+
+  自动换行、bean 类变量自动判 null、代码模板、文件模板
+
+### :bulb: 编码规范
+
+- [代码风格规范](./notes/代码风格规范.md)
 
   阿里巴巴 Java 开发手册、阿里巴巴 Android 开发手册。
 
 ### :couple: 归纳整理
 
-- [归纳整理](https://github.com/passin95/LearningNotes/blob/master/notes/归纳整理.md)
+- [归纳整理](./notes/归纳整理.md)
 
   对优秀文章归纳整理，包括又不局限于源码解析、机型适配、疑难杂症等。
 
@@ -123,7 +123,7 @@
 
 #### About
 
-笔记是根据自己的实际情况和理解进行编写、整理，欢迎其它读者收阅、提供建议。
+笔记是根据日常学习的理解进行编写、整理。md 排版、文本排版、语言描述也根据自己的提升不断完善。
 
 该笔记暂时由笔者一个人维护，为了方便在不同 PC 端编写笔记，因此不再在 commit 的时候提供详细的说明。
 

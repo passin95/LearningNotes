@@ -1,53 +1,48 @@
-
-# Paint
-
 <!-- TOC -->
 
-- [Paint](#paint)
-  - [基础设置](#%E5%9F%BA%E7%A1%80%E8%AE%BE%E7%BD%AE)
-    - [绘制模式 Style](#%E7%BB%98%E5%88%B6%E6%A8%A1%E5%BC%8F-style)
-    - [线条宽度 StrokeWidth](#%E7%BA%BF%E6%9D%A1%E5%AE%BD%E5%BA%A6-strokewidth)
-    - [文字大小 TextSize](#%E6%96%87%E5%AD%97%E5%A4%A7%E5%B0%8F-textsize)
-    - [抗锯齿开关 AntiAlias](#%E6%8A%97%E9%94%AF%E9%BD%BF%E5%BC%80%E5%85%B3-antialias)
-  - [设置颜色](#%E8%AE%BE%E7%BD%AE%E9%A2%9C%E8%89%B2)
-    - [基本颜色](#%E5%9F%BA%E6%9C%AC%E9%A2%9C%E8%89%B2)
-      - [直接设置](#%E7%9B%B4%E6%8E%A5%E8%AE%BE%E7%BD%AE)
-      - [着色器 Shape](#%E7%9D%80%E8%89%B2%E5%99%A8-shape)
-        - [着色规则 Shader.TileMode](#%E7%9D%80%E8%89%B2%E8%A7%84%E5%88%99-shadertilemode)
-        - [线性渐变 LinearGradient](#%E7%BA%BF%E6%80%A7%E6%B8%90%E5%8F%98-lineargradient)
-        - [辐射渐变 RadialGradient](#%E8%BE%90%E5%B0%84%E6%B8%90%E5%8F%98-radialgradient)
-        - [扫描渐变 SweepGradient](#%E6%89%AB%E6%8F%8F%E6%B8%90%E5%8F%98-sweepgradient)
-        - [Bitmap BitmapShader](#bitmap-bitmapshader)
-        - [混合着色器 ComposeShader](#%E6%B7%B7%E5%90%88%E7%9D%80%E8%89%B2%E5%99%A8-composeshader)
-          - [叠加策略 PorterDuff.Mode](#%E5%8F%A0%E5%8A%A0%E7%AD%96%E7%95%A5-porterduffmode)
-    - [颜色过滤 ColorFilter](#%E9%A2%9C%E8%89%B2%E8%BF%87%E6%BB%A4-colorfilter)
-      - [LightingColorFilter](#lightingcolorfilter)
-      - [PorterDuffColorFilter](#porterduffcolorfilter)
-      - [ColorMatrixColorFilter](#colormatrixcolorfilter)
-    - [Xfermode](#xfermode)
-  - [辅助设置](#%E8%BE%85%E5%8A%A9%E8%AE%BE%E7%BD%AE)
-    - [线条端点形状 StrokeCap](#%E7%BA%BF%E6%9D%A1%E7%AB%AF%E7%82%B9%E5%BD%A2%E7%8A%B6-strokecap)
-    - [拐角的形状 StrokeJoin](#%E6%8B%90%E8%A7%92%E7%9A%84%E5%BD%A2%E7%8A%B6-strokejoin)
-    - [尖角时延长线最大值 StrokeMiter](#%E5%B0%96%E8%A7%92%E6%97%B6%E5%BB%B6%E9%95%BF%E7%BA%BF%E6%9C%80%E5%A4%A7%E5%80%BC-strokemiter)
-    - [双线性过滤 FilterBitmap](#%E5%8F%8C%E7%BA%BF%E6%80%A7%E8%BF%87%E6%BB%A4-filterbitmap)
-    - [阴影 ShadowLayer](#%E9%98%B4%E5%BD%B1-shadowlayer)
-    - [过滤画面（特效） MaskFilter](#%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%E7%89%B9%E6%95%88-maskfilter)
-      - [BlurMaskFilter](#blurmaskfilter)
-      - [EmbossMaskFilter](#embossmaskfilter)
-  - [图形轮廓 PathEffect](#%E5%9B%BE%E5%BD%A2%E8%BD%AE%E5%BB%93-patheffect)
-    - [CornerPathEffect](#cornerpatheffect)
-    - [DiscretePathEffect](#discretepatheffect)
-    - [DashPathEffect](#dashpatheffect)
-    - [SumPathEffect](#sumpatheffect)
-    - [ComposePathEffect](#composepatheffect)
-    - [注意事项](#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
-- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+- [一、Paint 基础设置](#%E4%B8%80paint-%E5%9F%BA%E7%A1%80%E8%AE%BE%E7%BD%AE)
+  - [1.1 绘制模式 Style](#11-%E7%BB%98%E5%88%B6%E6%A8%A1%E5%BC%8F-style)
+  - [1.2 文字大小 TextSize](#12-%E6%96%87%E5%AD%97%E5%A4%A7%E5%B0%8F-textsize)
+  - [1.3 抗锯齿开关](#13-%E6%8A%97%E9%94%AF%E9%BD%BF%E5%BC%80%E5%85%B3)
+- [二、颜色 Color](#%E4%BA%8C%E9%A2%9C%E8%89%B2-color)
+  - [2.1 基本颜色](#21-%E5%9F%BA%E6%9C%AC%E9%A2%9C%E8%89%B2)
+  - [2.2 设置着色器 Shape](#22-%E8%AE%BE%E7%BD%AE%E7%9D%80%E8%89%B2%E5%99%A8-shape)
+    - [2.2.1 着色规则 Shader.TileMode](#221-%E7%9D%80%E8%89%B2%E8%A7%84%E5%88%99-shadertilemode)
+    - [2.2.2 线性渐变 LinearGradient](#222-%E7%BA%BF%E6%80%A7%E6%B8%90%E5%8F%98-lineargradient)
+    - [2.2.3 辐射渐变 RadialGradient](#223-%E8%BE%90%E5%B0%84%E6%B8%90%E5%8F%98-radialgradient)
+    - [2.2.4 扫描渐变 SweepGradient](#224-%E6%89%AB%E6%8F%8F%E6%B8%90%E5%8F%98-sweepgradient)
+    - [2.2.5 Bitmap BitmapShader](#225-bitmap-bitmapshader)
+    - [2.2.6 混合着色器 ComposeShader](#226-%E6%B7%B7%E5%90%88%E7%9D%80%E8%89%B2%E5%99%A8-composeshader)
+  - [2.2.6.1 叠加策略 PorterDuff.Mode](#2261-%E5%8F%A0%E5%8A%A0%E7%AD%96%E7%95%A5-porterduffmode)
+  - [2.3 颜色过滤 ColorFilter](#23-%E9%A2%9C%E8%89%B2%E8%BF%87%E6%BB%A4-colorfilter)
+    - [2.3.1 LightingColorFilter](#231-lightingcolorfilter)
+    - [2.3.2 PorterDuffColorFilter](#232-porterduffcolorfilter)
+    - [2.3.3 ColorMatrixColorFilter](#233-colormatrixcolorfilter)
+  - [2.4 Xfermode](#24-xfermode)
+- [三、线条形状](#%E4%B8%89%E7%BA%BF%E6%9D%A1%E5%BD%A2%E7%8A%B6)
+  - [3.1 设置线条宽度 StrokeWidth](#31-%E8%AE%BE%E7%BD%AE%E7%BA%BF%E6%9D%A1%E5%AE%BD%E5%BA%A6-strokewidth)
+  - [3.2 线条端点形状 StrokeCap](#32-%E7%BA%BF%E6%9D%A1%E7%AB%AF%E7%82%B9%E5%BD%A2%E7%8A%B6-strokecap)
+  - [3.2 拐角的形状 StrokeJoin](#32-%E6%8B%90%E8%A7%92%E7%9A%84%E5%BD%A2%E7%8A%B6-strokejoin)
+  - [3.3 尖角延长线最大值 StrokeMiter](#33-%E5%B0%96%E8%A7%92%E5%BB%B6%E9%95%BF%E7%BA%BF%E6%9C%80%E5%A4%A7%E5%80%BC-strokemiter)
+- [四、阴影 ShadowLayer](#%E5%9B%9B%E9%98%B4%E5%BD%B1-shadowlayer)
+- [五、过滤画面（特效） MaskFilter](#%E4%BA%94%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%E7%89%B9%E6%95%88-maskfilter)
+  - [5.1 模糊效果 BlurMaskFilter](#51-%E6%A8%A1%E7%B3%8A%E6%95%88%E6%9E%9C-blurmaskfilter)
+  - [5.2 浮雕效果 EmbossMaskFilter](#52-%E6%B5%AE%E9%9B%95%E6%95%88%E6%9E%9C-embossmaskfilter)
+- [六、图形轮廓 PathEffect](#%E5%85%AD%E5%9B%BE%E5%BD%A2%E8%BD%AE%E5%BB%93-patheffect)
+  - [6.1 CornerPathEffect](#61-cornerpatheffect)
+  - [6.2 DiscretePathEffect](#62-discretepatheffect)
+  - [6.3 DashPathEffect](#63-dashpatheffect)
+  - [6.4 PathDashPathEffect](#64-pathdashpatheffect)
+  - [6.5 SumPathEffect](#65-sumpatheffect)
+  - [6.6 ComposePathEffect](#66-composepatheffect)
+  - [6.7 注意事项](#67-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
+- [七、硬件加速](#%E4%B8%83%E7%A1%AC%E4%BB%B6%E5%8A%A0%E9%80%9F)
 
 <!-- /TOC -->
 
-## 基础设置
+# 一、Paint 基础设置
 
-### 绘制模式 Style
+## 1.1 绘制模式 Style
 
 Paint.setStyle(Style style)
 
@@ -57,39 +52,37 @@ style 默认值为 FILL。
 - Paint.Style.FILL - 填充模式
 - Paint.Style.FILLFILL_AND_STROKE - 两种模式并用
 
-### 线条宽度 StrokeWidth
-
-Paint.setStrokeWidth(float width) 
-
-### 文字大小 TextSize
+## 1.2 文字大小 TextSize
 
 Paint.setTextSize(float textSize) 
 
-### 抗锯齿开关 AntiAlias
+## 1.3 抗锯齿开关 
+
+抗锯齿的原理是：修改图形边缘处的像素颜色，从而让图形在肉眼看来具有更加平滑的感觉，因此从某种角度讲，它也造成了图形的颜色失真。
 
 Paint.setAntiAlias(boolean aa) 
 
-## 设置颜色
+Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);  
+
+# 二、颜色 Color
 
 Canvas 绘制的内容，有三层对颜色的处理：
 
 <img src="../pictures//52eb2279ly1fig6dcywn2j20j909yabu.jpg"/>
 
-### 基本颜色
-
-#### 直接设置
+## 2.1 基本颜色
 
 Paint.setColor(int color) 
 
 Paint.setARGB(int a, int r, int g, int b) 
 
-#### 着色器 Shape
+## 2.2 设置着色器 Shape
 
 Paint.setShader(Shader shader)
 
 同时 setShader() 和 setColor/ARGB() 和 Color 时优先使用 Shader 的颜色。
 
-##### 着色规则 Shader.TileMode
+### 2.2.1 着色规则 Shader.TileMode
 
 Shader.TileMode 为端点范围之外的着色规则。
 
@@ -97,7 +90,7 @@ Shader.TileMode 为端点范围之外的着色规则。
 - Shader.TileMode.MIRROR - 镜像模式，以任何一个渐变中间或端点为基准都是堆成的。
 - Shader.TileMode.REPEAT - 重复模式
 
-##### 线性渐变 LinearGradient
+### 2.2.2 线性渐变 LinearGradient
 
 LinearGradient(float x0, float y0, float x1, float y1, int color0, int color1, Shader.TileMode tileMode)
 
@@ -125,7 +118,7 @@ REPEAT:
 <img src="../pictures//52eb2279ly1fig6em2wabj20ck08xjvo.jpg"/>
 
 
-##### 辐射渐变 RadialGradient
+### 2.2.3 辐射渐变 RadialGradient
 
 RadialGradient(float centerX, float centerY, float radius,int colors[], float stops[], TileMode tileMode)
 
@@ -137,7 +130,7 @@ RadialGradient(float centerX, float centerY, float radius,int colors[], float st
 
 <img src="../pictures//52eb2279ly1fig6ewf1o5j206d066q4a.jpg"/>
 
-##### 扫描渐变 SweepGradient
+### 2.2.4 扫描渐变 SweepGradient
 
  SweepGradient(float cx, float cy, int color0, int color1)
 
@@ -147,7 +140,7 @@ RadialGradient(float centerX, float centerY, float radius,int colors[], float st
 
 <img src="../pictures//52eb2279ly1fig6fmbemdj206u061my4.jpg"/>
 
-##### Bitmap BitmapShader
+### 2.2.5 Bitmap BitmapShader
 
 BitmapShader(Bitmap bitmap, Shader.TileMode tileX, Shader.TileMode tileY)
 
@@ -157,15 +150,15 @@ BitmapShader(Bitmap bitmap, Shader.TileMode tileX, Shader.TileMode tileY)
 
 <img src="../pictures//52eb2279ly1fig6fragq2j20lc089djv.jpg"/>
 
-##### 混合着色器 ComposeShader
+### 2.2.6 混合着色器 ComposeShader
 
-把两个 Shader 一起使用。
+所谓混合，就是把两个 Shader 一起使用。
 
 ComposeShader(Shader shaderA, Shader shaderB, PorterDuff.Mode mode)
 
 - shaderA 目标图像。
 - shaderB 源图像。
-- mode - 两个 Shader 的叠加模式，即 shaderA 和 shaderB 应该怎样共同绘制。默认类型是 PorterDuff.Mode。
+- mode - 两个 Shader 的叠加模式，即 shaderA 和 shaderB 应该怎样共同绘制。它的类型是枚举类 PorterDuff.Mode。
 
 ```java
 // 第一个 Shader：头像的 Bitmap
@@ -180,31 +173,32 @@ Shader shader2 = new BitmapShader(bitmap2, Shader.TileMode.CLAMP, Shader.TileMod
 Shader shader = new ComposeShader(shader1, shader2, PorterDuff.Mode.SRC_OVER);  
 paint.setShader(shader);
 ```
-> 上面这段代码中使用了两个 BitmapShader 来作为 ComposeShader() 的参数，而 ComposeShader() 在硬件加速下是不支持两个相同类型的 Shader 的，所以这里需要关闭硬件加速才能看到效果。
+
+上面这段代码中使用了两个 BitmapShader 来作为 ComposeShader() 的参数，而 ComposeShader() 在硬件加速下是不支持两个相同类型的 Shader 的，所以这里需要关闭硬件加速才能看到效果。
 
 <img src="../pictures//52eb2279ly1fig6hbeg7gj20qy08cafn.jpg"/>
 
-###### 叠加策略 PorterDuff.Mode
+## 2.2.6.1 叠加策略 PorterDuff.Mode
 
 <img src="../pictures//52eb2279ly1fig6ia1twgj20ds07tdgs.jpg"/>
 
-第一类：Alpha 合成（关于 Alpha 通道计算）。
+**（1）Alpha 合成（关于 Alpha 通道计算）**
 
 <img src="../pictures//52eb2279ly1fig6im3hhcj20o50zt7bj.jpg"/>
 
-第二类，混合（就是常见的色彩叠加）
+**（2）混合（常见的色彩叠加）**
 
 <img src="../pictures//52eb2279ly1fig6iw04v0j20ny0hzmzj.jpg"/>
 
-### 颜色过滤 ColorFilter
+## 2.3 颜色过滤 ColorFilter
 
 Paint.setColorFilter(ColorFilter filter)
 
 为绘制设置颜色过滤。颜色过滤的意思，就是为绘制的内容设置一个统一的过滤策略，然后 Canvas.drawXXX() 方法会对每个像素都进行过滤后再绘制出来。
 
-#### LightingColorFilter 
+### 2.3.1 LightingColorFilter
 
-LightingColorFilter(int mul, int add)
+LightingColorFilter 是用来模拟简单的光照效果的，它的构造函数是 LightingColorFilter(int mul, int add)。
 
 - mul - 和目标像素相乘。
 - add - 用来和目标像素相加。
@@ -217,7 +211,7 @@ G' = G * mul.G / 0xff + add.G
 B' = B * mul.B / 0xff + add.B  
 ```
 
-想去掉原像素中的红色，可以把它的 mul 改为 0x00ffff （红色部分为 0 ）， ，那么它的计算过程就是：
+想去掉原像素中的红色，可以把它的 mul 改为 0x00ffff（红色部分为 0 ），那么它的计算过程就是：
 
 ```
 R' = R * 0x0 / 0xff + 0x0 = 0 // 红色被移除  
@@ -227,15 +221,15 @@ B' = B * 0xff / 0xff + 0x0 = B
 
 <img src= "../pictures//52eb2279ly1fig6k1n8aij209104faay.jpg"/>
 
-#### PorterDuffColorFilter
+### 2.3.2 PorterDuffColorFilter
 
 PorterDuffColorFilter(int color, PorterDuff.Mode mode) 
 
-一个指定的颜色（作为源图像）和一种指定的 PorterDuff.Mode 来与绘制对象（目标图像）进行合成。
+一个指定的颜色（作为源图像）与绘制对象（目标图像）按照指定的叠加策略 PorterDuff.Mode 来进行合成。
 
 PorterDuffColorFilter 作为一个 ColorFilter，只能指定一种颜色作为源，而不是一个 Bitmap。
 
-#### ColorMatrixColorFilter
+### 2.3.3 ColorMatrixColorFilter
 
 ColorMatrixColorFilter(ColorMatrix matrix)
 
@@ -257,15 +251,21 @@ B’ = k*R + l*G + m*B + n*A + o;
 A’ = p*R + q*G + r*B + s*A + t;  
 ```
 
-### Xfermode
+## 2.4 Xfermode
 
 Paint.setXfermode(Xfermode xfermode)
 
-Xfermode 全名为 Transfer mode，暂时只有一个子类 PorterDuffXfermode，它的用处为以绘制的内容作为源图像和 View 中已绘制的内容作为目标图像选取一个 PorterDuff.Mode 作为绘制内容的颜色处理方案。
+Xfermode 全名为 Transfer mode，暂时只有一个子类 PorterDuffXfermode，它的用处为以绘制的内容作为源图像，以 View 中已有的内容作为目标图像，选取一个 PorterDuff.Mode 作为绘制内容的叠加策略。
 
-由于 View 的的显示区域都会参与计算，并且 View 自身的底色并不是默认的透明色，会导致范围之外都变成了黑色，因此得使用离屏缓冲，把要绘制的内容单独绘制在缓冲层。用法如下：
+由于 View 的的显示区域都会参与计算，并且 View 自身的底色并不是默认的透明色，会导致范围之外都变成了黑色，因此得使用离屏缓冲，把要绘制的内容单独绘制在缓冲层。
+使用离屏缓冲有两种方式：
+
+**（1）Canvas.saveLayer()**
+
+在一般的自定义绘制需求中，都是使用该方式。
 
 ```java
+// saveLayer() 可以做短时的离屏缓冲
 int saved = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
 
 canvas.drawBitmap(rectBitmap, 0, 0, paint); // 先画方
@@ -282,17 +282,36 @@ canvas.restoreToCount(saved);
 
 <img src= "../pictures//006tNc79ly1fig73037soj30sj0x3myt.jpg"/>
 
-## 辅助设置
+**（2）View.setLayerType()**
 
-### 线条端点形状 StrokeCap
+View.setLayerType() 是直接把整个 View 都绘制在离屏缓冲中。 setLayerType(LAYER_TYPE_HARDWARE) 是使用 GPU 来缓冲， setLayerType(LAYER_TYPE_SOFTWARE) 是直接直接用一个 Bitmap 来缓冲。更详情的介绍请看 [硬件加速](#七、硬件加速)
 
-Paint.setStrokeCap(cap)
+# 三、线条形状
+
+设置线条形状的一共有 4 个方法：setStrokeWidth(float width), setStrokeCap(Paint.Cap cap), setStrokeJoin(Paint.Join join), setStrokeMiter(float miter) 。
+
+## 3.1 设置线条宽度 StrokeWidth
+
+Paint.setStrokeWidth(float width)
+
+默认情况下，线条宽度为 0，但依然能够画出线，线条的宽度为 1 像素。那么它和线条宽度为 1 有什么区别呢？
+
+其实这个和「几何变换」有关：你可以为 Canvas 设置 Matrix 来实现几何变换（如放大、缩小、平移、旋转），在几何变换之后 Canvas 绘制的内容就会发生相应变化，包括线条也会加粗，例如 2 像素宽度的线条在 Canvas 放大 2 倍后会被以 4 像素宽度来绘制。而当线条宽度被设置为 0 时，它的宽度就被固定为 1 像素，就算 Canvas 通过几何变换被放大，它也依然会被以 1 像素宽度来绘制。Google 在文档中把线条宽度为 0 时称作「hairline mode（发际线模式）」。
+
+
+## 3.2 线条端点形状 StrokeCap
+
+Paint.setStrokeCap(Paint.Cap cap)
 
 - Paint.Cap.ROUND - 圆头
 - Paint.Cap.BUTT - 平头 
 - Paint.Cap.SQUARE - 方头
 
-### 拐角的形状 StrokeJoin
+虚线是额外加的，虚线左边是线的实际长度，虚线右边是线头。有了虚线作为辅助，可以清楚地看出 BUTT 和 SQUARE 的区别。
+
+<img src= "../pictures//StrokeCap.webp"/>
+
+## 3.2 拐角的形状 StrokeJoin
 
 Paint.setStrokeJoin(Paint.Join join)
 
@@ -300,33 +319,28 @@ Paint.setStrokeJoin(Paint.Join join)
 - Paint.Join.BEVEL - 平角
 - Paint.Join.ROUND - 圆角
 
-### 尖角时延长线最大值 StrokeMiter
+<img src= "../pictures//StrokeJoin.webp"/>
+
+## 3.3 尖角延长线最大值 StrokeMiter
 
 Paint.setStrokeMiter(float miter)
 
 - miter - 对于转角长度的限制，默认值为 4。
 
-当线条拐角为 MITER 时，拐角处的外缘会自动使用延长线来补偿。a/b 比值超过 miter 时，自动改用 BEVEL 的方式来渲染连接点。
+这个方法是对于 setStrokeJoin() 的一个补充，。当线条拐角为 MITER 时，拐角处的外缘会自动使用延长线来补偿。a/b 比值超过 miter 时，自动改用 BEVEL 的方式来渲染连接点。
 
 <img src="../pictures//006tNc79ly1fig7btolhij30e706dglp.jpg"/>
 
-### 双线性过滤 FilterBitmap
 
-setFilterBitmap(boolean filter)
+# 四、阴影 ShadowLayer
 
-图像在放大绘制的时候，默认使用的是最近邻插值过滤，这种算法简单，但会出现马赛克现象；而如果开启了双线性过滤，就可以让结果图像显得更加平滑。
-
-<img src="../pictures//006tNc79ly1fig7dbga6ij30jb0a00tr.jpg"/>
-
-### 阴影 ShadowLayer
-
-setShadowLayer(float radius, float dx, float dy, int shadowColor)
+Paint.setShadowLayer(float radius, float dx, float dy, int shadowColor)
 
 - radius - 阴影的模糊范围
 - dx dy - 阴影的偏移量
 - shadowColor - 阴影的颜色
 
-在绘制内容下面加一层阴影。清楚阴影使用 clearShadowLayer()。
+在绘制内容下面加一层阴影。清除阴影使用 clearShadowLayer()。
 
 ```java
 paint.setShadowLayer(10, 0, 0, Color.RED);
@@ -341,15 +355,15 @@ canvas.drawText(text, 80, 300, paint);
 - 在硬件加速开启的情况下， setShadowLayer() 只支持文字的绘制，文字之外的绘制必须关闭硬件加速才能正常绘制阴影。
 - 如果 shadowColor 是半透明的，阴影的透明度就使用 shadowColor 自己的透明度；而如果 shadowColor 是不透明的，阴影的透明度就使用 paint 的透明度。
 
-### 过滤画面（特效） MaskFilter
+# 五、过滤画面（特效） MaskFilter
 
 在绘制内容上面加一层附加效果。
 
-> 之前的 setColorFilter(filter) 对每个像素的颜色进行过滤；而这里的 setMaskFilter(filter) 则是基于整个画面来进行过滤.
+Paint.setColorFilter(filter) 对每个像素的颜色进行过滤；而 Paint.setMaskFilter(filter) 则是基于整个画面来进行过滤。
 
-#### BlurMaskFilter
+## 5.1 模糊效果 BlurMaskFilter
 
-BlurMaskFilter(float radius, BlurMaskFilter.Blur style) 
+Paint.BlurMaskFilter(float radius, BlurMaskFilter.Blur style) 
 
 - radius - 模糊的范围
 - style - 模糊的类型
@@ -359,11 +373,11 @@ BlurMaskFilter(float radius, BlurMaskFilter.Blur style)
 - NORMAL: 内外都模糊绘制
 - SOLID: 内部正常绘制，外部模糊
 - INNER: 内部模糊，外部不绘制
-- OUTER: 内部不绘制，外部模糊（什么鬼？）
+- OUTER: 内部不绘制，外部模糊（仅发光部分可见）
 
 <img src="../pictures//006tNc79ly1fig7fr4dwgj30lk0mbgne.jpg"/>
 
-#### EmbossMaskFilter
+## 5.2 浮雕效果 EmbossMaskFilter
 
 EmbossMaskFilter(float[] direction, float ambient, float specular, float blurRadius) 
 
@@ -374,13 +388,13 @@ EmbossMaskFilter(float[] direction, float ambient, float specular, float blurRad
 
 <img src="../pictures//006tNc79ly1fig7g3ktlmj30kp09g0tl.jpg"/>
 
-## 图形轮廓 PathEffect
+# 六、图形轮廓 PathEffect
 
-setPathEffect(PathEffect effect)
+Paint.setPathEffect(PathEffect effect)
 
-对 Canvas 所有的图形绘制（drawXXX()）有效
+该方法对 Canvas 所有的图形绘制有效。
     
-### CornerPathEffect
+## 6.1 CornerPathEffect
 
  CornerPathEffect(float radius)
 
@@ -390,57 +404,97 @@ setPathEffect(PathEffect effect)
 
 <img src= "../pictures//006tNc79ly1fig7dobrizj30iv0agt8z.jpg"/>
 
-### DiscretePathEffect
+## 6.2 DiscretePathEffect
 
 DiscretePathEffect(float segmentLength, float deviation)
 
 - segmentLength - 切段线段长度
 - deviation - 偏离量
 
-将线条切段后随机偏离。
+将线条按长度 segmentLength 切段后随机偏离。
 
 <img src= "../pictures//006tNc79ly1fig7dug01cj30ir0bawet.jpg"/>
 
-### DashPathEffect
+## 6.3 DashPathEffect
 
 DashPathEffect(float[] intervals, float phase)
 
-- intervals - 虚线的格式（必须是偶数）
-- phase - 以原虚线起点开始的偏移量
+- intervals - 虚线的格式（必须是偶数），按照「画线长度、空白长度、画线长度、空白长度」……的顺序排列。
+- phase - intervals 的偏移量。
 
 使用虚线来绘制线条。
 
 <img src= "../pictures//006tNc79ly1fig7dz1jenj30iw0b9mxh.jpg"/>
 
-### SumPathEffect
+## 6.4 PathDashPathEffect
 
- SumPathEffect(PathEffect first, PathEffect second)
+PathDashPathEffect 比 DashPathEffect 多了一个 Path，意思就是用 **Path** 来代替虚线。
 
- 分别按照两种 PathEffect 分别对目标进行绘制。
+PathDashPathEffect(Path shape, float advance, float phase, PathDashPathEffect.Style style)
+
+- shape：充当虚线的 Path。
+- advance：两个相邻的 shape 起点之间的间隔。
+- phase：shape 的偏移量。
+- style：它有 3 个值：位移、旋转、变体，区别如下图所示。
+
+<img src= "../pictures//PathDashPathEffect.webp"/>
+
+## 6.5 SumPathEffect
+
+SumPathEffect(PathEffect first, PathEffect second)
+
+分别按照两种 PathEffect 分别对目标进行绘制。
 
 <img src= "../pictures//006tNc79ly1fig7dobrizj30iv0agt8z.jpg"/>
 
-### ComposePathEffect
+## 6.6 ComposePathEffect
 
 先对目标 Path 使用一个 PathEffect，然后再对这个改变后的 Path 使用另一个 PathEffect。
 
+ComposePathEffect(PathEffect outerpe, PathEffect innerpe)
+
+- innerpe 比 outerpe 先应用。
+
 ```java
+// 即先「先偏离，再变虚线」。
 PathEffect dashEffect = new DashPathEffect(new float[]{20, 10}, 0);  
 PathEffect discreteEffect = new DiscretePathEffect(20, 5);  
-pathEffect = new SumPathEffect(dashEffect, discreteEffect);
+ComposePathEffect pathEffect = new ComposePathEffect(dashEffect, discreteEffect);
+Paint.setPathEffect(pathEffect);
+
 
 canvas.drawPath(path, paint);  
 ```
 
 <img src= "../pictures//006tNc79ly1fig7epf94aj30dr05eq2x.jpg"/>
 
-### 注意事项
+## 6.7 注意事项
 
-- Canvas.drawLine() 和 Canvas.drawLines() 方法画直线时，setPathEffect() 是不支持硬件加速的。
+- 使用 Canvas.drawLine() 和 Canvas.drawLines() 方法画直线时，setPathEffect() 是不支持硬件加速的。
 - PathDashPathEffect 对硬件加速的支持也有问题，所以当使用 PathDashPathEffect 的时候，最好也把硬件加速关了。
 
+# 七、硬件加速
 
-# 参考资料
+所谓硬件加速，指的是把某些计算工作交给专门的硬件来做，而不是和普通的计算工作一样交给 CPU 来处理。这样不仅减轻了 CPU 的压力，而且由于有了「专人」的处理，这份计算工作的速度也被加快了。这就是「硬件加速」。
 
-- [绘制基础 - HenCoder](https://hencoder.com/ui-1-1/)
-- [Paint 详解 - HenCoder](https://hencoder.com/ui-1-2/)
+在硬件加速关闭的时候，Canvas 绘制的工作方式是：把要绘制的内容写进一个 Bitmap，然后在之后的渲染过程中，这个 Bitmap 的像素内容被直接用于渲染到屏幕。这种绘制方式的主要计算工作在于把绘制操作转换为像素的过程。
+
+而在硬件加速开启时，Canvas 的工作方式改变了：它只是把绘制的内容转换为 GPU 的操作保存了下来，然后就把它交给 GPU，最终由 GPU 来完成实际的显示工作。除此之外，GPU 自身的设计就对图形计算（例如简单的圆形、简单的方形）具有优势； 最后，由于绘制流程的不同，硬件加速在界面内容发生重绘的时候绘制流程可以得到优化，**它只会重绘变化的视图**，它的父 View 和兄弟 View，只需要保持原样，从而大幅提升绘制效率。
+
+正是由于上面的原因，硬件加速不仅是由于 GPU 的引入而提高了绘制效率，还由于绘制机制的改变，而极大地提高了界面内容改变时的刷新效率。
+
+**（1）硬件加速的开关**
+
+硬件加速可以使用 setLayerType() 来关闭硬件加速，但这个方法其实是用来设置 View Layer 的（离屏缓冲，配合 Xfermode 使用）：
+
+- 参数为 LAYER_TYPE_SOFTWARE 时，使用软件来绘制 View Layer，绘制到一个 Bitmap，并顺便关闭硬件加速；
+- 参数为 LAYER_TYPE_HARDWARE 时，使用 GPU 来绘制 View Layer，绘制到一个 OpenGL texture（如果硬件加速关闭，那么行为和 VIEW_TYPE_SOFTWARE 一致）；
+- 参数为 LAYER_TYPE_NONE 时，关闭 View Layer。
+
+当设置了 View Layer 后，View 在初次绘制时以及每次 invalidate() 后重绘时，需要进行两次的绘制工作（一次绘制到 Layer，一次从 Layer 绘制到显示屏），所以其实它的每次绘制的效率是被降低了的。因此一般情况下建议关闭 View Layer。
+
+**（2）硬件加速的限制**
+
+硬件加速不只是好处，也有它的限制：受到 GPU 绘制方式的限制，Canvas 的有些方法在硬件加速开启式会失效或无法正常工作。具体的 API 限制和 API 版本的关系如下图：
+
+<img src="../pictures//硬件加速的限制.webp"/>

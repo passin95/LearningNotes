@@ -1,61 +1,62 @@
 <!-- TOC -->
 
-- [一、基础概念](#一基础概念)
-    - [1.1 线程和进程](#11-线程和进程)
-    - [1.2 线程的状态（生命周期）](#12-线程的状态生命周期)
-- [二、Thread](#二thread)
-    - [2.1 Thread 的构造函数](#21-thread-的构造函数)
-    - [2.2 守护线程](#22-守护线程)
-    - [2.3 Thread API](#23-thread-api)
-        - [2.3.1 sleep](#231-sleep)
-            - [2.3.1.1 TimeUnit 代替 sleep](#2311-timeunit-代替-sleep)
-        - [2.3.2 yield](#232-yield)
-        - [2.3.3 interrupt](#233-interrupt)
-            - [2.3.3.1 interrupt() 和 InterruptedException](#2331-interrupt-和-interruptedexception)
-            - [2.3.3.2 thread.isInterrupted() 和 Thread.interrupted()](#2332-threadisinterrupted-和-threadinterrupted)
-        - [2.3.4 join](#234-join)
-    - [2.4 ThreadLocal](#24-threadlocal)
-        - [2.4.1 ThreadLocal 内存泄漏](#241-threadlocal-内存泄漏)
-    - [2.5 线程间协作](#25-线程间协作)
-        - [2.5.1 wait()、notify()、notifyAll()](#251-waitnotifynotifyall)
-        - [2.5.2 await()、signal()、signalAll()](#252-awaitsignalsignalall)
-- [三、Java 内存模型](#三java-内存模型)
-    - [3.1 CPU Cache 模型](#31-cpu-cache-模型)
-    - [3.2 Java 内存模型详解](#32-java-内存模型详解)
-        - [3.2.1 内存间交互操作](#321-内存间交互操作)
-    - [3.3 内存模型三大特性](#33-内存模型三大特性)
-        - [3.3.1 原子性](#331-原子性)
-        - [3.3.2 可见性](#332-可见性)
-        - [3.3.3 有序性](#333-有序性)
-    - [3.4 volatile](#34-volatile)
-- [四、线程安全和锁](#四线程安全和锁)
-    - [4.1 不可变](#41-不可变)
-    - [4.2 互斥同步（阻塞同步）](#42-互斥同步阻塞同步)
-        - [4.2.1 synchronized](#421-synchronized)
-            - [4.2.1.1 synchronized 锁优化](#4211-synchronized-锁优化)
-        - [4.2.2 ReentrantLock](#422-reentrantlock)
-        - [4.2.3 比较](#423-比较)
-    - [4.3 非阻塞同步](#43-非阻塞同步)
-        - [4.3.1 CAS（Compare-and-Swap）](#431-cascompare-and-swap)
-            - [4.3.1.1 ABA 问题](#4311-aba-问题)
-        - [4.3.2 Atomic 原子类](#432-atomic-原子类)
-        - [4.3.2.1 原子类方法、原理浅析](#4321-原子类方法原理浅析)
-    - [4.4 无同步方案](#44-无同步方案)
-    - [4.5 死锁](#45-死锁)
-        - [4.5.1 死锁产生条件](#451-死锁产生条件)
-        - [4.5.2 简单的死锁 Demo](#452-简单的死锁-demo)
-- [五、线程池 ExecutorService](#五线程池-executorservice)
-    - [5.1 ThreadPoolExecutor](#51-threadpoolexecutor)
-        - [5.1.1 ThreadPoolExecutor 的执行顺序](#511-threadpoolexecutor-的执行顺序)
-        - [5.1.2 BlockingQueue](#512-blockingqueue)
-    - [5.2 Executors](#52-executors)
-        - [5.2.1 CachedThreadPool](#521-cachedthreadpool)
-        - [5.2.2 FixedThreadPool](#522-fixedthreadpool)
-        - [5.2.3 SingleThreadExecutor](#523-singlethreadexecutor)
-        - [5.2.4 不推荐直接使用 Executors](#524-不推荐直接使用-executors)
-    - [六、多线程开发建议](#六多线程开发建议)
-- [8. Java 多线程面试题](#8-java-多线程面试题)
-- [参考资料](#参考资料)
+- [一、基础概念](#%E4%B8%80%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5)
+  - [1.1 线程和进程](#11-%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B)
+  - [1.2 线程的状态（生命周期）](#12-%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+- [二、Thread](#%E4%BA%8Cthread)
+  - [2.1 Thread 的构造函数](#21-thread-%E7%9A%84%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
+  - [2.2 守护线程](#22-%E5%AE%88%E6%8A%A4%E7%BA%BF%E7%A8%8B)
+  - [2.3 Thread API](#23-thread-api)
+    - [2.3.1 sleep](#231-sleep)
+      - [2.3.1.1 TimeUnit 代替 sleep](#2311-timeunit-%E4%BB%A3%E6%9B%BF-sleep)
+    - [2.3.2 yield](#232-yield)
+    - [2.3.3 interrupt](#233-interrupt)
+      - [2.3.3.1 interrupt() 和 InterruptedException](#2331-interrupt-%E5%92%8C-interruptedexception)
+      - [2.3.3.2 thread.isInterrupted() 和 Thread.interrupted()](#2332-threadisinterrupted-%E5%92%8C-threadinterrupted)
+    - [2.3.4 join](#234-join)
+  - [2.4 ThreadLocal](#24-threadlocal)
+    - [2.4.1 ThreadLocal 内存泄漏](#241-threadlocal-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F)
+  - [2.5 线程间协作](#25-%E7%BA%BF%E7%A8%8B%E9%97%B4%E5%8D%8F%E4%BD%9C)
+    - [2.5.1 wait()、notify()、notifyAll()](#251-waitnotifynotifyall)
+    - [2.5.2 await()、signal()、signalAll()](#252-awaitsignalsignalall)
+- [三、Java 内存模型](#%E4%B8%89java-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B)
+  - [3.1 CPU Cache 模型](#31-cpu-cache-%E6%A8%A1%E5%9E%8B)
+  - [3.2 Java 内存模型详解](#32-java-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E8%AF%A6%E8%A7%A3)
+    - [3.2.1 内存间交互操作](#321-%E5%86%85%E5%AD%98%E9%97%B4%E4%BA%A4%E4%BA%92%E6%93%8D%E4%BD%9C)
+  - [3.3 内存模型三大特性](#33-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%89%E5%A4%A7%E7%89%B9%E6%80%A7)
+    - [3.3.1 原子性](#331-%E5%8E%9F%E5%AD%90%E6%80%A7)
+    - [3.3.2 可见性](#332-%E5%8F%AF%E8%A7%81%E6%80%A7)
+    - [3.3.3 有序性](#333-%E6%9C%89%E5%BA%8F%E6%80%A7)
+  - [3.4 volatile](#34-volatile)
+- [四、线程安全和锁](#%E5%9B%9B%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%92%8C%E9%94%81)
+  - [4.1 不可变](#41-%E4%B8%8D%E5%8F%AF%E5%8F%98)
+  - [4.2 互斥同步（阻塞同步）](#42-%E4%BA%92%E6%96%A5%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5)
+    - [4.2.1 synchronized](#421-synchronized)
+      - [4.2.1.1 synchronized 锁优化](#4211-synchronized-%E9%94%81%E4%BC%98%E5%8C%96)
+    - [4.2.2 ReentrantLock](#422-reentrantlock)
+    - [4.2.3 比较](#423-%E6%AF%94%E8%BE%83)
+  - [4.3 非阻塞同步](#43-%E9%9D%9E%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5)
+    - [4.3.1 CAS（Compare-and-Swap）](#431-cascompare-and-swap)
+      - [4.3.1.1 ABA 问题](#4311-aba-%E9%97%AE%E9%A2%98)
+    - [4.3.2 Atomic 原子类](#432-atomic-%E5%8E%9F%E5%AD%90%E7%B1%BB)
+    - [4.3.2.1 原子类方法、原理浅析](#4321-%E5%8E%9F%E5%AD%90%E7%B1%BB%E6%96%B9%E6%B3%95%E5%8E%9F%E7%90%86%E6%B5%85%E6%9E%90)
+  - [4.4 无同步方案](#44-%E6%97%A0%E5%90%8C%E6%AD%A5%E6%96%B9%E6%A1%88)
+  - [4.5 死锁](#45-%E6%AD%BB%E9%94%81)
+    - [4.5.1 死锁产生条件](#451-%E6%AD%BB%E9%94%81%E4%BA%A7%E7%94%9F%E6%9D%A1%E4%BB%B6)
+    - [4.5.2 简单的死锁 Demo](#452-%E7%AE%80%E5%8D%95%E7%9A%84%E6%AD%BB%E9%94%81-demo)
+- [五、线程池 ExecutorService](#%E4%BA%94%E7%BA%BF%E7%A8%8B%E6%B1%A0-executorservice)
+  - [5.1 ThreadPoolExecutor](#51-threadpoolexecutor)
+    - [5.1.1 ThreadPoolExecutor 的执行顺序](#511-threadpoolexecutor-%E7%9A%84%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F)
+    - [5.1.2 BlockingQueue](#512-blockingqueue)
+  - [5.2 Executors](#52-executors)
+    - [5.2.1 CachedThreadPool](#521-cachedthreadpool)
+    - [5.2.2 FixedThreadPool](#522-fixedthreadpool)
+    - [5.2.3 SingleThreadExecutor](#523-singlethreadexecutor)
+    - [5.2.4 不推荐直接使用 Executors](#524-%E4%B8%8D%E6%8E%A8%E8%8D%90%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8-executors)
+  - [5.3 线程池的思考](#53-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E6%80%9D%E8%80%83)
+- [六、多线程开发建议](#%E5%85%AD%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91%E5%BB%BA%E8%AE%AE)
+- [七、Java 多线程面试题](#%E4%B8%83java-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%9D%A2%E8%AF%95%E9%A2%98)
+- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- /TOC -->
 
@@ -1103,7 +1104,11 @@ Executors 创建的线程池对象的弊端如下：
 1. FixedThreadPool 和 SingleThreadPool:允许的请求队列长度为 Integer.MAX_VALUE，可能会堆积大量的请求，从而导致 OOM。
 2. CachedThreadPool 和 ScheduledThreadPool:允许的创建线程数量为 Integer.MAX_VALUE，可能会创建大量的线程，从而导致 OOM。
 
-## 六、多线程开发建议
+## 5.3 线程池的思考
+
+https://mp.weixin.qq.com/s/HpMu_QI_N-J18fNJG96yzA
+
+# 六、多线程开发建议
 
 - 为线程赋予一个有意义的名字有助于问题的排查和线程的追踪。
 - 缩小同步范围，从而减少锁争用。例如对于 synchronized，应该尽量使用同步块而不是同步方法。
@@ -1112,7 +1117,7 @@ Executors 创建的线程池对象的弊端如下：
 - 使用线程池而不是直接创建线程，因为线程是一个重量级的资源，直接创建线程资源利用率低，选择合适的线程池可以有效地利用有限的线程执行任务。
 - 不推荐使用 Executors 去创建线程池。
 
-# 8. Java 多线程面试题
+# 七、Java 多线程面试题
 
 https://www.nowcoder.com/discuss/334
 

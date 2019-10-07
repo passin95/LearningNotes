@@ -378,7 +378,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 ## 4.3 重写 onMeasure() 来全新计算自定义 View 的尺寸
 
 1. 重写 onMeasure()，并计算出 View 的尺寸；
-2. 使用 resolveSize() 来让子 View 的计算结果符合父 View 的限制（onMeasure() 方法的两个参数），如果想用自己的方式来满足父 View 的限制也行，也可以不满足父 View 的限制，具体可根据实际需求决定。
+2. 使用 resolveSize() 来让子 View 的计算结果符合父 View 的限制（onMeasure() 方法的两个参数），如果想用自己的方式来满足父 View 的限制也行，也可以不满足父 View 的限制，具体可根据实际需求决定；
 3. 调用 setMeasuredDimension() 来保存新的结果。
 
 子 View 也可以不遵守父 View 的限制，按自己方式进行绘制，但可能出现 BUG，例如开发者在 xml 布局文件中将父 View 的宽度为固定 100 dp，而子 View 的绘制宽度却为 120，会超出开发者的预期效果，会绘制出宽度为 120dp 的子 View。
@@ -388,6 +388,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 开发者的要求：xml 文件中子 View layout 打头的 API。
 
 大多数情况下重写 onMeasure() 的三个步骤（或者说是思路）：
+
 1. 调用每个子 View 的 measure() 来计算子 View 的尺寸;
 2. 计算子 View 的位置并保存子 View 的位置和尺寸;
 3. 计算自己的尺寸并用 setMeasuredDimension() 保存。
@@ -508,7 +509,7 @@ Android 里面的绘制都是按顺序的，先绘制的内容会被后绘制的
 
 <img src="../pictures//draw()%20执行顺序表.webp"/>
 
-- onDrawForeground() 是 API 23 才引入的，会依次绘制滑动边缘渐变、滑动条和前景
+- onDrawForeground() 是 API 23 才引入的，会依次绘制滑动边缘渐变、滑动条和前景。
 - 出于效率的考虑，ViewGroup 默认会绕过 draw() 方法，换而直接执行 dispatchDraw()，以此来简化绘制流程。所以如果你自定义了某个 ViewGroup 的子类（比如 LinearLayout）并且需要在它的除 dispatchDraw() 以外的任何一个绘制方法内绘制内容，你可能会需要调用 View.setWillNotDraw(false) 这行代码来切换到完整的绘制流程（是「可能」而不是「必须」的原因是，有些 ViewGroup 是已经调用过 setWillNotDraw(false) 了的，例如 ScrollView）。
 - 如果绘制代码既可以写在 onDraw() 里，也可以写在其他绘制方法里，那么优先写在 onDraw() ，因为 Android 有相关的优化，可以在不需要重绘的时候自动跳过 onDraw() 的重复执行，以提升开发效率。
 

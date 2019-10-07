@@ -1,13 +1,15 @@
 <!-- TOC -->
 
 - [一、概述](#一概述)
-    - [1.1 说明](#11-说明)
-    - [1.1 Collection](#11-collection)
-        - [1.1.1 List](#111-list)
-        - [1.1.2 Set](#112-set)
-        - [1.1.3 Queue](#113-queue)
-    - [1.2 Map](#12-map)
-    - [1.3 Arrays.asList()](#13-arraysaslist)
+    - [1.1 名词说明](#11-名词说明)
+        - [1.1.1 RandomAccess](#111-randomaccess)
+        - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-和-failsafe)
+    - [1.2 Collection](#12-collection)
+        - [1.2.1 List](#121-list)
+        - [1.2.2 Set](#122-set)
+        - [1.2.3 Queue](#123-queue)
+    - [1.3 Map](#13-map)
+    - [1.4 Arrays.asList()](#14-arraysaslist)
 - [二、源码分析](#二源码分析)
     - [2.1 ArrayList](#21-arraylist)
         - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
@@ -26,28 +28,28 @@
 
 <div align ="center"> <img src ="../pictures//Java%20容器.webp" /> </div><br>
 
-## 1.1 说明
+## 1.1 名词说明
 
-**（1）RandomAccess**
+### 1.1.1 RandomAccess
 
 RandomAccess 是一个接口，仅仅起一个标识的作用，标识实现的类支持快速随机访问功能，即可通过元素的序号快速获取元素对象 (对应于 get(int index) 方法)。
 
-**（2）fail-fast 和 fail—safe**
+### 1.1.2 fail-fast 和 fail—safe
 
-- fail-fast：用迭代器遍历一个集合对象时，如果遍历过程中对集合对象的内容进行了修改（增加、删除、修改时 modCount 会自增），遍历期间 modCount 字段不同则会抛出 ConcurrentModificationException。
-- fail—safe：支持在多线程下并发使用和修改，也可以在 foreach 中删减，原理是遍历时先复制原有集合内容，在拷贝的集合上遍历。
+- fail-fast：用迭代器遍历一个集合对象时，如果遍历过程中对集合对象的内容进行了修改（增加、删除、修改时 modCount 会自增），遍历期间 modCount 字段和 expectedmodCount 不同则会抛出 ConcurrentModificationException。
+- fail—safe：支持在多线程下并发使用和修改，也可以在 foreach 中删减，原理是遍历时先复制原有集合内容，在拷贝的集合上进行遍历，也因此在遍历期间原集合元素有所修改时，迭代器并不能访问到修改后的元素。
 
-## 1.1 Collection
+## 1.2 Collection
 
-### 1.1.1 List
+### 1.2.1 List
 
-List 接口存储一组不唯一（可以有多个元素引用相同的对象），有序的对象。
+List 接口存储一组不唯一（可以有多个元素引用相同的对象）、有序的对象。
 
 - ArrayList：基于动态数组实现，支持随机访问。
 - Vector：和 ArrayList 类似，但它是线程安全的（方法加锁）。
-- LinkedList：基于双向链表实现，只能顺序访问，但是可以快速地在链表中间插入和删除元素。不仅如此，LinkedList 还可以用作栈、队列和双向队列。
+- LinkedList：基于双向链表实现，只能顺序访问，但是可以快速地在链表中间插入和删除元素。基于它的特性，可以用作栈、队列和双向队列。
 
-### 1.1.2 Set
+### 1.2.2 Set
 
 不允许重复对象的集合。
 
@@ -55,23 +57,23 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 - HashSet：基于哈希表实现，支持快速查找，但不支持有序性操作。并且失去了元素的插入顺序信息，也就是说使用 Iterator 遍历 HashSet 得到的结果是不确定的。
 - LinkedHashSet：具有 HashSet 的查找效率，且内部使用双向链表维护元素的插入顺序。
 
-### 1.1.3 Queue
+### 1.2.3 Queue
 
 - LinkedList：可以用它来实现双向队列。
 - PriorityQueue：基于堆结构实现，可以用它来实现优先队列。
 
-## 1.2 Map
+## 1.3 Map
 
 - TreeMap：基于红黑树实现。
 - HashMap：基于哈希表实现。
-- HashTable：和 HashMap 类似，但它是线程安全的，这意味着同一时刻多个线程可以同时写入 HashTable 并且不会导致数据不一致。它是遗留类，不应该去使用它。现在可以使用 ConcurrentHashMap 来支持线程安全，并且 ConcurrentHashMap 的效率会更高，因为 ConcurrentHashMap 引入了分段锁。
+- HashTable：和 HashMap 类似，区别在于它是线程安全的。但不推荐使用。更推荐使用 ConcurrentHashMap 来支持线程安全，因为 ConcurrentHashMap 在 JDK1.7 引入了分段锁。
 - LinkedHashMap：使用双向链表来维护元素的顺序，顺序为插入顺序或者最近最少使用（LRU）顺序。
 
-## 1.3 Arrays.asList()
+## 1.4 Arrays.asList()
 
 Arrays.asList() 可以将一个数组转换为一个 List 集合。该返回对象是一个 Arrays 内部类，并没有实现集合的修改方法，因此 add/remove/clear 等方法会抛出 UnsupportedOperationException 异常。
 
-Arrays.asList() 是泛型方法，传入的对象必须是对象数组。若传入一个原生数据类型数组时，Arrays.asList() 的真正得到的参数就不是数组中的元素，而是数组对象本身！此时 List 的唯一元素就是这个数组。使用包装类型数组就可以解决这个问题。
+Arrays.asList() 是泛型方法，传入的对象必须是对象数组。若传入一个原生数据类型数组时，Arrays.asList() 得到的参数就不是数组中的元素，而是数组对象本身！此时 List 的唯一元素就是这个数组。使用包装类型数组就可以解决这个问题。
 
 ```java
 int[] myArray = { 1, 2, 3 };
@@ -98,12 +100,11 @@ ArrayList 的特性：
 2. 实现了 Cloneable 接口，即覆盖了函数 clone()，能被克隆。
 3. 实现了 Serializable 接口，这意味着 ArrayList 支持 Serializable 序列化。
 
-
-在看 ArrayList 的源码前，先看一个方法，它在 ArrayList 中经常用到。
+在分析 ArrayList 的源码前，先看一个方法，它在 ArrayList 中经常用到。
 ```java
 public final class System {
     /**
-     * 从数组 src 的第 srcPos（包含） 开始，复制 length 个元素到数组 dest ，并在第 destPos（包含）个索引开始复制。
+     * 从数组 src 的第 srcPos（包含） 开始，复制 length 个元素到数组 dest 第 destPos（包含）个索引依次往后。
      *
      */
     public static native void arraycopy(Object src,  int  srcPos,
@@ -162,7 +163,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * 默认构造函数，DEFAULTCAPACITY_EMPTY_ELEMENTDATA 为 0，默认容量为 10，
-     * 也就是说初始其实是空数组，当第一次添加元素的时候为 10 和添加元素（集）数量的最大值。
+     * 也就是说初始其实是空数组，当第一次添加元素的时候数组容量为 10 和添加元素（集）数量的最大值。
      */
     public ArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
@@ -197,14 +198,14 @@ public class ArrayList<E> extends AbstractList<E>
               : Arrays.copyOf(elementData, size);
         }
     }
+    
     /**
-     * ArrayList 的扩容机制
-     *
-     * 如有有必要，增加数组的容量，以确保它至少能容纳元素的数量。
-     * @param   minCapacity   所需的最小容量
+     * 该方法提供给开发者手动扩容。
+     * 
+     * @param minCapacity 所需的最小容量
      */
     public void ensureCapacity(int minCapacity) {
-        // 即：实例化时没指定数组大小则为默认大小 DEFAULT_CAPACITY，否则为 0。
+        // 实例化时没指定数组大小时，minExpand 为默认大小 DEFAULT_CAPACITY，否则为 0。
         int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA) ? 0
             : DEFAULT_CAPACITY;
 
@@ -223,6 +224,13 @@ public class ArrayList<E> extends AbstractList<E>
         ensureExplicitCapacity(minCapacity);
     }
 
+
+    /**
+     * ArrayList 的扩容机制。
+     * 如有有必要，扩张数组的容量，以确保它至少能容纳所有元素。
+     * 
+     * @param minCapacity 所需的最小容量
+     */
     private void ensureExplicitCapacity(int minCapacity) {
         modCount++;
 
@@ -246,7 +254,7 @@ public class ArrayList<E> extends AbstractList<E>
         // 将 oldCapacity 右移一位，其效果相当于 oldCapacity /2，
         // 位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的 1.5 倍。
         int newCapacity = oldCapacity + (oldCapacity >> 1);
-        // 检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量。
+        // 检查新容量是否大于所需最小容量，若还是小于所需最小容量，那么就把所需最小容量当作数组的新容量。
         if (newCapacity - minCapacity < 0)
             newCapacity = minCapacity;
         // 再检查新容量是否超出了 ArrayList 所定义的最大容量。
@@ -273,14 +281,14 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * 空数据集，则返回 true 。
+     * 空数据集，则返回 true。
      */
     public boolean isEmpty() {
         return size == 0;
     }
 
     /**
-     * 如果包含指定的元素，则返回 true。
+     * 如果列表包含指定的元素，则返回 true。
      */
     public boolean contains(Object o) {
         return indexOf(o) >= 0;
@@ -288,7 +296,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * 从列表中首节点开始向前驱节点遍历查找第一次找到的指定元素的索引。
-     * 如果此列表不包含此元素，则为-1 
+     * 如果此列表不包含此元素，则返回 -1。
      */
     public int indexOf(Object o) {
         if (o == null) {
@@ -305,7 +313,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * 从列表中尾节点开始向前驱节点遍历查找第一次找到的指定元素的索引。
-     * 如果此列表不包含元素，则返回 -1。.
+     * 如果此列表不包含元素，则返回 -1。
      */
     public int lastIndexOf(Object o) {
         if (o == null) {
@@ -321,12 +329,12 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * 返回此 ArrayList 实例的浅拷贝。
+     * 深拷贝
      */
     public Object clone() {
         try {
             ArrayList<?> v = (ArrayList<?>) super.clone();
-            // 创建一个新数组，并复制 elementData 中的元素前 size 个到新数组。
+            // 创建一个新数组，并复制 elementData 中的所有元素到新数组。
             v.elementData = Arrays.copyOf(elementData, size);
             v.modCount = 0;
             return v;
@@ -395,7 +403,7 @@ public class ArrayList<E> extends AbstractList<E>
     public boolean add(E e) {
         // 添加元素前，先扩容（若需要的话）。
         ensureCapacityInternal(size + 1);  // Increments modCount!!
-        // ArrayList 添加元素的本质就相当于为数组赋值。
+        // ArrayList 添加元素的本质是为数组元素赋值。
         elementData[size++] = e;
         return true;
     }
@@ -430,13 +438,13 @@ public class ArrayList<E> extends AbstractList<E>
         if (numMoved > 0)
             System.arraycopy(elementData, index+1, elementData, index,
                              numMoved);
-        // 数组最后一位元素置 null，下次 GC 回收该无用元素。
+        // 数组最后一位元素置 null，下次 GC 回收该无用对象。
         elementData[--size] = null; 
         return oldValue;
     }
 
     /**
-     * 从列表中首节点开始遍历删除第一次找到的指定元素节点。
+     * 从列表首节点开始遍历，删除首次找到的指定元素节点。
      * 如果此列表包含指定的元素返回 ture，否则返回 false。
      */
     public boolean remove(Object o) {
@@ -510,7 +518,7 @@ public class ArrayList<E> extends AbstractList<E>
         System.arraycopy(a, 0, elementData, index, numNew);
         size += numNew;
         return numNew != 0;
-    }
+    } 
 
     /**
      * 删除此列表中第 formIndex 个到第 toIndex-1 个元素。
@@ -524,7 +532,7 @@ public class ArrayList<E> extends AbstractList<E>
 
         // clear to let GC do its work
         int newSize = size - (toIndex-fromIndex);
-        // 置空第 newSize 到 size-1 的元素（元素全都被复制到索引 newSize 之前）
+        // 置空第 newSize 到 size-1 的元素（元素全都被复制到索引 newSize 之前）。
         for (int i = newSize; i < size; i++) {
             elementData[i] = null;
         }
@@ -662,7 +670,7 @@ public synchronized boolean add(E e) {
 private void grow(int minCapacity) {
     // overflow-conscious code
     int oldCapacity = elementData.length;
-    // 扩容为原来容量的 2 倍
+    // 扩容为原来容量的 2 倍。
     int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
                                         capacityIncrement : oldCapacity);
     if (newCapacity - minCapacity < 0)
@@ -685,6 +693,7 @@ public boolean add(E e) {
         Object[] elements = getArray();
         int len = elements.length;
         // 每一次写操作在一个复制的数组上进行，读操作还是在原始数组中进行，读写分离，互不影响。
+        // 但也因此消耗了更多的内存。
         Object[] newElements = Arrays.copyOf(elements, len + 1);
         newElements[len] = e;
         // 写操作结束之后需要把原始数组指向新的复制数组。
@@ -713,13 +722,13 @@ public void add(int index, E element) {
 
 **（4）小结**
 
-1. 扩容方面：Vector 扩容为原来容量的 2 倍，ArrayList 扩容为原来容量 1.5 倍，CopyOnWriteArrayList 每次都是一个新的数组。
+1. 扩容方面：Vector 扩容为原来容量的 2 倍，ArrayList 扩容为原来容量 1.5 倍，CopyOnWriteArrayList 每次添加元素都是一个新的数组。
 2. 性能方面：没有并发需求的情况下，优先使用 ArrayList。有并发需求的情况下：
 - Collections.synchronizedList() 和 Vector 的读写性能几乎一致，理论 Vector 比  Collections.synchronizedList() 还快一些，因为后者对方法多包了一层。
-- 仅在读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，大大提高了读操作的性能，但是在写操作时需要复制一个新的数组，使得内存占用为原来的两倍左右。
-- 其余情况推荐自己控制并发或使用 Collections.synchronizedList()。
+- 仅在读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，大大提高了读操作的性能，但是在写操作时需要复制一个新的数组，会频繁消耗内存。
+- 其余情况推荐自己控制并发，硬性需求才使用 Collections.synchronizedList() 或 Vector。
 3. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
-2. Vector 和 Collections.synchronizedList() 看似已经线程安全，但 Iterator 例外，在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非迭代器修改数据会抛 ConcurrentModificationException 异常。
+2. Vector 和 Collections.synchronizedList() 看似已经线程安全，但使用 Iterator 例外，因为在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非迭代器修改数据会抛 ConcurrentModificationException 异常。
 
 ## 2.2 LinkedList
 
@@ -751,12 +760,12 @@ public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 {
-   /**
+    /**
      * 元素数量。
      */
     transient int size = 0;
 
-   /**
+    /**
      * 首节点。
      */
     transient Node<E> first;
@@ -767,7 +776,7 @@ public class LinkedList<E>
     transient Node<E> last;
 
     /**
-     * 使用该构造函数，生成一个空链表。
+     * 使用该构造函数，则生成一个空链表。
      */
     public LinkedList() {
     }
@@ -865,12 +874,12 @@ public class LinkedList<E>
             next.prev = null;
         size--;
         modCount++;
-        // 返回删除节点的元素
+        // 返回删除节点的元素。
         return element;
     }
 
     /**
-     * 删除尾节点。该方法的参数 f 一定是尾节点且不会为 null。
+     * 删除尾节点。该方法的参数 l 一定是尾节点且不会为 null。
      */
     private E unlinkLast(Node<E> l) {
         // assert l == last && l != null;
@@ -1155,7 +1164,7 @@ public class LinkedList<E>
     }
 
     /**
-     * 判断参数是否是现有元素的索引
+     * 判断参数是否是现有元素的索引。
      */
     private boolean isElementIndex(int index) {
         return index >= 0 && index < size;
@@ -1379,7 +1388,7 @@ public class LinkedList<E>
     }
 
     /**
-     * 返回当前实例的浅拷贝。
+     * 返回当前实例的深拷贝。
      */
     public Object clone() {
         LinkedList<E> clone = superClone();
@@ -1456,9 +1465,9 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     // 数组容量任何时候总是 2 的幂次倍。
     // 原因在于（n 代表 table 的容量）：使用 (n - 1) & hash 确定 hash 值在数组中的索引时，(n-1) 的二进制一定是 1111111***111 形式的，从而在按位与的时候，能够充分的散列（利用到每一位），使得添加的节点均匀分布在每个位置上。
     transient Node<k,v>[] table; 
-    // 存放具体节点的 Set。
+    // 存放具体节点的 Set，只在使用时才创建（调用 entrySet()）。
     transient Set<map.entry<k,v>> entrySet;
-    // 存放元素的个数，注意这个不等于数组的长度。
+    // 存放元素的个数，注意这个不等于数组 table 的长度。
     transient int size;
     // 每次扩容和更改 map 结构的计数器。
     transient int modCount;   
@@ -1469,11 +1478,6 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
 
      public HashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR; 
-    }
-
-     public HashMap(Map<? extends K, ? extends V> m) {
-         this.loadFactor = DEFAULT_LOAD_FACTOR;
-         putMapEntries(m, false);
     }
 
     /**
@@ -1497,10 +1501,21 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
         this.threshold = tableSizeFor(initialCapacity);
     }
 
+    /**
+     * 传入具体的 map 作为构造函数。
+     */
+    public HashMap(Map<? extends K, ? extends V> m) {
+         this.loadFactor = DEFAULT_LOAD_FACTOR;
+         putMapEntries(m, false);
+    }
+
+    /**
+     * 该方法在 putAll() 也会调用
+     */
    final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
         int s = m.size();
         if (s > 0) {
-            // 判断 table 是否已经初始化
+            // 判断 table 是否已经初始化，未初始化时在构造函数内使用。
             if (table == null) { // pre-size
                 // 计算刚好容纳 Map 元素数量的数组容器大小。
                 float ft = ((float)s / loadFactor) + 1.0F;
@@ -1525,9 +1540,9 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
 
 - loadFactor：控制数组存放数据的疏密程度，loadFactor 越趋近于 1，那么数组中存放的数据 (entry) 也就越多，也就越密，也就是会让链表的长度增加，loadFactor 越小，越趋近于 0，数组中存放的数据 (entry) 也就越少，也就越稀疏。
 
-loadFactor 太大导致查找元素效率低，太小导致数组的利用率低，存放的数据会很分散。loadFactor 的默认值为 0.75f 是官方给出的一个比较好的临界值。
+loadFactor 太大导致查找元素效率低，太小导致数组的利用率低，存放的数据会很分散。loadFactor 的默认值为 0.75f ，是官方给出的一个比较好的临界值。
 
-给定的默认容量为 16，负载因子为 0.75。Map 在使用过程中不断的往里面存放数据，当数量达到了 16 * 0.75 = 12 就需要将当前 16 的容量进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以非常消耗性能。
+以给定的默认容量为 16，负载因子为 0.75 举例。 不断的往 Map 存储数据，当元素数量达到了 16 * 0.75 = 12 时就需要进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以比较消耗性能，因此应当尽量减少扩容的次数。
 
 ### 2.3.2 存储结构
 
@@ -1536,12 +1551,13 @@ JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体
 ```java
 // 链表结构
 static class Node<K,V> implements Map.Entry<K,V> {
-       final int hash;  // 哈希值，存放元素到 hashmap 中时用来与其他元素 hash 值比较。
-       final K key;  // 键
-       V value;  // 值
-       // 指向下一个节点
-       Node<K,V> next;
-       Node(int hash, K key, V value, Node<K,V> next) {
+        final int hash;  // 哈希值，存放元素到 HashMap 时用来与其他元素 hash 值比较。
+        final K key;  // 键
+        V value;  // 值
+        // 指向下一个节点
+        Node<K,V> next;
+       
+        Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -1550,7 +1566,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
         public final K getKey()        { return key; }
         public final V getValue()      { return value; }
         public final String toString() { return key + "=" + value; }
-        // 重写了 hashCode() 方法
+        
         public final int hashCode() {
             return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
@@ -1560,7 +1576,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
             value = newValue;
             return oldValue;
         }
-        // 重写了 equals() 方法
+
         public final boolean equals(Object o) {
             if (o == this)
                 return true;
@@ -1598,7 +1614,7 @@ public V put(K key, V value) {
 static final int hash(Object key) {
     int h;
     // 通过 key 的 hashCode() 计算 hash 值。
-    // 当 key == null 时，hash 值 为 0，在 putVal() 可由 (n - 1) & hash 可得值为 0，因此 null key 一定在数组的第一个桶内（索引为 0）。
+    // 当 key == null 时，hash 值 为 0，在 putVal() 可由 (n - 1) & hash 可得值为 0，因此 null key 一定在数组的第一个桶内。
     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
 }
 
@@ -1619,9 +1635,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     else {
         // 桶中已经存在元素。
         Node<K,V> e; K k;
-        // 比较桶中第一个元素的 key 值和 key 的 hash 值是否与新元素相等。
         if (p.hash == hash &&
             ((k = p.key) == key || (key != null && key.equals(k))))
+            // 桶中第一个元素的 key 值以及 key 的 hash 值与新元素相等。
             // 用 e 暂存当前桶的第一个节点 p。
             e = p;
         else if (p instanceof TreeNode)
@@ -1630,11 +1646,11 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
             e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
         else {
             // 第一个节点的 key 与新增的 key 不相等，且节点是 Node（链表结构）。
-            // 遍历至链表表尾后插入结点
+            // 遍历至链表表尾后插入结点。
             for (int binCount = 0; ; ++binCount) {
-                // 到达链表的尾部
+                // 到达链表的尾部。
                 if ((e = p.next) == null) {
-                    // 在尾部插入新结点
+                    // 在尾部插入新结点。
                     p.next = newNode(hash, key, value, null);
                     // 节点数量达到阈值，转化为红黑树。-1 是因为从 0 开始计数。
                     if (binCount >= TREEIFY_THRESHOLD - 1)
@@ -1653,24 +1669,24 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
         }
         // 若 e != null 则表示在桶中找到 key 值、hash 值与插入元素的相等的节点。
         if (e != null) { 
-            // 记录 e 的 value
+            // 记录 e 的 value。
             V oldValue = e.value;
             // onlyIfAbsent 传入时为 false。
             if (!onlyIfAbsent || oldValue == null)
                 // 用新值替换旧值
                 e.value = value;
-            // 访问后回调
+            // 访问后回调，用于继承 HashMap 的子类 LinkedHashMap。
             afterNodeAccess(e);
             // 返回旧值
             return oldValue;
         }
     }
-    // 元素结构修改
+    // 元素结构修改。
     ++modCount;
-    // 大于阈值则扩容
+    // 大于阈值则扩容。
     if (++size > threshold)
         resize();
-    // 插入后回调
+    // 插入后回调，用于继承 HashMap 的子类 LinkedHashMap。
     afterNodeInsertion(evict);
     return null;
 } 
@@ -1746,7 +1762,7 @@ final Node<K,V>[] resize() {
     // 赋值新的数组容量阈值。
     threshold = newThr;
 
-    // 每次扩容都会使用新的数组并复制数据到新数组，部分节点还需要重新计算 hash，因此应该尽量减少扩容的次数。
+    // 每次扩容都会复制原来的数据到新数组，部分节点还需要重新计算 hash，因此应该尽量减少扩容的次数。
     @SuppressWarnings({"rawtypes","unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
     table = newTab;
@@ -1763,15 +1779,19 @@ final Node<K,V>[] resize() {
                 else if (e instanceof TreeNode)
                     ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
                 else { 
-                     // 按原始链表顺序，过滤出来扩容后位置不变的元素（低位=0），放在一起。
-                     // loHead 是过滤后的头节点，loTail 用于不断链接节点。
+                    // jdk 1.8 不需要重新计算所有节点的 hash 值。
+                    
+                    // 按原始链表顺序，过滤出扩容后位置不变的元素，放在一起。
+                    // loHead 是过滤后桶位置不变的头节点，loTail 用于不断链接节点。
                     Node<K,V> loHead = null, loTail = null;
-                    // 按原始链表顺序，过滤出来扩容后位置改变到（index+oldCap）的元素（高位=0），放在一起。
+                    // 按原始链表顺序，过滤出扩容后位置改变到（index+oldCap）的元素，放在一起。
                     Node<K,V> hiHead = null, hiTail = null;
                     Node<K,V> next;
                     do {
                         // 暂存下一个节点，用于遍历。
                         next = e.next;
+                        // 新容量等于旧容量乘以 2，所有只需要比较节点 hash 值与新增的一位 bit 是 1 还是 0，
+                        // 就可以知道节点所处桶的位置是否变化，因为 & 运算变化的仅仅是新增的一位 bit。
                         if ((e.hash & oldCap) == 0) {
                             if (loTail == null)
                                 loHead = e;
@@ -1850,7 +1870,9 @@ public synchronized V get(Object key) {
 
 **（2）ConcurrentHashMap**
 
-在 JDK 1.7 的时候，ConcurrentHashMap（分段锁）对整个桶数组进行了分割分段 (Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，会大大减少锁竞争的可能性，提高并发访问率。 到了 JDK1.8 的时候已经摒弃了 Segment 的概念，而是直接使用 **数组+ Node 链表+红黑树** 的数据结构实现，并发使用 synchronized 和 CAS 来控制。（JDK1.6 以后对 synchronized 做了很多优化，从而降低了 synchronized 的性能开销），虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本的方法。
+在 JDK 1.7 的时候，ConcurrentHashMap（分段锁）对整个桶数组进行了分割分段 (Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，会大大减少锁竞争的可能性，提高并发访问率。 
+
+到了 JDK1.8 的时候已经摒弃了 Segment 的概念，而是直接使用 **数组+ Node 链表+红黑树** 的数据结构实现，并发使用 synchronized 和 CAS 来控制。（JDK1.6 以后对 synchronized 做了很多优化，从而降低了 synchronized 的性能开销），虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本的方法。
 
 **（3）Collections.synchronizedMap()**
 
