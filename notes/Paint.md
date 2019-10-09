@@ -13,7 +13,7 @@
     - [2.2.4 扫描渐变 SweepGradient](#224-%E6%89%AB%E6%8F%8F%E6%B8%90%E5%8F%98-sweepgradient)
     - [2.2.5 Bitmap BitmapShader](#225-bitmap-bitmapshader)
     - [2.2.6 混合着色器 ComposeShader](#226-%E6%B7%B7%E5%90%88%E7%9D%80%E8%89%B2%E5%99%A8-composeshader)
-  - [2.2.6.1 叠加策略 PorterDuff.Mode](#2261-%E5%8F%A0%E5%8A%A0%E7%AD%96%E7%95%A5-porterduffmode)
+      - [2.2.6.1 叠加策略 PorterDuff.Mode](#2261-%E5%8F%A0%E5%8A%A0%E7%AD%96%E7%95%A5-porterduffmode)
   - [2.3 颜色过滤 ColorFilter](#23-%E9%A2%9C%E8%89%B2%E8%BF%87%E6%BB%A4-colorfilter)
     - [2.3.1 LightingColorFilter](#231-lightingcolorfilter)
     - [2.3.2 PorterDuffColorFilter](#232-porterduffcolorfilter)
@@ -178,7 +178,7 @@ paint.setShader(shader);
 
 <img src="../pictures//52eb2279ly1fig6hbeg7gj20qy08cafn.jpg"/>
 
-## 2.2.6.1 叠加策略 PorterDuff.Mode
+#### 2.2.6.1 叠加策略 PorterDuff.Mode
 
 <img src="../pictures//52eb2279ly1fig6ia1twgj20ds07tdgs.jpg"/>
 
@@ -330,7 +330,6 @@ Paint.setStrokeMiter(float miter)
 这个方法是对于 setStrokeJoin() 的一个补充，。当线条拐角为 MITER 时，拐角处的外缘会自动使用延长线来补偿。a/b 比值超过 miter 时，自动改用 BEVEL 的方式来渲染连接点。
 
 <img src="../pictures//006tNc79ly1fig7btolhij30e706dglp.jpg"/>
-
 
 # 四、阴影 ShadowLayer
 

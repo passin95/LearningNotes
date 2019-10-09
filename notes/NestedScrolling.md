@@ -118,7 +118,7 @@ public int getNestedScrollAxes();
 
 下文以 View、ViewGroup 的默认实现源码去具体分析一般情况下嵌套滑动的流程：
 
-（1）当子 View 接受触摸事件后，一般在 ACTION_DOWN 事件中调 startNestedScroll()
+**（1）**当子 View 接受触摸事件后，一般在 ACTION_DOWN 事件中调 startNestedScroll()
 开始确认嵌套滑动的父 View。
 
 ```java
@@ -176,7 +176,7 @@ public void onNestedScrollAccepted(View child, View target, int axes) {
 }
 ```
 
-（2）每次子 View 在滑动前都需要将滑动细节传递给父 View，一般情况下在 ACTION_MOVE 事件中调用 dispatchNestedPreScroll()。如果父 View 没有消费完所有距离，view 将自己接着消费并调用 dispatchNestedScroll() 告知 父 View 消费了多少距离。
+**（2）**每次子 View 在滑动前都需要将滑动细节传递给父 View，一般情况下在 ACTION_MOVE 事件中调用 dispatchNestedPreScroll()。如果父 View 没有消费完所有距离，view 将自己接着消费并调用 dispatchNestedScroll() 告知父 View 消费了多少距离。
 
 ```java
 public boolean dispatchNestedPreScroll(int dx, int dy, @Nullable int[] consumed, @Nullable int[] offsetInWindow) {
@@ -249,7 +249,7 @@ public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUncons
 }
 ```
 
-（3）当触发 ACTION_UP 的时候，如果余下的速度达到 Fling 的标准，将调用 dispatchNestedPreFling() 让父 View 继续消费 velocity，如果返回 false（父 View 不消费），则继续调用 dispatchNestedFling()。在这些方法调用结束后最终都需要 stopNestedScroll() 来告知父 View 本次嵌套滑动结束。
+**（3）**当触发 ACTION_UP 的时候，如果余下的速度达到 Fling 的标准，将调用 dispatchNestedPreFling() 让父 View 继续消费 velocity，如果返回 false（父 View 不消费），则继续调用 dispatchNestedFling()。在这些方法调用结束后最终都需要 stopNestedScroll() 来告知父 View 本次嵌套滑动结束。
 
 ```java
 public boolean dispatchNestedPreFling(float velocityX, float velocityY) {

@@ -124,7 +124,7 @@ onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用,
 - 按下 Home 键 : Activity 进入了后台, 此时会调用该方法;
 - 按下电源键 : 屏幕关闭, Activity 进入后台;
 - 启动其它 Activity : Activity 被压入了任务栈的栈底;
-- 横竖屏切换 : 会销毁当前 Activity 并重新创建;
+- 横竖屏切换 : 会销毁当前 Activity 并重新创建。
 
 ## 1.4 其余情况补充
 

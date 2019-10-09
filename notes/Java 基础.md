@@ -38,11 +38,11 @@
 - [九、泛型](#%E4%B9%9D%E6%B3%9B%E5%9E%8B)
 - [十、注解](#%E5%8D%81%E6%B3%A8%E8%A7%A3)
 - [十一、Type](#%E5%8D%81%E4%B8%80type)
-    - [Class](#class)
-    - [ParameterizedType](#parameterizedtype)
-    - [GenericArrayType](#genericarraytype)
-    - [TypeVariable](#typevariable)
-- [十一、JDK 和 JRE](#%E5%8D%81%E4%B8%80jdk-%E5%92%8C-jre)
+  - [11.1 Class](#111-class)
+  - [11.2 ParameterizedType](#112-parameterizedtype)
+  - [11.3 GenericArrayType](#113-genericarraytype)
+  - [11.4 TypeVariable](#114-typevariable)
+- [十二、JDK 和 JRE](#%E5%8D%81%E4%BA%8Cjdk-%E5%92%8C-jre)
 - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- /TOC -->
@@ -1063,11 +1063,11 @@ Type 体系包括的类型：**原始类型**(raw types) 对应 Class、**参数
 - 类型变量：泛型中的变量，例如 public class Demo<T>{} ，则 T 是类型变量。
 - 基本类型：java 的基本类型，即 int,float,double 等。
 
-### Class
+## 11.1 Class
 
 Class 不是一个接口，而是对 Type 的一个实现类,是 Java 反射的基础，对 Java 类的抽象。
 
-### ParameterizedType
+## 11.2 ParameterizedType
 
 参数化类型，即使用了泛型的类，并且没有使用通配符。
 
@@ -1094,7 +1094,7 @@ public interface ParameterizedType extends Type {
 }
 ```
 
-### GenericArrayType
+## 11.3 GenericArrayType
 
 泛型数组类型，例如 List<String>[],T[],而 List<String> 不属于 GenericArrayType（属于 ParameterizedType），String[] 不属于 GenericArrayType（属于原始类型）。
 
@@ -1108,7 +1108,7 @@ public interface GenericArrayType extends Type {
 }
 ```
 
-### TypeVariable
+## 11.4 TypeVariable
 
 TypeVariable 指的是泛型的类型变量，指的是 List<T>、Map<K,V> 的 T、K、V 值，实际的 Java 类型是 TypeVariableImpl（TypeVariable 的子类）。
 
@@ -1135,7 +1135,7 @@ public interface TypeVariable<D extends GenericDeclaration> extends Type {
 }
 ```
 
-# 十一、JDK 和 JRE
+# 十二、JDK 和 JRE
 
 JDK 全名 Java Development Kit，它是功能齐全的 Java SDK。它拥有 JRE 所拥有的一切，还有编译器（javac）和工具（如 javadoc 和 jdb）。它能够创建和编译程序。
 
