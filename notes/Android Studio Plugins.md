@@ -8,4 +8,5 @@
 - [eventbus3-intellij-plugin](https://github.com/likfe/eventbus3-intellij-plugin) - 对事件总线 EventBus 发布的事件进行导航。
 - [Translation](https://github.com/YiiGuxing/TranslationPlugin) - 英文翻译插件，可直接在 Android Studio 里翻译。
 - [Git Commit Template](https://plugins.jetbrains.com/plugin/9861-git-commit-template) - Git commit 模板。
+- [Parcelable](https://github.com/mcharmas/android-parcelable-intellij-plugin) - Parcelable 生成插件。
 

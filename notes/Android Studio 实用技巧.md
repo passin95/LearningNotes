@@ -1,9 +1,11 @@
 
+## 抽取代码块
 
+可在 File -> Settting -> Keymap 的输入框直接搜索，更多的抽取功能可直接搜索 **Extract**。
 
-## 自动换行
-
-Settings -> editor -> code style -> JAVA -> Wrapping and Braces -> 勾选 Line breaks 和 Ensure right margin is not exceeded -> 设置 Right margin 数值（每行的字符数），默认为 100，建议设置为 110 或 120。
+- 提取值为常量 - Extract Constant
+- 提取代码块为方法- Extract Method
+- 提取 XML 代码块为 Style - Extract Style
 
 ## bean 类变量自动判 null
 
