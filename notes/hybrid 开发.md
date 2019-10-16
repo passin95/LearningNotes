@@ -396,12 +396,12 @@ public class AndroidtoJs extends Object {
 ```
 
 该方式使用简单，仅将 Android 对象和 JS 对象映射即可，但在 Android 4.2 及以下存在漏洞。
-漏洞产生原因：当 Js 拿到 Android 这个对象后，就可以调用这个 Android 对象中所有的方法，包括系统类（java.lang.Runtime 类），从而进行任意代码执行。
+漏洞产生原因：当 Js 拿到 Android 这个对象后，就可以调用这个 Android 对象中所有的方法，包括系统类（java.lang.Runtime 类），从而可以执行任意代码。
 推荐使用 [SafeWebView](https://github.com/seven456/SafeWebView/tree/0f11155d38b765c3d832c4dab733f771610c73a3) 解决了 Android WebView 中 Js 注入漏洞问题，另外还包含了一些异常处理。除此之外还需注意（Android 4.0 以上）：
 
 - 设置 webView.setSavePassword(false)，否则密码会被明文保到 /data/data/com.package.name/databases/webview.db 中。
 
-- 如果不使用 file 协议（加载本地 html）禁用 file 协议。
+- 如果不使用 file 协议（加载本地 html）禁用 file 协议，显式设置 webView.getSettings().setAllowFileAccess(false)。
 
 ```java
 webSettings.setAllowFileAccess(false); 
@@ -418,6 +418,8 @@ if (url.startsWith("file://") {
     webSettings.setJavaScriptEnabled(true);
 }
 ```
+
+- 加载网页发生证书认证错误时,采用默认的处理方法 handler.cancel()，停止加载问题页面，而不是调用 handler.proceed() 忽略证书错误。
 
 ### 2.2.2 WebViewClient 的 shouldOverrideUrlLoading()
 

@@ -381,7 +381,7 @@ bindService(bindIntent,connection,BIND_AUTO_CREATE);
 - permission：申明此 Service 的权限。
 - process：申明该服务是否在另一个进程中运行（远程服务)。不设置默认为本地服务，设置为 :remote 则设置成远程服务。
 - enable：true：Service 将会默认被系统启动；不设置则默认为 false。
-- exported：该服务是否能够被其他应用程序所控制或连接，默认为 false。
+- exported：该服务是否能够被其他应用程序所控制或连接，包含 intent-filter 时 exported 默认值为 true，反之为 false。
 
 ## 5.2 前台 Service 和后台 Service
 
