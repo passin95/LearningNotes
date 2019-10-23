@@ -6,32 +6,32 @@
 - [Retrofit 源码分析](#retrofit-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [一、Retrofit 的基本使用](#%E4%B8%80retrofit-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
   - [二、Retrofit 的构建](#%E4%BA%8Cretrofit-%E7%9A%84%E6%9E%84%E5%BB%BA)
-    - [Retrofit 的成员变量](#retrofit-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
-    - [Retrofit.Builder](#retrofitbuilder)
+    - [2.1 Retrofit 的成员变量](#21-retrofit-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+    - [2.2 Retrofit.Builder](#22-retrofitbuilder)
   - [三、Retrofit.create()](#%E4%B8%89retrofitcreate)
-    - [Retrofit.loadServiceMethod()](#retrofitloadservicemethod)
+    - [3.1 Retrofit.loadServiceMethod()](#31-retrofitloadservicemethod)
   - [四、ServiceMethod 的构建](#%E5%9B%9Bservicemethod-%E7%9A%84%E6%9E%84%E5%BB%BA)
-    - [ServiceMethod 的成员变量](#servicemethod-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
-    - [ServiceMethod.Builder](#servicemethodbuilder)
-      - [createCallAdapter()](#createcalladapter)
-      - [createResponseConverter()](#createresponseconverter)
-      - [parseParameter()](#parseparameter)
+    - [4.1 ServiceMethod 的成员变量](#41-servicemethod-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+    - [4.2 ServiceMethod.Builder](#42-servicemethodbuilder)
+      - [4.2.1 createCallAdapter()](#421-createcalladapter)
+      - [4.2.2 createResponseConverter()](#422-createresponseconverter)
+      - [4.2.3 parseParameter()](#423-parseparameter)
   - [五、CallAdapter](#%E4%BA%94calladapter)
-    - [RxJava2CallAdapterFactory](#rxjava2calladapterfactory)
+    - [5.1 RxJava2CallAdapterFactory](#51-rxjava2calladapterfactory)
   - [六、Converter](#%E5%85%ADconverter)
-    - [BuiltInConverters](#builtinconverters)
+    - [6.1 BuiltInConverters](#61-builtinconverters)
   - [七、OkHttpCall](#%E4%B8%83okhttpcall)
-    - [createRawCall()](#createrawcall)
-      - [serviceMethod.toCall()](#servicemethodtocall)
-    - [parseResponse()](#parseresponse)
+    - [7.1 createRawCall()](#71-createrawcall)
+    - [7.2 parseResponse()](#72-parseresponse)
   - [八、serviceMethod.adapt(okHttpCall)](#%E5%85%ABservicemethodadaptokhttpcall)
-    - [BodyObservable](#bodyobservable)
+    - [8.1 BodyObservable](#81-bodyobservable)
 
 <!-- /TOC -->
 
 ## 一、Retrofit 的基本使用
 
 本文将直接结合 Gson 以及 RxJava 的使用以代码+注解的方式按运行流程解读源码，主要对主流程进行源码剖析。
+
 本文基于 Retrofit 2.4.0。
 
 ```java
@@ -57,7 +57,7 @@ Observable<List<User>> userList = retrofit.create(UserService.class).getUserList
 
 ## 二、Retrofit 的构建
 
-### Retrofit 的成员变量
+### 2.1 Retrofit 的成员变量
 
 通过 Builder 设计模式初始化变量。
 ```java
@@ -78,7 +78,7 @@ private @Nullable Executor callbackExecutor;
 private boolean validateEagerly;
 ```
 
-###  Retrofit.Builder
+### 2.2 Retrofit.Builder
 
 ```java
 public Retrofit build() {
@@ -87,15 +87,16 @@ public Retrofit build() {
     }
 
     okhttp3.Call.Factory callFactory = this.callFactory;
-    // 默认使用 OkHttp 提供的 OkHttpClient。
+    
     if (callFactory == null) {
+      // 默认使用 OkHttp 提供的 OkHttpClient。
       callFactory = new OkHttpClient();
     }
 
     Executor callbackExecutor = this.callbackExecutor;
     // 默认根据所在的编译环境去取决于使用哪种具体 platform 的实现类。
     if (callbackExecutor == null) {
-      callbackExecutor = platform.defaultCallbackExecutor();
+      callbackExecutor =  .defaultCallbackExecutor();
     }
 
    
@@ -112,7 +113,7 @@ public Retrofit build() {
     converterFactories.add(new BuiltInConverters());
     converterFactories.addAll(this.converterFactories);
 
-   // 构建 Retrofit
+   // 构建 Retrofit 对象。
     return new Retrofit(callFactory, baseUrl, unmodifiableList(converterFactories),
         unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
   }
@@ -129,37 +130,39 @@ public <T> T create(final Class<T> service) {
     if (validateEagerly) {
       eagerlyValidateMethods(service);
     }
-    // Java 动态代理，Proxy.newProxyInstance 会把参数 service 类中的所有方法都实现 InvocationHandler 接口中的 invoke() 方法，
-    // 在调用该类的方法时，会回调到 invoke() 方法。
+    // Java 动态代理，Proxy.newProxyInstance 会把 service 类中的所有方法都实现 InvocationHandler 接口中的 invoke() 方法，
+    // 在调用该类的任何方法，都会回调 invoke()。
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
         new InvocationHandler() {
           private final Platform platform = Platform.get();
 
           @Override public Object invoke(Object proxy, Method method, @Nullable Object[] args)
               throws Throwable {
-            // 如果该方法是 Object.class 原本就存在的方法，则直接调用原本的方法。
+            // 如果该方法是在 Object.class 中申明的，则直接调用原本 Object 中的方法。
             if (method.getDeclaringClass() == Object.class) {
               return method.invoke(this, args);
             }
-            // 针对 java8 做的兼容，针对非 android 环境的情况，具体可看 Platform 类。
+            // 针对 Java 环境做的兼容，当接口方法有默认实现时返回 true（Java8 特性）。
             if (platform.isDefaultMethod(method)) {
               return platform.invokeDefaultMethod(method, service, proxy, args);
             }
-            // 通过解析网络请求接口方法的参数、返回值和注解类型获取网络请求所需的数据、网络请求适配器工厂、数据转换器工厂。
+            // 通过解析 service 接口方法的参数、返回值和注解类型，得到网络请求所需的数据、网络请求适配器工厂、数据转换器工厂。
             ServiceMethod<Object, Object> serviceMethod =
                 (ServiceMethod<Object, Object>) loadServiceMethod(method);
-            // 提供 OkHttp 进行网络请求所需的数据并将 Retrofit 和 OkHttp 连接到一起。
+            // OkHttpCall 是 Retrofit 中抽象网络接口的 OkHttp 实现。
+            // 本质上是 Retrofit 提供网络请求数据的来源和网络响应数据的转换，OkHttp 提供网络请求的支持。
+            // 传入网络请求所需的数据和方法参数实例化 OkHttpCall。
             OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
-            // 返回想要的数据适配结果。
-            return serviceMethod.adapt(okHttpCall);
+            // 返回网络请求适配器转换的结果，也就是 method 的返回值。
+            return serviceMethod.callAdapter.adapt(okHttpCall);
           }
         });
 }
 ```
 
-### Retrofit.loadServiceMethod()
+### 3.1 Retrofit.loadServiceMethod()
 
-该方法比较简单，使用了懒加载的思想，并对 ServiceMethod 进行了缓存。
+该方法比较简单，使用了懒加载的思想，由于 ServiceMethod 在实例化的过程需要解析注解且比较耗时，因此进行了缓存。
 
 ```java
 // Retrofit 的全局变量。
@@ -184,7 +187,7 @@ ServiceMethod<?, ?> loadServiceMethod(Method method) {
 
 ## 四、ServiceMethod 的构建
 
-### ServiceMethod 的成员变量
+### 4.1 ServiceMethod 的成员变量
 
 ```java
 final class ServiceMethod<R, T> {
@@ -207,32 +210,31 @@ final class ServiceMethod<R, T> {
   private final boolean isFormEncoded;
   private final boolean isMultipart;
 
-  // ParameterHandler 是一个抽象类，定义了一个抽象方法，统一规范向 RequestBuilder 参数进行赋值。
-  为不同注解对 RequestBuilder
-  // ParameterHandler[] 保存着方法所有参数中不同注解是向 RequestBuilder 赋值的方式。
+  // ParameterHandler 是一个抽象类，用于解析方法中参数的注解向 RequestBuilder 提供数据。RequestBuilder 包含了一个请求报文所需的所有数据。
   private final ParameterHandler<?>[] parameterHandlers;
 
 }
 ```
 
-### ServiceMethod.Builder
+### 4.2 ServiceMethod.Builder
 
 ```java
 public ServiceMethod build() {
-  // 根据网络请求接口返回类型和方法注解（不一定用到，例如 RxJavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器。
+  // 根据方法返回类型和方法注解（方法注解不一定会用到，例如 RxJavaCallAdapter 便没用到），遍历获取到合适的网络请求适配器。
   callAdapter = createCallAdapter();
-  // responseType 为最终我们想要的结果，例如使用的 RxJava2CallAdapterFactory。
-  // 假设接口方法返回值为 Observable<User>,则 responseType 为 User。
+  // responseType 为最终想要的响应体类型。
+  // 例如对于 RxJava2CallAdapter 中，假设接口方法返回值为 Observable<User>，则 responseType 为 User。
   responseType = callAdapter.responseType();
   if (responseType == Response.class || responseType == okhttp3.Response.class) {
     throw methodError("'"
         + Utils.getRawType(responseType).getName()
         + "' is not a valid response body type. Did you mean ResponseBody?");
   }
-  // 根据 responseType 和方法上注解，从 Retrofit 对象中获取可用的数据转换器。
+  // 根据 responseType 和方法上注解，遍历获取可用的数据转换器。
+  // 例如默认情况下的响应体为 ResponseBody，可通过转换器转为 User。
   responseConverter = createResponseConverter();
 
-  // 解析网络请求接口方法的注解和注解值,获取该次请求的 httpMethod、hasBody、contentType 等数据。
+  // 解析接口方法的注解和注解值，获取请求报文中的请求方法、附加请求头、请求地址、contentType。
   for (Annotation annotation : methodAnnotations) {
     parseMethodAnnotation(annotation);
   }
@@ -254,24 +256,25 @@ public ServiceMethod build() {
     }
   }
 
-  // 获取该方法的所有有注解的参数数量。
+  // 获取方法上的所有有注解的参数数量。
   int parameterCount = parameterAnnotationsArray.length;
   parameterHandlers = new ParameterHandler<?>[parameterCount];
   for (int p = 0; p < parameterCount; p++) {
     // 获取第 p 个参数的参数类型。
     Type parameterType = parameterTypes[p];
+    // 参数类型校验。
     if (Utils.hasUnresolvableType(parameterType)) {
       throw parameterError(p, "Parameter type must not include a type variable or wildcard: %s",
           parameterType);
     }
 
-    // 获取第 p 个参数的所有注解。
+    // 获取第 p 个参数上的所有注解。
     Annotation[] parameterAnnotations = parameterAnnotationsArray[p];
     if (parameterAnnotations == null) {
       throw parameterError(p, "No Retrofit annotation found.");
     }
-    // 通过解析参数的类型和注解构建不同的 ParameterHandler<?> 对象实现类。
-    // 后面会调用 parseParameter.apply() 方法赋值给 RequestBuilder 构建Request。
+    // 通过解析参数类型和注解构建适合的 ParameterHandler<?> 对象实现类。
+    // 后面会调用 parseParameter.apply() 方法提供给 RequestBuilder 数据从而构建 Okhttp 的 Request。
     parameterHandlers[p] = parseParameter(p, parameterType, parameterAnnotations);
   }
 
@@ -279,7 +282,7 @@ public ServiceMethod build() {
 }
 ```
 
-#### createCallAdapter()
+#### 4.2.1 createCallAdapter()
 
 ```java
 final class ServiceMethod<R, T> {
@@ -291,17 +294,17 @@ final class ServiceMethod<R, T> {
         throw methodError(
             "Method return type must not include a type variable or wildcard: %s", returnType);
       }
-      // 如果返回类型为 Void，抛出异常。
+      // 不支持无意义的返回类型 Void。
       if (returnType == void.class) {
         throw methodError("Service methods cannot return void.");
       }
       // 获取该方法上的所有注解。
       Annotation[] annotations = method.getAnnotations();
       try {
-        // 通过返回类型 Type 和方法所有注解 annotations 获取一个可用的的 CallAdapter。
+        // 通过返回类型 Type 和方法上所有注解 annotations 遍历获取一个可用的的 CallAdapter。
         return (CallAdapter<T, R>) retrofit.callAdapter(returnType, annotations);
       } catch (RuntimeException e) {
-        // 没有一个可用的 CallAdapter 抛出异常。
+        // 没有一个可用的 CallAdapter 则抛出异常。
         throw methodError(e, "Unable to create call adapter for %s", returnType);
       }
     }
@@ -330,7 +333,7 @@ public final class Retrofit {
       }
     }
     
-    // 没有可用的 callAdapter,便并抛出异常说明。
+    // 没有可用的 callAdapter，则抛出异常说明。
     StringBuilder builder = new StringBuilder("Could not locate call adapter for ")
         .append(returnType)
         .append(".\n");
@@ -350,8 +353,7 @@ public final class Retrofit {
 }
 ```
 
-
-#### createResponseConverter()
+#### 4.2.2 createResponseConverter()
 
 ```java
 final class ServiceMethod<R, T> {
@@ -359,7 +361,7 @@ final class ServiceMethod<R, T> {
   private Converter<ResponseBody, T> createResponseConverter() {
     Annotation[] annotations = method.getAnnotations();
     try {
-      // responseType 为非方法接口返回类型，而是响应报文中的 ResponseBody 想转化为的类型。
+      // responseType 并不一定为方法返回类型，而是响应报文中的 ResponseBody 想转化的类型。
       return retrofit.responseBodyConverter(responseType, annotations);
     } catch (RuntimeException e) { // Wide exception range because factories are user code.
       throw methodError(e, "Unable to create converter for %s", responseType);
@@ -400,13 +402,13 @@ public final class Retrofit {
 }
 ```
 
-#### parseParameter()
+#### 4.2.3 parseParameter()
 
 ```java
 private ParameterHandler<?> parseParameter(
         int p, Type parameterType, Annotation[] annotations) {
       ParameterHandler<?> result = null;
-      // 遍历一个参数上所有注解
+      // 遍历参数上所有注解
       for (Annotation annotation : annotations) {
         ParameterHandler<?> annotationAction = parseParameterAnnotation(
             p, parameterType, annotations, annotation);
@@ -423,7 +425,7 @@ private ParameterHandler<?> parseParameter(
         result = annotationAction;
       }
 
-      // 没有一个有效的注解解析，则抛异常
+      // 没有一个有效的注解解析，则抛异常。
       if (result == null) {
         throw parameterError(p, "No Retrofit annotation found.");
       }
@@ -432,26 +434,26 @@ private ParameterHandler<?> parseParameter(
     }
 ```
 
-这里抽取 parseParameterAnnotation() 方法中的一个注解解析过程解读。
+这里抽取 parseParameterAnnotation() 中的 @FieldMap 解析过程解读。
 
 ```java
 private ParameterHandler<?> parseParameterAnnotation(
      int p, Type type, Annotation[] annotations, Annotation annotation) {
        // p 为方法第 p 个参数；type 为变量类型；annotations 为该参数上所有注解; annotation 为 annotations[p]。
-       // 这里假定 type 为一个 Map<String,String>。
+       // 这里假定 type 为 Map<String,String>。
        if (annotation instanceof FieldMap) {
          // 没有添加 @FormEncoded 抛异常。
         if (!isFormEncoded) {
           throw parameterError(p, "@FieldMap parameters can only be used with form encoding.");
         }
-        // 此时 rawParameterType 为 Map。
+        // 在上面假定的前提下，此时 rawParameterType 为 Map。
         Class<?> rawParameterType = Utils.getRawType(type);
-        // 如果 rawParameterType 不是 Map 的实现类。
+        // 如果 rawParameterType 不是 Map 的实现类，则抛出异常。
         if (!Map.class.isAssignableFrom(rawParameterType)) {
           throw parameterError(p, "@FieldMap parameter type must be Map.");
         }
         Type mapType = Utils.getSupertype(type, rawParameterType, Map.class);
-        // 如果 Map 没有声明具体的泛型类型则抛异常。
+        // 如果 Map 没有声明具体的泛型类型，则抛出异常。
         if (!(mapType instanceof ParameterizedType)) {
           throw parameterError(p,
               "Map must include generic types (e.g., Map<String, String>)");
@@ -494,7 +496,7 @@ static final class FieldMap<T> extends ParameterHandler<Map<String, T>> {
       throw new IllegalArgumentException("Field map was null.");
     }
 
-    // 遍历 value 解析 T 并赋值给 RequestBuilder。
+    // 遍历 value 通过 valueConverter 解析得到 T，并新增 Field 添加给 RequestBuilder。
     for (Map.Entry<String, T> entry : value.entrySet()) {
       String entryKey = entry.getKey();
       if (entryKey == null) {
@@ -528,22 +530,22 @@ static final class FieldMap<T> extends ParameterHandler<Map<String, T>> {
 ```java
 public interface CallAdapter<R, T> {
 
-  // 网络请求接口方法返回类型
+  // responseType 为最终想要的响应体类型。
+  // 例如对于 RxJava2CallAdapter 中，假设接口方法返回值为 Observable<User>，则 responseType 为 User。
   Type responseType();
 
-  // 将 Call<R> 适配成 T
+  // 将 Call<R> 适配成 T。
   T adapt(Call<R> call);
 
-  // 工厂模式，一是对外隐藏 CallAdapter 的实例化，二是制定构建 CallAdapter 的规范。
   abstract class Factory {
  
-    // 提供 Type 和 Annotation 让 CallAdapter 去确定自己能够处理的 Type 或 Annotation，若返回 null 则表示无法处理。
+   /**
+    * 提供方法返回值 Type 和 Annotation 让 CallAdapter 去确定自己能够处理的 Type 或 Annotation，返回 null 则表示无法处理。
+    */
     public abstract @Nullable CallAdapter<?, ?> get(Type returnType, Annotation[] annotations,
         Retrofit retrofit);
 
     /**
-     * Extract the upper bound of the generic parameter at {@code index} from {@code type}. For
-     * example, index 1 of {@code Map<String, ? extends Runnable>} returns {@code Runnable}.
      * 获取该类型中第 index 个泛型的实际类型。
      */
     protected static Type getParameterUpperBound(int index, ParameterizedType type) {
@@ -551,8 +553,6 @@ public interface CallAdapter<R, T> {
     }
 
     /**
-     * Extract the raw class type from {@code type}. For example, the type representing
-     * {@code List<? extends Runnable>} returns {@code List.class}.
      * 获取声明泛型的类或者接口。
      */
     protected static Class<?> getRawType(Type type) {
@@ -562,28 +562,26 @@ public interface CallAdapter<R, T> {
 }
 ```
 
-### RxJava2CallAdapterFactory
+### 5.1 RxJava2CallAdapterFactory
 
-接下来以 RxJava2CallAdapterFactory 为例对看下 CallAdapter.Factory 的实现。
+以 RxJava2CallAdapterFactory 为例看下对 CallAdapter.Factory 的实现。
+
 ```java
-
 public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
 
   @Override
   public CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
-    // 此处假设 returnType 由接口方法 Method.getGenericReturnType() 得到 Observable<User>。
-    // 此处 rawType 即为 Observable.class
+    // 此处假设 returnType 由接口方法 Method.getGenericReturnType() 得到类型为 Observable<User>。
+    // 则 rawType 即为 Observable.class。
     Class<?> rawType = getRawType(returnType);
 
     // Completable 是 RxJava 的一种被观察者形式。
     if (rawType == Completable.class) {
-      // Completable is not parameterized (which is what the rest of this method deals with) so it
-      // can only be created with a single configuration.
       return new RxJava2CallAdapter(Void.class, scheduler, isAsync, false, true, false, false,
           false, true);
     }
 
-    // 如果 rawType 不为 RxJava 以下四种被观察者 返回 null 表示无法适配为当前 rawType。
+    // 如果 rawType 不为 RxJava 以下四种被观察者，返回 null 表示无法适配为类型 rawType。
     boolean isFlowable = rawType == Flowable.class;
     boolean isSingle = rawType == Single.class;
     boolean isMaybe = rawType == Maybe.class;
@@ -606,7 +604,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
 
     // 获取第一个泛型类型，以 Observable<User> 为例，则此处 observableType 为 User。
     Type observableType = getParameterUpperBound(0, (ParameterizedType) returnType);
-    // 此时 rawObservableType 也为 User
+    // 此时 rawObservableType 也为 User。
     // 若假设 observableType 为 Observable<Response<User>> 则 rawObservableType 为 Response<User>。
     Class<?> rawObservableType = getRawType(observableType);
 
@@ -623,6 +621,7 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
         throw new IllegalStateException("Result must be parameterized"
             + " as Result<Foo> or Result<? extends Foo>");
       }
+      // 拿到 Result<T> 第一个泛型类型，也就是 T。
       responseType = getParameterUpperBound(0, (ParameterizedType) observableType);
       isResult = true;
     } else {
@@ -675,9 +674,9 @@ public interface Converter<F, T> {
 }
 ```
 
-### BuiltInConverters
+### 6.1 BuiltInConverters
 
-BuiltInConverters 是 Retrofit 默认提供的 Converter.Factory（转换工厂）。
+BuiltInConverters 是 Retrofit 默认提供的 Converter.Factory（数据转换工厂）。
 
 ```java
 final class BuiltInConverters extends Converter.Factory {
@@ -690,7 +689,7 @@ final class BuiltInConverters extends Converter.Factory {
       // @Streaming 的一般用于大文件的传输，
       // 不用 Streaming 的时候，把整个网络响应的数据全部加载完，然后返回加载后的数据，
       // 并生成了新的 ResponseBody，避免服务器再次传输数据，但会大量占用客户端的内存。
-      // 使用 Streaming 则是用于边接收数据边处理（不断更新Response）。
+      // 使用 Streaming 则是用于边接收数据边处理（不断更新 Response）。
       return Utils.isAnnotationPresent(annotations, Streaming.class)
           ? StreamingResponseBodyConverter.INSTANCE
           : BufferingResponseBodyConverter.INSTANCE;
@@ -750,7 +749,7 @@ final class BuiltInConverters extends Converter.Factory {
     }
   }
   
-  // 该转换器在 Retrofit 主要用于将网络接口方法的变量转换为 String 类型。
+  // 该转换器在 Retrofit 主要用于将方法的参数转换为 String 类型。
   static final class ToStringConverter implements Converter<Object, String> {
     static final ToStringConverter INSTANCE = new ToStringConverter();
 
@@ -778,7 +777,7 @@ final class OkHttpCall<T> implements Call<T> {
     okhttp3.Call call;
 
     synchronized (this) {
-      // 同一个请求对象不能多次调用，否则抛异常。
+      // 同一个请求不能多次使用，否则抛异常。
       if (executed) throw new IllegalStateException("Already executed.");
       executed = true;
 
@@ -813,11 +812,11 @@ final class OkHttpCall<T> implements Call<T> {
   }
 }
 ```
-### createRawCall()
+### 7.1 createRawCall()
 
 ```java
 private okhttp3.Call createRawCall() throws IOException {
-  // args 为方法参数实际的传参 此处的作用就是为 RequestBuilder 成员变量赋值并构造 okhttp3.Call。
+  // args 为方法参数实际的传参，此处的作用就是为 RequestBuilder 成员变量赋值并构造 okhttp3.Call。
   okhttp3.Call call = serviceMethod.toCall(args);
   if (call == null) {
     throw new NullPointerException("Call.Factory returned null.");
@@ -825,7 +824,7 @@ private okhttp3.Call createRawCall() throws IOException {
   return call;
 }
 ```
-#### serviceMethod.toCall()
+serviceMethod.toCall()：
 
 ```java
 okhttp3.Call toCall(@Nullable Object... args) throws IOException {
@@ -842,29 +841,30 @@ okhttp3.Call toCall(@Nullable Object... args) throws IOException {
     throw new IllegalArgumentException("Argument count (" + argumentCount
         + ") doesn't match expected count (" + handlers.length + ")");
   }
-  // 调用 ParameterHandler.apply() 为 RequestBuilder 赋值。
+  // 调用 ParameterHandler.apply() 从而提供给 RequestBuilder 请求报文的数据。
   for (int p = 0; p < argumentCount; p++) {
     handlers[p].apply(requestBuilder, args[p]);
   }
 
-  // 构建 OkHttp.Call。
+  // 构建 OkHttp 的 Call 对象，之后便是调用 OkHttp 的 API 了。
   return callFactory.newCall(requestBuilder.build());
 }
 ```
 
-### parseResponse()
+### 7.2 parseResponse()
 
 ```java
 Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
   ResponseBody rawBody = rawResponse.body();
 
   // 构建一个新的 ResponseBody 用于返回给调用者，
-  // 移除了请求体的数据源( byte 数据源)，调用方如果尝试拿便抛异常。
+  // 移除了请求体的数据源，调用方如果尝试拿便会抛异常。
   rawResponse = rawResponse.newBuilder()
       .body(new NoContentResponseBody(rawBody.contentType(), rawBody.contentLength()))
       .build();
 
   int code = rawResponse.code();
+  // 2XX 表示成功响应。
   if (code < 200 || code >= 300) {
     try {
       // Buffer the entire body to avoid future I/O.
@@ -875,6 +875,7 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
     }
   }
 
+  // 成功响应，但不包含响应体。
   if (code == 204 || code == 205) {
     rawBody.close();
     return Response.success(null, rawResponse);
@@ -882,7 +883,7 @@ Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
 
   ExceptionCatchingRequestBody catchingBody = new ExceptionCatchingRequestBody(rawBody);
   try {
-    // 通过数据转换器转换成我们想要的 responseType(例如 Call<User> 则 T 为 User)。
+    // 通过数据转换器将响应体转换成我们想要的 responseType(例如 Call<User> 则 T 为 User)。
     T body = serviceMethod.toResponse(catchingBody);
     // 构建 Retrofit 的 response。
     return Response.success(body, rawResponse);
@@ -979,6 +980,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
 
     boolean terminated = false;
     try {
+      // 同步执行 OkHttp 的网络请求，并拿到响应 Response。
       Response<T> response = call.execute();
       if (!disposable.isDisposed()) {
         //返回 response 给 observer 的实现类调用。
@@ -1005,7 +1007,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
 }
 ```
 
-### BodyObservable
+### 8.1 BodyObservable
 
 ```java
 final class BodyObservable<T> extends Observable<T> {
