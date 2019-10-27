@@ -40,11 +40,13 @@
 
 - [Android 框架](./notes/Android%20常用框架.md)
 
-  Android 常用框架的介绍和源码分析。[OkHttp、]
+  Android 常用框架的介绍和源码分析。
+
+  已包含：OkHttp、Retrofit、RxJava。
 
 - [View](./notes/View.md)
 
-  View 的工作流程、自定义 View、动画、触摸反馈、NestedScrolling。
+  View 的工作流程、自定义 View、动画、触摸反馈、NestedScrolling、RecyclerView。
 
 - [性能优化](./notes/性能优化.md)
 
