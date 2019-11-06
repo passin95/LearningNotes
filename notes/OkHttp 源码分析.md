@@ -747,7 +747,7 @@ public final class CacheInterceptor implements Interceptor {
 
     if (networkRequest == null) {
       // 执行到这里，说明不使用网络且缓存没过期。
-      // 返回缓存的响应体，并设置 cacheResponse 从而其它拦截器可以得知该响应体来自缓存。
+      // 返回缓存的响应体，设置 cacheResponse 又没设置 networkResponse，从而其它拦截器可以得知该响应体的数据来源只有缓存。
       return cacheResponse.newBuilder()
           .cacheResponse(stripBody(cacheResponse))
           .build();

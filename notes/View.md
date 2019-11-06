@@ -8,7 +8,7 @@
 
 - [Paint](./Paint.md)
 
-  Paint 相关。
+  Paint 相关、硬件加速。
 
 - [Canvas](./Canvas.md)
 

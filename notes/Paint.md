@@ -1,42 +1,42 @@
 <!-- TOC -->
 
-- [一、Paint 基础设置](#%E4%B8%80paint-%E5%9F%BA%E7%A1%80%E8%AE%BE%E7%BD%AE)
-  - [1.1 绘制模式 Style](#11-%E7%BB%98%E5%88%B6%E6%A8%A1%E5%BC%8F-style)
-  - [1.2 文字大小 TextSize](#12-%E6%96%87%E5%AD%97%E5%A4%A7%E5%B0%8F-textsize)
-  - [1.3 抗锯齿开关](#13-%E6%8A%97%E9%94%AF%E9%BD%BF%E5%BC%80%E5%85%B3)
-- [二、颜色 Color](#%E4%BA%8C%E9%A2%9C%E8%89%B2-color)
-  - [2.1 基本颜色](#21-%E5%9F%BA%E6%9C%AC%E9%A2%9C%E8%89%B2)
-  - [2.2 设置着色器 Shape](#22-%E8%AE%BE%E7%BD%AE%E7%9D%80%E8%89%B2%E5%99%A8-shape)
-    - [2.2.1 着色规则 Shader.TileMode](#221-%E7%9D%80%E8%89%B2%E8%A7%84%E5%88%99-shadertilemode)
-    - [2.2.2 线性渐变 LinearGradient](#222-%E7%BA%BF%E6%80%A7%E6%B8%90%E5%8F%98-lineargradient)
-    - [2.2.3 辐射渐变 RadialGradient](#223-%E8%BE%90%E5%B0%84%E6%B8%90%E5%8F%98-radialgradient)
-    - [2.2.4 扫描渐变 SweepGradient](#224-%E6%89%AB%E6%8F%8F%E6%B8%90%E5%8F%98-sweepgradient)
-    - [2.2.5 Bitmap BitmapShader](#225-bitmap-bitmapshader)
-    - [2.2.6 混合着色器 ComposeShader](#226-%E6%B7%B7%E5%90%88%E7%9D%80%E8%89%B2%E5%99%A8-composeshader)
-      - [2.2.6.1 叠加策略 PorterDuff.Mode](#2261-%E5%8F%A0%E5%8A%A0%E7%AD%96%E7%95%A5-porterduffmode)
-  - [2.3 颜色过滤 ColorFilter](#23-%E9%A2%9C%E8%89%B2%E8%BF%87%E6%BB%A4-colorfilter)
-    - [2.3.1 LightingColorFilter](#231-lightingcolorfilter)
-    - [2.3.2 PorterDuffColorFilter](#232-porterduffcolorfilter)
-    - [2.3.3 ColorMatrixColorFilter](#233-colormatrixcolorfilter)
-  - [2.4 Xfermode](#24-xfermode)
-- [三、线条形状](#%E4%B8%89%E7%BA%BF%E6%9D%A1%E5%BD%A2%E7%8A%B6)
-  - [3.1 设置线条宽度 StrokeWidth](#31-%E8%AE%BE%E7%BD%AE%E7%BA%BF%E6%9D%A1%E5%AE%BD%E5%BA%A6-strokewidth)
-  - [3.2 线条端点形状 StrokeCap](#32-%E7%BA%BF%E6%9D%A1%E7%AB%AF%E7%82%B9%E5%BD%A2%E7%8A%B6-strokecap)
-  - [3.2 拐角的形状 StrokeJoin](#32-%E6%8B%90%E8%A7%92%E7%9A%84%E5%BD%A2%E7%8A%B6-strokejoin)
-  - [3.3 尖角延长线最大值 StrokeMiter](#33-%E5%B0%96%E8%A7%92%E5%BB%B6%E9%95%BF%E7%BA%BF%E6%9C%80%E5%A4%A7%E5%80%BC-strokemiter)
-- [四、阴影 ShadowLayer](#%E5%9B%9B%E9%98%B4%E5%BD%B1-shadowlayer)
-- [五、过滤画面（特效） MaskFilter](#%E4%BA%94%E8%BF%87%E6%BB%A4%E7%94%BB%E9%9D%A2%E7%89%B9%E6%95%88-maskfilter)
-  - [5.1 模糊效果 BlurMaskFilter](#51-%E6%A8%A1%E7%B3%8A%E6%95%88%E6%9E%9C-blurmaskfilter)
-  - [5.2 浮雕效果 EmbossMaskFilter](#52-%E6%B5%AE%E9%9B%95%E6%95%88%E6%9E%9C-embossmaskfilter)
-- [六、图形轮廓 PathEffect](#%E5%85%AD%E5%9B%BE%E5%BD%A2%E8%BD%AE%E5%BB%93-patheffect)
-  - [6.1 CornerPathEffect](#61-cornerpatheffect)
-  - [6.2 DiscretePathEffect](#62-discretepatheffect)
-  - [6.3 DashPathEffect](#63-dashpatheffect)
-  - [6.4 PathDashPathEffect](#64-pathdashpatheffect)
-  - [6.5 SumPathEffect](#65-sumpatheffect)
-  - [6.6 ComposePathEffect](#66-composepatheffect)
-  - [6.7 注意事项](#67-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
-- [七、硬件加速](#%E4%B8%83%E7%A1%AC%E4%BB%B6%E5%8A%A0%E9%80%9F)
+- [一、Paint 基础设置](#一paint-基础设置)
+    - [1.1 绘制模式 Style](#11-绘制模式-style)
+    - [1.2 文字大小 TextSize](#12-文字大小-textsize)
+    - [1.3 抗锯齿开关](#13-抗锯齿开关)
+- [二、颜色 Color](#二颜色-color)
+    - [2.1 基本颜色](#21-基本颜色)
+    - [2.2 设置着色器 Shape](#22-设置着色器-shape)
+        - [2.2.1 着色规则 Shader.TileMode](#221-着色规则-shadertilemode)
+        - [2.2.2 线性渐变 LinearGradient](#222-线性渐变-lineargradient)
+        - [2.2.3 辐射渐变 RadialGradient](#223-辐射渐变-radialgradient)
+        - [2.2.4 扫描渐变 SweepGradient](#224-扫描渐变-sweepgradient)
+        - [2.2.5 Bitmap BitmapShader](#225-bitmap-bitmapshader)
+        - [2.2.6 混合着色器 ComposeShader](#226-混合着色器-composeshader)
+            - [2.2.6.1 叠加策略 PorterDuff.Mode](#2261-叠加策略-porterduffmode)
+    - [2.3 颜色过滤 ColorFilter](#23-颜色过滤-colorfilter)
+        - [2.3.1 LightingColorFilter](#231-lightingcolorfilter)
+        - [2.3.2 PorterDuffColorFilter](#232-porterduffcolorfilter)
+        - [2.3.3 ColorMatrixColorFilter](#233-colormatrixcolorfilter)
+    - [2.4 Xfermode](#24-xfermode)
+- [三、线条形状](#三线条形状)
+    - [3.1 设置线条宽度 StrokeWidth](#31-设置线条宽度-strokewidth)
+    - [3.2 线条端点形状 StrokeCap](#32-线条端点形状-strokecap)
+    - [3.2 拐角的形状 StrokeJoin](#32-拐角的形状-strokejoin)
+    - [3.3 尖角延长线最大值 StrokeMiter](#33-尖角延长线最大值-strokemiter)
+- [四、阴影 ShadowLayer](#四阴影-shadowlayer)
+- [五、过滤画面（特效） MaskFilter](#五过滤画面特效-maskfilter)
+    - [5.1 模糊效果 BlurMaskFilter](#51-模糊效果-blurmaskfilter)
+    - [5.2 浮雕效果 EmbossMaskFilter](#52-浮雕效果-embossmaskfilter)
+- [六、图形轮廓 PathEffect](#六图形轮廓-patheffect)
+    - [6.1 CornerPathEffect](#61-cornerpatheffect)
+    - [6.2 DiscretePathEffect](#62-discretepatheffect)
+    - [6.3 DashPathEffect](#63-dashpatheffect)
+    - [6.4 PathDashPathEffect](#64-pathdashpatheffect)
+    - [6.5 SumPathEffect](#65-sumpatheffect)
+    - [6.6 ComposePathEffect](#66-composepatheffect)
+    - [6.7 注意事项](#67-注意事项)
+- [七、硬件加速](#七硬件加速)
 
 <!-- /TOC -->
 
@@ -265,7 +265,8 @@ Xfermode 全名为 Transfer mode，暂时只有一个子类 PorterDuffXfermode�
 在一般的自定义绘制需求中，都是使用该方式。
 
 ```java
-// saveLayer() 可以做短时的离屏缓冲
+// saveLayer() 可以做短时间的离屏缓冲，但该方法性能消耗过大，在满足需求的请下一般推荐第二种。
+// 什么时候不能使用第二种：只想截取某一部分区域进行叠加或背景不是透明色。
 int saved = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
 
 canvas.drawBitmap(rectBitmap, 0, 0, paint); // 先画方
@@ -297,7 +298,6 @@ Paint.setStrokeWidth(float width)
 默认情况下，线条宽度为 0，但依然能够画出线，线条的宽度为 1 像素。那么它和线条宽度为 1 有什么区别呢？
 
 其实这个和「几何变换」有关：你可以为 Canvas 设置 Matrix 来实现几何变换（如放大、缩小、平移、旋转），在几何变换之后 Canvas 绘制的内容就会发生相应变化，包括线条也会加粗，例如 2 像素宽度的线条在 Canvas 放大 2 倍后会被以 4 像素宽度来绘制。而当线条宽度被设置为 0 时，它的宽度就被固定为 1 像素，就算 Canvas 通过几何变换被放大，它也依然会被以 1 像素宽度来绘制。Google 在文档中把线条宽度为 0 时称作「hairline mode（发际线模式）」。
-
 
 ## 3.2 线条端点形状 StrokeCap
 
@@ -487,7 +487,7 @@ canvas.drawPath(path, paint);
 硬件加速可以使用 setLayerType() 来关闭硬件加速，但这个方法其实是用来设置 View Layer 的（离屏缓冲，配合 Xfermode 使用）：
 
 - 参数为 LAYER_TYPE_SOFTWARE 时，使用软件来绘制 View Layer，绘制到一个 Bitmap，并顺便关闭硬件加速；
-- 参数为 LAYER_TYPE_HARDWARE 时，使用 GPU 来绘制 View Layer，绘制到一个 OpenGL texture（如果硬件加速关闭，那么行为和 VIEW_TYPE_SOFTWARE 一致）；
+- 参数为 LAYER_TYPE_HARDWARE 时，使用 GPU 来绘制 View Layer，绘制到一个 OpenGL texture（如果硬件加速关闭，那么行为和 VIEW_TYPE_SOFTWARE 一致），；
 - 参数为 LAYER_TYPE_NONE 时，关闭 View Layer。
 
 当设置了 View Layer 后，View 在初次绘制时以及每次 invalidate() 后重绘时，需要进行两次的绘制工作（一次绘制到 Layer，一次从 Layer 绘制到显示屏），所以其实它的每次绘制的效率是被降低了的。因此一般情况下建议关闭 View Layer。
