@@ -1,43 +1,43 @@
 <!-- TOC -->
 
-- [一、生命周期](#%E4%B8%80%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
-  - [1.1 Activity 的生命周期](#11-activity-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
-  - [1.2 Fragment 的生命周期](#12-fragment-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
-    - [1.2.1 Fragment 之间切换](#121-fragment-%E4%B9%8B%E9%97%B4%E5%88%87%E6%8D%A2)
-  - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-%E5%92%8C-onrestoreinstancestate)
-  - [1.4 其余情况补充](#14-%E5%85%B6%E4%BD%99%E6%83%85%E5%86%B5%E8%A1%A5%E5%85%85)
-  - [1.5 Application 的生命周期](#15-application-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
-- [二、Activity 标签属性](#%E4%BA%8Cactivity-%E6%A0%87%E7%AD%BE%E5%B1%9E%E6%80%A7)
-- [三、Activity LaunchMode](#%E4%B8%89activity-launchmode)
-  - [3.1 FLAG](#31-flag)
-  - [3.2 补充说明](#32-%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E)
-- [四、IntentFilter 的匹配规则](#%E5%9B%9Bintentfilter-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
-  - [4.1 action 的匹配规则](#41-action-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
-  - [4.2 category 的匹配规则](#42-category-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
-  - [4.3 data 的匹配规则](#43-data-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
-  - [4.4 注意事项](#44-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
-- [五、Service](#%E4%BA%94service)
-  - [5.1 Androidmanifest Serivce 属性说明](#51-androidmanifest-serivce-%E5%B1%9E%E6%80%A7%E8%AF%B4%E6%98%8E)
-  - [5.2 前台 Service 和后台 Service](#52-%E5%89%8D%E5%8F%B0-service-%E5%92%8C%E5%90%8E%E5%8F%B0-service)
-  - [5.3 远程 Service](#53-%E8%BF%9C%E7%A8%8B-service)
-  - [5.4 IntentSerivce](#54-intentserivce)
-- [六、BroadcastReceiver](#%E5%85%ADbroadcastreceiver)
-  - [6.1 BroadcastReceiver 的使用](#61-broadcastreceiver-%E7%9A%84%E4%BD%BF%E7%94%A8)
-  - [6.2 广播类型](#62-%E5%B9%BF%E6%92%AD%E7%B1%BB%E5%9E%8B)
-- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+- [一、生命周期](#一生命周期)
+    - [1.1 Activity 的生命周期](#11-activity-的生命周期)
+    - [1.2 Fragment 的生命周期](#12-fragment-的生命周期)
+        - [1.2.1 Fragment 之间切换](#121-fragment-之间切换)
+    - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-和-onrestoreinstancestate)
+    - [1.4 其余情况补充](#14-其余情况补充)
+    - [1.5 Application 的生命周期](#15-application-的生命周期)
+- [二、Activity 标签属性](#二activity-标签属性)
+- [三、Activity LaunchMode](#三activity-launchmode)
+    - [3.1 FLAG](#31-flag)
+    - [3.2 补充说明](#32-补充说明)
+- [四、IntentFilter 的匹配规则](#四intentfilter-的匹配规则)
+    - [4.1 action 的匹配规则](#41-action-的匹配规则)
+    - [4.2 category 的匹配规则](#42-category-的匹配规则)
+    - [4.3 data 的匹配规则](#43-data-的匹配规则)
+    - [4.4 注意事项](#44-注意事项)
+- [五、Service](#五service)
+    - [5.1 Androidmanifest Serivce 属性说明](#51-androidmanifest-serivce-属性说明)
+    - [5.2 前台 Service 和后台 Service](#52-前台-service-和后台-service)
+    - [5.3 远程 Service](#53-远程-service)
+    - [5.4 IntentSerivce](#54-intentserivce)
+- [六、BroadcastReceiver](#六broadcastreceiver)
+    - [6.1 BroadcastReceiver 的使用](#61-broadcastreceiver-的使用)
+    - [6.2 广播类型](#62-广播类型)
+- [参考资料](#参考资料)
 
 <!-- /TOC -->
 
 
 # 一、生命周期
 
-以下描述是正常情况下 Fragment 直接写在 Activity xml 文件下的生命周期图：
+下图是正常情况下 Fragment 直接写在 Activity xml 文件下的生命周期图：
 
 <div align ="center"> <img src ="../pictures/Activity和Fragment生命周期.png"/> </div><br>
 
 ## 1.1 Activity 的生命周期
 
-正常情况下，Activity 会经历以下生命周期。
+正常情况下，Activity 会经历以下生命周期：
 
 （1）onCreate：
 Activity 正在被创建，一般做一些初始化的操作，如果在该方法调用 **finish()**，下一个生命周期方法会运行 **onDestroy()**。
@@ -59,6 +59,8 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 而非正常情况下（App 被系统强杀），onStop()，onDestory() 就不会执行。
 
 ## 1.2 Fragment 的生命周期
+
+正常情况下，Fragment 会经历以下生命周期：
 
 （1）onAttach：Fragment 和 Activity 相关联时回调。
 

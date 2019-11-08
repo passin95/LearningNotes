@@ -33,6 +33,7 @@
     - [3.5 网络安全](#35-网络安全)
         - [3.5.1 校验服务器主机](#351-校验服务器主机)
         - [3.5.2 SSL 证书校验](#352-ssl-证书校验)
+- [四、逆向学习资料](#四逆向学习资料)
 - [参考资料](#参考资料)
 
 <!-- /TOC -->
@@ -304,6 +305,10 @@ sslContext.init(null, new TrustManager[]{tm}, null);
 ```
 
 开发建议：使用 TrustManagerFactory.getDefaultAlgorithm() 构建默认的 TrustManager，或自己实现 TrustManager。
+
+# 四、逆向学习资料
+
+https://bbs.pediy.com/thread-249602.htm
 
 # 参考资料 
 
