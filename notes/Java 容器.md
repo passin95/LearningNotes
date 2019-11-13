@@ -1,24 +1,24 @@
 <!-- TOC -->
 
-- [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
-  - [1.1 名词说明](#11-%E5%90%8D%E8%AF%8D%E8%AF%B4%E6%98%8E)
-    - [1.1.1 RandomAccess](#111-randomaccess)
-    - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-%E5%92%8C-failsafe)
-  - [1.2 Collection](#12-collection)
-    - [1.2.1 List](#121-list)
-    - [1.2.2 Set](#122-set)
-    - [1.2.3 Queue](#123-queue)
-  - [1.3 Map](#13-map)
-  - [1.4 Arrays.asList()](#14-arraysaslist)
-- [二、源码分析](#%E4%BA%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [2.1 ArrayList](#21-arraylist)
-    - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-vectorcopyonwritearraylistcollectionssynchronizedlist-%E5%AF%B9%E6%AF%94)
-  - [2.2 LinkedList](#22-linkedlist)
-  - [2.3 HashMap](#23-hashmap)
-    - [2.3.1 成员变量和构造函数](#231-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
-    - [2.3.2 存储结构](#232-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
-    - [2.3.3 put、get、resize](#233-putgetresize)
-    - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-hashtableconcurrenthashmapcollectionssynchronizedmap-%E5%AF%B9%E6%AF%94)
+- [一、概述](#一概述)
+    - [1.1 名词说明](#11-名词说明)
+        - [1.1.1 RandomAccess](#111-randomaccess)
+        - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-和-failsafe)
+    - [1.2 Collection](#12-collection)
+        - [1.2.1 List](#121-list)
+        - [1.2.2 Set](#122-set)
+        - [1.2.3 Queue](#123-queue)
+    - [1.3 Map](#13-map)
+    - [1.4 Arrays.asList()](#14-arraysaslist)
+- [二、源码分析](#二源码分析)
+    - [2.1 ArrayList](#21-arraylist)
+        - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
+    - [2.2 LinkedList](#22-linkedlist)
+    - [2.3 HashMap](#23-hashmap)
+        - [2.3.1 成员变量和构造函数](#231-成员变量和构造函数)
+        - [2.3.2 存储结构](#232-存储结构)
+        - [2.3.3 put、get、resize](#233-putgetresize)
+        - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-线程安全方案-hashtableconcurrenthashmapcollectionssynchronizedmap-对比)
 
 <!-- /TOC -->
 
@@ -101,6 +101,7 @@ ArrayList 的特性：
 3. 实现了 Serializable 接口，这意味着 ArrayList 支持 Serializable 序列化。
 
 在分析 ArrayList 的源码前，先看一个方法，它在 ArrayList 中经常用到。
+
 ```java
 public final class System {
     /**
@@ -136,7 +137,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * 元素（数据）集，ArrayList 本质上是一个数组。
-     * 使用 transient 修饰，不会被序列化。
+     * 使用 transient 修饰，不会被 Serializable 序列化。
      */
     transient Object[] elementData; // non-private to simplify nested class access
 
@@ -163,7 +164,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * 默认构造函数，DEFAULTCAPACITY_EMPTY_ELEMENTDATA 为 0，默认容量为 10，
-     * 也就是说初始其实是空数组，当第一次添加元素的时候数组容量为 10 和添加元素（集）数量的最大值。
+     * 也就是说初始其实是空数组，当第一次添加元素的时候数组容量为 DEFAULT_CAPACITY（10） 和添加元素（集）数量的最大值。
      */
     public ArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
@@ -173,7 +174,7 @@ public class ArrayList<E> extends AbstractList<E>
      * 构造一个包含指定集合的元素的列表，按照它们由集合的迭代器返回的顺序。
      */
     public ArrayList(Collection<? extends E> c) {
-        //
+        // 返回一个新的数组，它包含了 c 集合的元素。
         elementData = c.toArray();
         // 如果指定集合元素个数不为 0。
         if ((size = elementData.length) != 0) {
@@ -210,14 +211,14 @@ public class ArrayList<E> extends AbstractList<E>
             : DEFAULT_CAPACITY;
 
         if (minCapacity > minExpand) {
-            // 扩容
+            // 扩容。
             ensureExplicitCapacity(minCapacity);
         }
     }
 
     private void ensureCapacityInternal(int minCapacity) {
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
-            // 获取默认的容量和传入参数的较大值作为所需的最小容量
+            // 获取默认的容量和传入参数的较大值作为所需的最小容量。
             minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
         }
 
@@ -227,7 +228,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * ArrayList 的扩容机制。
-     * 如有有必要，扩张数组的容量，以确保它至少能容纳所有元素。
+     * 如有有必要，扩大数组的容量，以确保它至少能容纳所有元素。
      * 
      * @param minCapacity 所需的最小容量
      */
@@ -241,7 +242,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * ArrayList 定义的最大数组大小
+     * ArrayList 定义的数组最大大小。
      */
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 

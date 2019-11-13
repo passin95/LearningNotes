@@ -40,7 +40,7 @@
     - [10.1 元注解](#101-元注解)
         - [10.1.1 @Retention](#1011-retention)
         - [10.1.2 @Target](#1012-target)
-        - [10.1.2 @Inherited](#1012-inherited)
+        - [10.1.3 @Inherited](#1013-inherited)
 - [十一、Type](#十一type)
     - [11.1 Class](#111-class)
     - [11.2 ParameterizedType](#112-parameterizedtype)
@@ -579,13 +579,14 @@ ToStringExample@4554617c
 ```
 
 ## 5.4 clone()
+
 clone() 是 Object 的 protect 方法，它不是 public，一个类不显式去重写 clone()，其它类就不能直接去调用该类实例的 clone() 方法。
 我们可以通过重写 clone() 去实现浅拷贝或深拷贝。super.clone() 默认情况下实现对象的浅拷贝。
 
 - 浅拷贝：当对象的属性是基本数据类型时，会复制属性及值，当对象的属性有引用类型的时候，会把当前属性引用复制。
 - 深拷贝：当对象的属性是基本数据类型时，会复制属性及值，当对象的属性有引用类型的时候，会把当前属性引用的对象再复制一份。
 
-即当需要 clone 的对象的属性都是基本数据类型，深拷贝浅拷贝一样，当需要 clone 的对象的属性有引用类型的时候，浅拷贝直接把引用地址复制过去，深拷贝会把引用的对象再复制一份。
+即当需要 clone 的对象的属性都是基本数据类型（不包括数组），深拷贝浅拷贝一样，当需要 clone 的对象的属性有引用类型的时候，浅拷贝直接把引用地址复制过去，深拷贝会把引用的对象再复制一份。
 
 ```java
 public class ShallowCloneExample implements Cloneable {
@@ -894,7 +895,7 @@ Class 和 java.lang.reflect 一起对反射提供了支持。
 
 类加载相当于 Class 对象的加载，类在第一次使用时才动态加载到 JVM 中。
 
-使用 Class.forName() 方法
+（1）使用 Class.forName() 方法
 
 ```java
 // 这也是在反射需求中，常用的运用中获取 Class 对象的方式。
@@ -968,21 +969,21 @@ public Field[] getFields()
 // 所有已声明的成员变量，但不能得到其父类的成员变量。
 public Field[] getDeclaredFields();
 
-// 获取变量名为 name 的成员变量
+// 获取变量名为 name 的成员变量。
 public Field getField(String name)
 ```
 
-**（4）调用方法**
+**（5）调用方法**
 
 ```java
 // 当我们从类中获取了一个方法后，我们就可以用 invoke() 方法来调用这个方法。
-// obj 为相应的 Method 对象，args 为具体的参数值
+// obj 为相应的 Method 对象，args 为具体的参数值。
 public Object invoke(Object obj, Object... args)
         throws IllegalAccessException, IllegalArgumentException,
            InvocationTargetException
 ```
 
-**（5）创建数组**
+**（6）创建数组**
 
 数组在 Java 里是比较特殊的一种类型，它可以赋值给一个 Object Reference。
 
@@ -1002,23 +1003,20 @@ public Object invoke(Object obj, Object... args)
 
 ## 7.2 反射的优缺点
 
-**（1）反射的优点：**
+**（1）反射的优点**
 
 1. 提高了程序的灵活性和扩展性，降低耦合性。它允许程序创和控制任何类的对象，无需提前硬编码目标类。
-2. 调试器需要能够检查一个类里的私有成员。测试工具可以利用反射来自动地调用类里定义的可被发现的 API 定义，以确保一组测试中有较高的代码覆盖率。
+2. 调试器需要能够检查一个类里的私有成员。测试工具可以利用反射来自动地调用类里定义的可被发现的 API，以确保一组测试中有较高的代码覆盖率。
 
-**（2）反射的缺点：**
+**（2）反射的缺点**
 
 尽管反射非常强大，但也不能滥用。如果一个功能可以不用反射完成，那么最好就不用。在我们使用反射技术时，下面几条内容应该牢记于心。
 
-1. 性能开销：反射涉及了动态类型的解析，所以 JVM 无法对这些代码进行优化。因此，反射操作的效率要比那些非反射操作低。我们应该避免在经常被执行的代码或对性能要求很高的程序中使用反射。
+1. 性能开销：反射涉及了动态类型的解析，所以 JVM 无法对这些代码进行优化。因此，反射操作的效率要比非反射操作低。我们应该避免在经常被执行的代码或对性能要求很高的程序中使用反射。
 
-2. 安全限制：使用反射技术要求程序必须在一个没有安全限制的环境中运行。如果一个程序必须在有安全限制的环境中运行，如 Applet，那么这就是个问题了。
+2. 安全限制：使用反射技术要求程序必须在一个没有安全限制的环境中运行。如果一个程序必须在有安全限制的环境中运行，如 Applet，那么就是个问题了。
 
 3. 安全问题：由于反射可以忽略权限检查，因此可能会破坏封装性而导致安全问题.
-
-反射 (Reflection) 是 Java 程序开发语言的特征之一，它允许运行中的 Java 程序获取自身的信息，并且可以操作类或对象的内部属性。
-通过反射，我们可以在运行时获得程序或程序集中每一个类型的成员和成员的信息。
 
 # 八、异常
 
@@ -1085,14 +1083,14 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 - ElementType.TYPE_PARAMETER：类型参数（例如泛型）
 - ElementType.TYPE_USE：类型使用声明
 
-### 10.1.2 @Inherited 
+### 10.1.3 @Inherited 
 
 @Inherited 元注解是一个标记注解，@Inherited 阐述了某个被标注的类型是被继承的。如果一个使用了@Inherited 修饰的 annotation 类型被用于一个 class，则这个 annotation 将被用于该 class 的子类。
 
 # 十一、Type
 
 Type 是 Java 中所有类型的公共超级接口。
-Type 体系包括的类型：**原始类型**(raw types) 对应 Class、**参数化类型**(parameterized types) 对应 ParameterizedType、**数组类型**(array types) 对应 GenericArrayType、**类型变量**(type variables) 对应 TypeVariable、**基本类型**(primitive types) 对应 Class。
+Type 体系包括的类型：**原始类型**(raw types) 对应 Class，**参数化类型**(parameterized types) 对应 ParameterizedType，**数组类型**(array types) 对应 GenericArrayType，**类型变量**(type variables) 对应 TypeVariable，**基本类型**(primitive types) 对应 Class。
 - 原始类型：不仅仅包含我们平常所指的类，还包括枚举、数组、注解等。
 - 参数化类型：List<T>、Map<K,V> 等带有参数化的容器。
 - 数组类型：不是 String[] 、byte[] 等数组，而是带有泛型的数组 T[]。
@@ -1111,20 +1109,20 @@ Class 不是一个接口，而是对 Type 的一个实现类,是 Java 反射的�
 public interface ParameterizedType extends Type {
     /**
      * 以 Type[] 形式返回所有泛型的实际类型。
-     * 例如 Map<String,User> ，调用该方法则返回数组 Type[2]
+     * 例如 Map<String,User>，调用该方法则返回数组 Type[2]，
      * 其中 Type[0] 为 String，Type[1] 为 User。
      */
     Type[] getActualTypeArguments();
 
     /**
      * 返回表示类或接口的对象 {@code Type}。
-     * 例如 Map<K,V> 调用该方法，则返回接口 Map 。
+     * 例如 Map<K,V> 调用该方法，则返回接口 Map。
      */
     Type getRawType();
 
     /**
      * 返回该 Type 的所属者，也可以理解为内部类的所属者即为外部类。
-     * 例如 Map.Entry<String,Integer> 调用该方法，则返回接口 Map
+     * 例如 Map.Entry<String,Integer> 调用该方法，则返回接口 Map。
      */
     Type getOwnerType();
 }
