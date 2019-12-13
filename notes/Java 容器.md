@@ -1539,7 +1539,7 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
 }
 ```
 
-- loadFactor：控制数组存放数据的疏密程度，loadFactor 越趋近于 1，那么数组中存放的数据 (entry) 也就越多，也就越密，也就是会让链表的长度增加，loadFactor 越小，越趋近于 0，数组中存放的数据 (entry) 也就越少，也就越稀疏。
+loadFactor：控制数组存放数据的疏密程度，loadFactor 越趋近于 1，那么数组中存放的数据 (entry) 也就越多，也就越密，也就是会让链表的长度增加，loadFactor 越小，越趋近于 0，数组中存放的数据 (entry) 也就越少，也就越稀疏。
 
 loadFactor 太大导致查找元素效率低，太小导致数组的利用率低，存放的数据会很分散。loadFactor 的默认值为 0.75f ，是官方给出的一个比较好的临界值。
 

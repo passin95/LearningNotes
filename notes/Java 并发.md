@@ -168,7 +168,7 @@ private void init(ThreadGroup group, Runnable target, String name, long stackSiz
 
 Thread.sleep(millis) 会休眠当前线程一定的毫秒，该方法不会放弃 monitor 锁的所有权。
 
-该方法可能抛出 InterruptedException,因为异常不能跨线程传递回 main() 中，因此必须在所处线程进行处理，同时线程中抛出的其它异常也同样需要在所处线程进行处理。
+该方法可能抛出 InterruptedException，因为异常不能跨线程传递，所以必须在所处线程进行处理，同时线程中抛出的其它异常也同样需要在所处线程进行处理。
 
 #### 2.3.1.1 TimeUnit 代替 sleep
 
@@ -191,7 +191,7 @@ Thread.yield() 会使当前线程从 Running 状态转换为 Runnable 状态。
 
 ### 2.3.3 interrupt
 
-在说 interrupt 之前，先简单说说 Thread 对象的 stop() 为何被弃用，在调用 thread.stop() 方法后，线程会立即停止当前的线程的执行并永不再执行，使得软件具有非常大的不确定性，因此更推荐使用 interrupt，在线程的执行过程中 **让该线程自己选择在什么时候结束运行**。
+在说 interrupt 之前，先简单说说 thread.stop() 为何被弃用，在调用 thread.stop() 后，线程会立即停止当前的线程的执行并永不再执行，使得软件具有非常大的不确定性，因此更推荐使用 interrupt，在线程的执行过程中 **让该线程自己选择在什么时候结束运行**。
 
 #### 2.3.3.1 interrupt() 和 InterruptedException
 

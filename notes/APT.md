@@ -1,30 +1,22 @@
 
 
 
-# 编译时注解
 <!-- TOC -->
 
-- [编译时注解](#%E7%BC%96%E8%AF%91%E6%97%B6%E6%B3%A8%E8%A7%A3)
-  - [注解](#%E6%B3%A8%E8%A7%A3)
-  - [元注解](#%E5%85%83%E6%B3%A8%E8%A7%A3)
-    - [@Retention](#retention)
-    - [@Target](#target)
-    - [@Inherited](#inherited)
-  - [编译时注解框架](#%E7%BC%96%E8%AF%91%E6%97%B6%E6%B3%A8%E8%A7%A3%E6%A1%86%E6%9E%B6)
-    - [AbstractProcessor](#abstractprocessor)
-    - [Element](#element)
-    - [javapoet](#javapoet)
+- [一、元注解](#一元注解)
+    - [1.1 @Retention](#11-retention)
+    - [1.2 @Target](#12-target)
+- [二、APT 实现](#二apt-实现)
+    - [2.1 Module 结构](#21-module-结构)
+    - [2.2 AbstractProcessor](#22-abstractprocessor)
+        - [2.2.1 Element](#221-element)
+    - [2.3 JavaPoet 的使用](#23-javapoet-的使用)
 
 <!-- /TOC -->
 
+# 一、元注解
 
-## 注解
-
-Java 注解是附加在代码中的一些元信息，用于一些工具在编译、运行时进行解析和使用，起到说明、配置的功能。注解不会也不能影响代码的实际逻辑，仅仅起到辅助性的作用。
-
-注解本质是一个继承了 Annotation 的特殊接口，其具体实现类是 Java 运行时生成的动态代理类。而我们通过反射获取注解时，返回的是 Java 运行时生成的动态代理对象$Proxy1。通过代理对象调用自定义注解（接口）的方法，会最终调用 AnnotationInvocationHandler 的 invoke 方法。该方法会从 memberValues 这个 Map 中索引出对应的值。而 memberValues 的来源是 Java 常量池。
-
-## 元注解
+为了方便查阅，此处简述常用元注解的含义和取值。
 
 元注解就是用来定义注解的注解，java.lang.annotation 提供了四种元注解：
 
@@ -33,13 +25,13 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 - @Documented：是否将注解信息添加在 JavaDoc 文档中
 - @Inherited：是否允许子类继承该注解
 
-### @Retention
+## 1.1 @Retention
 
 - RetentionPolicy.SOURCE：在编译阶段丢弃。这些注解在开始编译阶段就不再有任何意义，所以它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解。
 - RetentionPolicy.CLASS：在类加载的时候丢弃。多用于写编译时注解框架，注解默认使用这种方式。
 - RetentionPolicy.RUNTIME：始终不会丢弃，运行期也保留该注解，因此使用在需要反射机制读取该注解的信息的时候。
 
-### @Target
+## 1.2 @Target
 
 - ElementType.TYPE：类、接口 (包括注解类型) 或 Enum 声明
 - ElementType.FIELD：成员变量、对象、属性（包括 Enum 实例）
@@ -52,22 +44,28 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 - ElementType.TYPE_PARAMETER：类型参数（例如泛型）
 - ElementType.TYPE_USE：类型使用声明
 
-### @Inherited 
+# 二、APT 实现
 
-@Inherited 元注解是一个标记注解，@Inherited 阐述了某个被标注的类型是被继承的。如果一个使用了@Inherited 修饰的 annotation 类型被用于一个 class，则这个 annotation 将被用于该 class 的子类。
+## 2.1 Module 结构
 
-
-## 编译时注解框架
-
-https://blog.csdn.net/lmj623565791/article/details/51931859
-
-Module 结构：
-
-- x-annotation：存放注解。
+- x-annotation：存放自定义注解。
 - x-compiler：用于编写注解处理器，里面的代码不会被打包进 apk。
-- x-api：对用户提供的 API。
+- x-api：对用户提供的 API，就是正常编写的代码以及 APT 生成的代码。
 
-### AbstractProcessor
+一般情况下 x-compiler 和 x-api 都会依赖 x-annotation。
+
+除此之外在 x-compiler 模块，还会依赖 2 个库以方便开发。
+
+```java
+implementation 'com.google.auto.service:auto-service:1.0-rc6'
+implementation 'com.squareup:javapoet:1.11.1'
+```
+
+- AutoService：会自动在META-INF文件夹下生成 Processor 配置信息文件，该文件里就是实现该服务接口的具体实现类。而当外部程序装配这个模块的时候，就能通过该 jar 包 META-INF/services/ 里的配置文件找到具体的实现类名，并装载实例化完成模块的注入。除吃
+
+- JavaPoet：用于方便生成 .java 源文件的 Java API。它的优势在于通过简单易懂的 Java API 在编译器生成代码。
+
+## 2.2 AbstractProcessor 
 
 ```java
 public abstract class BaseProcessor extends AbstractProcessor {
@@ -89,27 +87,30 @@ public abstract class BaseProcessor extends AbstractProcessor {
 }
 ```
 
-- Filer：跟文件相关的辅助类，用于生成 JavaSourceCode。
-- Elements：元素相关的辅助类，用于去获取一些元素相关的信息。
-- Types：类型辅助类，用于判断类型之间的
+- Filer：跟文件相关的辅助类，用于生成 JavaSourceCode；
+- Elements：元素相关的辅助类，用于去获取一些元素相关的信息；
+- Types：类型辅助类，用于判断类型之间是否存在某种关系；
 - Messager：日志辅助类。
 
-### Element 
+### 2.2.1 Element
 
-- VariableElement 成员变量、枚举、局部变量、方法参数
-- ExecutableElement 类中的方法
-- TypeElement 类、接口、注解
-- TypeParameterElement 类的泛型
-- PackageElement 包名
+- VariableElement：成员变量、枚举、局部变量、方法参数；
+- ExecutableElement：类中的方法；
+- TypeElement：类、接口、注解；
+- TypeParameterElement：类的泛型；
+- PackageElement：包名。
 
-### javapoet
+## 2.3 JavaPoet 的使用
 
 - MethodSpec：代表一个构造函数或方法声明。
 - TypeSpec：代表一个类，接口，或者枚举。
 - FieldSpec：代表一个成员变量，一个字段。
 - JavaFile：包含一个顶级类的 Java 文件。
 
-以下实例为了方便展示，注解和响应的类文件都在一个 Module，实际开发，可以使用 mElements.getTypeElement(类文件路径) 拿到相应的类信息。
+以下实例为了方便展示，将注解和响应的类文件都在一个 Module。
+
+在实际开发中，可以使用 mElements.getTypeElement(类文件路径) 拿到相应的类信息，再通过 ClassName.get(Element) 拿到 ClassName。
+
 ```java
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
