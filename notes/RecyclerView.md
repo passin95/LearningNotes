@@ -13,7 +13,9 @@
             - [2.1.3.4 缓存池小结](#2134-缓存池小结)
     - [2.2 自定义 LayoutManager 流程](#22-自定义-layoutmanager-流程)
     - [2.3 回收复用的实现思路](#23-回收复用的实现思路)
-    - [2.4 实战](#24-实战)
+    - [2.4 技巧](#24-技巧)
+    - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
+    - [2.4.2 滑动时回收](#242-滑动时回收)
 
 <!-- /TOC -->
 
@@ -464,6 +466,8 @@ RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setVie
 
 **（2）在 scrollVerticallyBy 滑动时**
 
+都得控制一个变量作为累计偏移量。
+
 方式一：
 
 1. 先判断在滚动 dy 距离后，哪些 ViewHolder 需要回收，需要回收的 ViewHolder 就调用 removeAndRecycleView(child, recycler) 先将它回收。
@@ -476,6 +480,24 @@ RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setVie
 2. 调用 detachAndScrapAttachedViews(recycler)，暂时分离所有子 View。
 2. 重新遍历所有 Item（根据需求可优化遍历的数量），添加撑满一屏的 Item 数即可，不要多创建。
 
-## 2.4 实战
+## 2.4 技巧
+
+## 2.4.1 getChildDrawingOrder()
+
+重写 getChildDrawingOrder() 可改变子 View 的绘制顺序。
+
+## 2.4.2 滑动时回收
+
+在滑动过程中，可以把 mAttachedScrap 中的缓存全部放进 mRecyclerPool 中，mAttachedScrap 中可重用的 ViewHolder 已经在 onLayoutChildren() 中复用。
+
+```java
+private void recycleChildren(RecyclerView.Recycler recycler) {
+    List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
+    for (int i = 0; i < scrapList.size(); i++) {
+        RecyclerView.ViewHolder holder = scrapList.get(i);
+        removeAndRecycleView(holder.itemView, recycler);
+    }
+}
+```
 
 // 未完待续
