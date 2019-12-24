@@ -28,11 +28,11 @@
 
 - [触摸反馈](./触摸反馈.md)
 
-  事件分发机制、触摸反馈流程以及触摸反馈算法的编写。
+  MotionEvent、事件分发机制、触摸反馈算法、手势检测、滑动、拖拽。
 
 - [NestedScrolling](./NestedScrolling.md)
 
-  NestedScrolling 解析。
+  NestedScrolling 分析。
 
 - [RecyclerView](./RecyclerView.md)
 
@@ -43,3 +43,4 @@
 
 - [HenCoder - 扔物线](https://hencoder.com/)
 - [自定义控件 - GcsSloop](http://www.gcssloop.com/category/customvie/)
+- [HenCoderPlus 例题 - 扔物线](https://github.com/rengwuxian/HenCoderPlus/)

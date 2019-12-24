@@ -3,14 +3,15 @@
 
 <!-- TOC -->
 
-- [一、元注解](#一元注解)
-    - [1.1 @Retention](#11-retention)
-    - [1.2 @Target](#12-target)
-- [二、APT 实现](#二apt-实现)
-    - [2.1 Module 结构](#21-module-结构)
-    - [2.2 AbstractProcessor](#22-abstractprocessor)
-        - [2.2.1 Element](#221-element)
-    - [2.3 JavaPoet 的使用](#23-javapoet-的使用)
+- [一、元注解](#%E4%B8%80%E5%85%83%E6%B3%A8%E8%A7%A3)
+  - [1.1 @Retention](#11-retention)
+  - [1.2 @Target](#12-target)
+- [二、APT 实现](#%E4%BA%8Capt-%E5%AE%9E%E7%8E%B0)
+  - [2.1 Module 结构](#21-module-%E7%BB%93%E6%9E%84)
+  - [2.2 AbstractProcessor](#22-abstractprocessor)
+    - [2.2.1 Element](#221-element)
+    - [2.2.1 RoundEnvironment](#221-roundenvironment)
+  - [2.3 JavaPoet 的使用](#23-javapoet-%E7%9A%84%E4%BD%BF%E7%94%A8)
 
 <!-- /TOC -->
 
@@ -61,7 +62,7 @@ implementation 'com.google.auto.service:auto-service:1.0-rc6'
 implementation 'com.squareup:javapoet:1.11.1'
 ```
 
-- AutoService：会自动在META-INF文件夹下生成 Processor 配置信息文件，该文件里就是实现该服务接口的具体实现类。而当外部程序装配这个模块的时候，就能通过该 jar 包 META-INF/services/ 里的配置文件找到具体的实现类名，并装载实例化完成模块的注入。除吃
+- AutoService：会自动在 META-INF 文件夹下生成 Processor 配置信息文件，该文件里就是实现该服务接口的具体实现类。而当外部程序装配这个模块的时候，就能通过该 jar 包 META-INF/services/ 里的配置文件找到具体的实现类名，并装载实例化完成模块的注入。除吃
 
 - JavaPoet：用于方便生成 .java 源文件的 Java API。它的优势在于通过简单易懂的 Java API 在编译器生成代码。
 
@@ -84,6 +85,10 @@ public abstract class BaseProcessor extends AbstractProcessor {
         mTypes = processingEnv.getTypeUtils();
         mElements = processingEnv.getElementUtils();
     }
+
+    public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+
+    }
 }
 ```
 
@@ -94,12 +99,47 @@ public abstract class BaseProcessor extends AbstractProcessor {
 
 ### 2.2.1 Element
 
+Element 有以下几种类型：
+
 - VariableElement：成员变量、枚举、局部变量、方法参数；
 - ExecutableElement：类中的方法；
 - TypeElement：类、接口、注解；
 - TypeParameterElement：类的泛型；
 - PackageElement：包名。
 
+Element 常用方法说明：
+
+- Element.getKind()：获取元素类型；
+- ExecutableElement.getReturnType().getKind()：获得方法返回类型；
+- VariableElement.asType().getKind()：获得参数类型；
+
+### 2.2.1 RoundEnvironment
+
+```java
+public interface RoundEnvironment {
+    /**
+     * 此 round 生成的类型不是以注释处理的后续 round 为准，则返回 true；否则返回 false。
+     */
+    boolean processingOver();
+    /**
+     * 在之前的其它 round 中发生错误，则返回 true；否则返回 false。
+     */
+    boolean errorRaised();
+    /**
+     * 返回 round 生成的注释处理根元素，例如 Activity 类对象，它的一级子元素则是变量、方法、内部类等，它的上级元素是包名。
+     */
+    Set<? extends Element> getRootElements();
+    /**
+     * 返回使用给定注释类型注释的元素。
+     */
+    Set<? extends Element> getElementsAnnotatedWith(TypeElement var1);
+    /**
+     * 返回给定注释类型注释的元素。
+     */
+    Set<? extends Element> getElementsAnnotatedWith(Class<? extends Annotation> var1);
+}
+
+```
 ## 2.3 JavaPoet 的使用
 
 - MethodSpec：代表一个构造函数或方法声明。

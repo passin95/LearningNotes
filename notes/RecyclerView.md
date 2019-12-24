@@ -1,21 +1,25 @@
 
 <!-- TOC -->
 
-- [一、自定义 ItemDecoration](#一自定义-itemdecoration)
-- [二、自定义 LayoutManager](#二自定义-layoutmanager)
-    - [2.1 常用方法](#21-常用方法)
-        - [2.1.1 测量](#211-测量)
-        - [2.1.2 布局](#212-布局)
-        - [2.1.3 回收复用](#213-回收复用)
-            - [2.1.3.1 detachAndScrapAttachedViews()](#2131-detachandscrapattachedviews)
-            - [2.1.3.2 removeAndRecycleView()](#2132-removeandrecycleview)
-            - [2.1.3.3 getViewForPosition()](#2133-getviewforposition)
-            - [2.1.3.4 缓存池小结](#2134-缓存池小结)
-    - [2.2 自定义 LayoutManager 流程](#22-自定义-layoutmanager-流程)
-    - [2.3 回收复用的实现思路](#23-回收复用的实现思路)
-    - [2.4 技巧](#24-技巧)
-    - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
-    - [2.4.2 滑动时回收](#242-滑动时回收)
+- [一、自定义 ItemDecoration](#%E4%B8%80%E8%87%AA%E5%AE%9A%E4%B9%89-itemdecoration)
+- [二、自定义 LayoutManager](#%E4%BA%8C%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager)
+  - [2.1 常用方法](#21-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95)
+    - [2.1.1 测量](#211-%E6%B5%8B%E9%87%8F)
+    - [2.1.2 布局](#212-%E5%B8%83%E5%B1%80)
+    - [2.1.3 回收复用](#213-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
+      - [2.1.3.1 detachAndScrapAttachedViews()](#2131-detachandscrapattachedviews)
+      - [2.1.3.2 removeAndRecycleView()](#2132-removeandrecycleview)
+      - [2.1.3.3 getViewForPosition()](#2133-getviewforposition)
+      - [2.1.3.4 缓存池小结](#2134-%E7%BC%93%E5%AD%98%E6%B1%A0%E5%B0%8F%E7%BB%93)
+  - [2.2 自定义 LayoutManager 流程](#22-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
+  - [2.3 回收复用的实现思路](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
+  - [2.4 技巧](#24-%E6%8A%80%E5%B7%A7)
+  - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
+  - [2.4.2 滑动时回收](#242-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
+  - [三、RecyclerView 性能优化](#%E4%B8%89recyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
+    - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
+    - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
+    - [3.3 DiffUtil](#33-diffutil)
 
 <!-- /TOC -->
 
@@ -498,6 +502,22 @@ private void recycleChildren(RecyclerView.Recycler recycler) {
         removeAndRecycleView(holder.itemView, recycler);
     }
 }
+
 ```
 
 // 未完待续
+
+## 三、RecyclerView 性能优化
+
+### 3.1 RecyclerView.setHasFixdSize()
+
+若 Adapter 的数据变化不会导致 RecyclerView 的大小变化，则将该方法设置为 true。它可以在 RecyclerView 内容发生变化时不需要调用 requestLayout()，而直接对子 View 进行 layout。
+
+### 3.2 RecyclerView.setRecycledViewPool()
+
+多个 RecyclerView 在 viewType 一样（布局文件也一致）的情况下可以共用同一个 RecycledViewPool，例如订单的不同状态使用了多个 RecyclerView。
+
+### 3.3 DiffUtil
+
+适用于整个页面需要刷新，但是部分数据可能相同的情况（是否相同的标准由开发者决定）。它可以比较出不同的数据源进行局部刷新（局部刷新可以是某个 ViewHolder 的全量刷新或是单单某个 View 的方法调用），达到最小刷新的效果。具体的使用方式可看
+https://github.com/CymChad/BaseRecyclerViewAdapterHelper/blob/master/library/src/main/java/com/chad/library/adapter/base/BaseQuickAdapter.java。
