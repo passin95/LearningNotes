@@ -80,9 +80,9 @@
 
 ### :pencil2: 算法 
 
-- [LeetCode](./notes/LeetCode.md)
+- [算法](./notes/算法.md)
 
-  LeetCode 题解。
+  常用数据结构。
 
 ### :hammer: 工具 
 
@@ -113,6 +113,10 @@
 - [博客推荐](./notes/博客推荐.md)
 
   优质博客推荐。
+
+- [ggtalk](https://talk.swift.gg/)
+
+  这是一个接地气、有价值的闲聊节目。
 
 ### :bulb: 编码规范
 

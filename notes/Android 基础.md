@@ -1,30 +1,30 @@
 <!-- TOC -->
 
-- [一、生命周期](#一生命周期)
-    - [1.1 Activity 的生命周期](#11-activity-的生命周期)
-    - [1.2 Fragment 的生命周期](#12-fragment-的生命周期)
-        - [1.2.1 Fragment 之间切换](#121-fragment-之间切换)
-    - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-和-onrestoreinstancestate)
-    - [1.4 其余情况补充](#14-其余情况补充)
-    - [1.5 Application 的生命周期](#15-application-的生命周期)
-- [二、Activity 标签属性](#二activity-标签属性)
-- [三、Activity LaunchMode](#三activity-launchmode)
-    - [3.1 FLAG](#31-flag)
-    - [3.2 补充说明](#32-补充说明)
-- [四、IntentFilter 的匹配规则](#四intentfilter-的匹配规则)
-    - [4.1 action 的匹配规则](#41-action-的匹配规则)
-    - [4.2 category 的匹配规则](#42-category-的匹配规则)
-    - [4.3 data 的匹配规则](#43-data-的匹配规则)
-    - [4.4 注意事项](#44-注意事项)
-- [五、Service](#五service)
-    - [5.1 Androidmanifest Serivce 属性说明](#51-androidmanifest-serivce-属性说明)
-    - [5.2 前台 Service 和后台 Service](#52-前台-service-和后台-service)
-    - [5.3 远程 Service](#53-远程-service)
-    - [5.4 IntentSerivce](#54-intentserivce)
-- [六、BroadcastReceiver](#六broadcastreceiver)
-    - [6.1 BroadcastReceiver 的使用](#61-broadcastreceiver-的使用)
-    - [6.2 广播类型](#62-广播类型)
-- [参考资料](#参考资料)
+- [一、生命周期](#%E4%B8%80%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+  - [1.1 Activity 的生命周期](#11-activity-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+  - [1.2 Fragment 的生命周期](#12-fragment-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+    - [1.2.1 Fragment 之间切换](#121-fragment-%E4%B9%8B%E9%97%B4%E5%88%87%E6%8D%A2)
+  - [1.3 onSaveInstanceState() 和 onRestoreInstanceState()](#13-onsaveinstancestate-%E5%92%8C-onrestoreinstancestate)
+  - [1.4 其余情况补充](#14-%E5%85%B6%E4%BD%99%E6%83%85%E5%86%B5%E8%A1%A5%E5%85%85)
+  - [1.5 Application 的生命周期](#15-application-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+- [二、Activity 标签属性](#%E4%BA%8Cactivity-%E6%A0%87%E7%AD%BE%E5%B1%9E%E6%80%A7)
+- [三、Activity LaunchMode](#%E4%B8%89activity-launchmode)
+  - [3.1 FLAG](#31-flag)
+  - [3.2 补充说明](#32-%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E)
+- [四、IntentFilter 的匹配规则](#%E5%9B%9Bintentfilter-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.1 action 的匹配规则](#41-action-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.2 category 的匹配规则](#42-category-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.3 data 的匹配规则](#43-data-%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99)
+  - [4.4 注意事项](#44-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
+- [五、Service](#%E4%BA%94service)
+  - [5.1 Androidmanifest Serivce 属性说明](#51-androidmanifest-serivce-%E5%B1%9E%E6%80%A7%E8%AF%B4%E6%98%8E)
+  - [5.2 前台 Service 和后台 Service](#52-%E5%89%8D%E5%8F%B0-service-%E5%92%8C%E5%90%8E%E5%8F%B0-service)
+  - [5.3 远程 Service](#53-%E8%BF%9C%E7%A8%8B-service)
+  - [5.4 IntentSerivce](#54-intentserivce)
+- [六、BroadcastReceiver](#%E5%85%ADbroadcastreceiver)
+  - [6.1 BroadcastReceiver 的使用](#61-broadcastreceiver-%E7%9A%84%E4%BD%BF%E7%94%A8)
+  - [6.2 广播类型](#62-%E5%B9%BF%E6%92%AD%E7%B1%BB%E5%9E%8B)
+- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- /TOC -->
 
@@ -146,7 +146,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理。若 Intent 添加 FLAG_ACTIVITY_NEW_TASK ，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity。其它正常使用的情况皆为 onActivityResult（B），注意若 Activity 是重建后的 Activity，那么会先初始化 Activity ，再执行 onRestoreInstanceState，再执行 onActivityResult（B），此时应该针对实际业务需求，再 onActivityResult 中进行判断，最后的结果应当是要不完全恢复正确的结果，要不不恢复保留初始化后的结果（即在 onActivityResult 判断当前界面是否是重建后的调用）。
 
-（5） Activity A 跳转到 Activity B（不透明）的生命周期为：onPause（A）-> onCreate(B) -> onStart(B) -> onResume(B) -> onStop(A) ，在 onPause(A) post 出去的 Message 先于 onStop（B）执行，晚于 onResume(B) 执行。
+（5） Activity A 跳转到 Activity B（不透明）的生命周期为：onPause（A）-> onCreate(B) -> onStart(B) -> onResume(B) -> onStop(A) ，在 onPause(A) post 出去的 Message 先于 onResume(B) 执行。
 
 ## 1.5 Application 的生命周期
 
@@ -243,7 +243,7 @@ aciton 是一个字符串，一个过滤规则可以有多个 action，只要 In
 
 ## 4.2 category 的匹配规则
 
-category 是一个字符串，一个 Intent 或 过滤规则中可以添加多个 category，如果 Intent 添加了 category，那么它的所有 category 都应该在过滤规则中添加，才算完全匹配从而成功启动目标 Activity；如果 Intent 中没有添加 category，则在 startActivity 的时候会默认添加 “android.intent.category.DEFAULT” 这个 category。
+category 是一个字符串，一个 Intent 或过滤规则中可以添加多个 category，如果 Intent 添加了 category，那么它的所有 category 都应该在过滤规则中添加，才算完全匹配从而成功启动目标 Activity；如果 Intent 中没有添加 category，则在 startActivity 的时候会默认添加 “android.intent.category.DEFAULT” 这个 category。
 
 ## 4.3 data 的匹配规则
 

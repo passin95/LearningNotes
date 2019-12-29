@@ -29,8 +29,8 @@
 ## 1.1 @Retention
 
 - RetentionPolicy.SOURCE：在编译阶段丢弃。这些注解在开始编译阶段就不再有任何意义，所以它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解。
-- RetentionPolicy.CLASS：在类加载的时候丢弃。多用于写编译时注解框架，注解默认使用这种方式。
-- RetentionPolicy.RUNTIME：始终不会丢弃，运行期也保留该注解，因此使用在需要反射机制读取该注解的信息的时候。
+- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。多用于写编译时注解框架，注解默认使用这种方式。
+- RetentionPolicy.RUNTIME：注释将由编译器记录在类文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解的信息的时候。
 
 ## 1.2 @Target
 
@@ -85,7 +85,7 @@ public abstract class BaseProcessor extends AbstractProcessor {
         mTypes = processingEnv.getTypeUtils();
         mElements = processingEnv.getElementUtils();
     }
-
+    
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
     }
@@ -159,6 +159,7 @@ public class TestProcessor extends BaseProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+        // 类名
         TypeSpec typeSpec = TypeSpec.classBuilder("HelloWorld")
                 .addAnnotation(ClassAnnotation.class)
                 .addModifiers(Modifier.PUBLIC)

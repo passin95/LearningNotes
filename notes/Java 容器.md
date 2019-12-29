@@ -1,24 +1,24 @@
 <!-- TOC -->
 
-- [一、概述](#一概述)
-    - [1.1 名词说明](#11-名词说明)
-        - [1.1.1 RandomAccess](#111-randomaccess)
-        - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-和-failsafe)
-    - [1.2 Collection](#12-collection)
-        - [1.2.1 List](#121-list)
-        - [1.2.2 Set](#122-set)
-        - [1.2.3 Queue](#123-queue)
-    - [1.3 Map](#13-map)
-    - [1.4 Arrays.asList()](#14-arraysaslist)
-- [二、源码分析](#二源码分析)
-    - [2.1 ArrayList](#21-arraylist)
-        - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
-    - [2.2 LinkedList](#22-linkedlist)
-    - [2.3 HashMap](#23-hashmap)
-        - [2.3.1 成员变量和构造函数](#231-成员变量和构造函数)
-        - [2.3.2 存储结构](#232-存储结构)
-        - [2.3.3 put、get、resize](#233-putgetresize)
-        - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-线程安全方案-hashtableconcurrenthashmapcollectionssynchronizedmap-对比)
+- [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
+  - [1.1 名词说明](#11-%E5%90%8D%E8%AF%8D%E8%AF%B4%E6%98%8E)
+    - [1.1.1 RandomAccess](#111-randomaccess)
+    - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-%E5%92%8C-failsafe)
+  - [1.2 Collection](#12-collection)
+    - [1.2.1 List](#121-list)
+    - [1.2.2 Set](#122-set)
+    - [1.2.3 Queue](#123-queue)
+  - [1.3 Map](#13-map)
+  - [1.4 Arrays.asList()](#14-arraysaslist)
+- [二、源码分析](#%E4%BA%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [2.1 ArrayList](#21-arraylist)
+    - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-vectorcopyonwritearraylistcollectionssynchronizedlist-%E5%AF%B9%E6%AF%94)
+  - [2.2 LinkedList](#22-linkedlist)
+  - [2.3 HashMap](#23-hashmap)
+    - [2.3.1 成员变量和构造函数](#231-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
+    - [2.3.2 存储结构](#232-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
+    - [2.3.3 put、get、resize](#233-putgetresize)
+    - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-hashtableconcurrenthashmapcollectionssynchronizedmap-%E5%AF%B9%E6%AF%94)
 
 <!-- /TOC -->
 
@@ -330,7 +330,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * 深拷贝
+     * 深拷贝。
      */
     public Object clone() {
         try {
@@ -419,13 +419,13 @@ public class ArrayList<E> extends AbstractList<E>
         // 先将原索引 index 及之后的元素复制到原索引位置的后一位（索引加一）。
         System.arraycopy(elementData, index, elementData, index + 1,
                          size - index);
-        // 赋值
+        // 赋值。
         elementData[index] = element;
         size++;
     }
 
     /**
-     * 删除该列表中指定位置的元素，并返回删除的元素.
+     * 删除该列表中指定位置的元素，并返回删除的元素。
      */
     public E remove(int index) {
         rangeCheck(index);
@@ -693,8 +693,8 @@ public boolean add(E e) {
     try {
         Object[] elements = getArray();
         int len = elements.length;
-        // 每一次写操作在一个复制的数组上进行，读操作还是在原始数组中进行，读写分离，互不影响。
-        // 但也因此消耗了更多的内存。
+        // 每一次写操作在一个复制的数组上进行，若读操作此时进来还是在原始数组中进行，
+        // 读写分离，互不影响，但也因此消耗了更多的内存。
         Object[] newElements = Arrays.copyOf(elements, len + 1);
         newElements[len] = e;
         // 写操作结束之后需要把原始数组指向新的复制数组。
@@ -737,7 +737,7 @@ LinkedList 的特性：
 
 1. 实现了 Cloneable 接口，即覆盖了函数 clone()，能被克隆。
 2. 实现了 Serializable 接口，这意味着 ArrayList 支持 Serializable 序列化。
-3. 实现了 Deque 接口，它拥有队列的特性。
+3. 实现了 Deque 接口，它拥有双端队列的特性。
 4. 支持高效的插入和删除操作，在索引上需要遍历链表，因此相对较慢。
 
 我们先看一下链表的节点类 Node。因此链表的本质就是围绕着节点的前驱节点和后驱节点设置引用对象。
