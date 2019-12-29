@@ -32,6 +32,7 @@
   - [2.8 高级命令](#28-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4)
     - [2.8.1 git cherry-pick](#281-git-cherry-pick)
     - [2.8.2 git describe](#282-git-describe)
+    - [2.8.3 交互式 rebase](#283-%E4%BA%A4%E4%BA%92%E5%BC%8F-rebase)
 - [三、本质解析](#%E4%B8%89%E6%9C%AC%E8%B4%A8%E8%A7%A3%E6%9E%90)
   - [3.1 merge](#31-merge)
   - [3.2 rebase](#32-rebase)
@@ -47,7 +48,7 @@
 
 # 一、基本概念
 
-commit id：对提交的信息数据进行一个 SHA1 算法所得，该 id 几乎不会重复。
+commit id：对提交的信息数据进行一个 SHA1 算法所得，该 id 几乎不会重复。并且每个 commit 真正意义上是不可修改的，下文的修改 commit 都是指生成一个新的 commit 代替了旧的 commit。
 
 工作区：日常情况下，工作使用的目录和文件。
 
@@ -59,7 +60,7 @@ unstaged changes：Git 跟踪的（在版本库中存在的）但并未添加到
 
 untracked files：在工作目录中新添加的文件。
 
-HEAD：它所指向的 commit 永远是我们所看到的该次 commit 的内容。
+HEAD：它永远指向当下的 commit。
 
 master：本地仓库默认分支，一般作为主分支使用。
 
@@ -72,7 +73,6 @@ HEAD，master，origin/master，origin/HEAD 等概念都类似于内存中的指
 <div align="center">
 <img src="../pictures//a1198642-9159-4d88-8aec-c3b04e7a2563.jpg" />
 </div>
-
 
 # 二、Git 命令
 
@@ -143,7 +143,7 @@ git log --oneline
 
 git reflog
 
-查看所有引用的移动过程。
+查看 HEAD 引用的移动过程。
 
 git reflog <name>
 
@@ -275,8 +275,7 @@ git revert <commit id>
 
 ### 2.5.1 git reset
 
-git reset 命令都会带着 HEAD 所指向的分支一起移动，例如 HEAD 此时指向 master，执行
-git reset HEAD^ 命令，则此时 master 指向该 commit，HEAD 指向 master。
+git reset 命令都会带着 HEAD 所指向的分支一起移动，例如 HEAD 此时指向 master，执行 git reset HEAD^ 命令，则此时 master 指向该 commit，HEAD 指向 master。
 
 ```
 git reset HEAD^(HEAD~1)
@@ -299,9 +298,6 @@ git reset --hard HEAD^
 
 将 HEAD 指向上一个 commit，并清空工作区和暂存区的修改。
 
-git reset --keep HEAD^
-
-将 HEAD 指向上一个 commit，清空暂存区，保留工作区，并处理工作区和指向 commit 的文件差异。
 ```
 
 ### 2.5.2 git checkout
@@ -468,8 +464,26 @@ git describe <ref>
 它会输出一段信息：<tag>_<numCommits>_g<hash>
 
 tag 表示的是离 ref 最近的标签， numCommits 是表示这个 ref 与 tag 相差有多少个提交记录， hash 表示的是你所给定的 ref 所表示的提交记录哈希值的前几位。
+```
+
+### 2.8.3 交互式 rebase 
 
 ```
+git rebase -i <commid id> or <branch name> or <HEAD^> or <HEAD~1>
+
+指定的 commit 到当前 commit 进行重新调整（增删改 commit）。
+```
+
+输入命令后会进入一个操作界面，并可指定不同 commit 的执行操作，操作的方式如下：
+
+- pick：什么都不修改；
+- reword：修改 commit 的提交信息；
+- edit：修改 commit 中的文件内容变动；
+- squash: 将指定 commit 和它前一个 commit 合成一个 commit，并支持修改 commit 的提交信息；
+- fixup：类似 squash，区别在于指定 commit 会丢失提交信息，直接使用上一个 commit 的提交信息。
+
+保存操作界面的修改后，若有 commit 涉及 edit 操作则会进入一个中间状态，之后操作都是基于该 commit 开始，在编辑完成后，输入 git rebase --continue 完成命令；反之直接修改成功。
+
 # 三、本质解析
 
 ## 3.1 merge
@@ -549,7 +563,9 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 
 # 六、.gitignore 文件
 
-使用 git add 命令时会忽略.gitignore 文件中的文件或目录。
+使用 git add 命令时会忽略 .gitignore 文件中的文件或目录。
+
+这个文件的规则对已经追踪的文件是没有效果的，此时需要使用命令 git rm --cached file 删除该文件以及对该文件的追踪。
 
 不需要全部自己编写，可以到 [https://github.com/github/gitignore](https://github.com/github/gitignore) 中进行查询。
 
