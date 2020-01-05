@@ -52,9 +52,9 @@
 
   布局、内存、APK 瘦身、电量、性能检测工具。
 
-- [AOP](./notes/AOP.md)
+- [Gradle 和 AOP](./notes/Gradle%20和%20AOP.md)
 
-  AOP 简述、APT、AspectJ、ASM。
+  Gradle、AOP、APT、AspectJ、ASM。
 
 - [Hybrid 开发](./notes/hybrid%20开发.md)
 

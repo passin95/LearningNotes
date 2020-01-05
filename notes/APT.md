@@ -6,7 +6,7 @@
 - [一、元注解](#%E4%B8%80%E5%85%83%E6%B3%A8%E8%A7%A3)
   - [1.1 @Retention](#11-retention)
   - [1.2 @Target](#12-target)
-- [二、APT 实现](#%E4%BA%8Capt-%E5%AE%9E%E7%8E%B0)
+- [二、APT](#%E4%BA%8Capt)
   - [2.1 Module 结构](#21-module-%E7%BB%93%E6%9E%84)
   - [2.2 AbstractProcessor](#22-abstractprocessor)
     - [2.2.1 Element](#221-element)
@@ -45,7 +45,9 @@
 - ElementType.TYPE_PARAMETER：类型参数（例如泛型）
 - ElementType.TYPE_USE：类型使用声明
 
-# 二、APT 实现
+# 二、APT
+
+APT（Annotation Processing Tool） 即为编译时注解处理器，可以用来在编译时扫描和处理注解。通过获取到注解和被注解对象的相关信息后，再根据需求自动生成类文件以及类中的代码，省去了手动编写。
 
 ## 2.1 Module 结构
 
@@ -62,7 +64,7 @@ implementation 'com.google.auto.service:auto-service:1.0-rc6'
 implementation 'com.squareup:javapoet:1.11.1'
 ```
 
-- AutoService：会自动在 META-INF 文件夹下生成 Processor 配置信息文件，该文件里就是实现该服务接口的具体实现类。而当外部程序装配这个模块的时候，就能通过该 jar 包 META-INF/services/ 里的配置文件找到具体的实现类名，并装载实例化完成模块的注入。除吃
+- AutoService：会自动在 META-INF 文件夹下生成 Processor 配置信息文件，该文件里就是实现该服务接口的具体实现类。而当外部程序装配这个模块的时候，就能通过该 jar 包 META-INF/services/ 里的配置文件找到具体的实现类名，并装载实例化完成模块的注入。
 
 - JavaPoet：用于方便生成 .java 源文件的 Java API。它的优势在于通过简单易懂的 Java API 在编译器生成代码。
 
@@ -98,6 +100,9 @@ public abstract class BaseProcessor extends AbstractProcessor {
 - Messager：日志辅助类。
 
 ### 2.2.1 Element
+
+Element接口族与Type接口族区别
+Element所代表的元素只在编译期可见，用于保存元素在编译期的各种状态，而Type所代表的元素是运行期可见，用于保存元素在运行期的各种状态。
 
 Element 有以下几种类型：
 

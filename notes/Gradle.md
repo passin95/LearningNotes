@@ -1,358 +1,567 @@
 
+<!-- TOC -->
 
-# Gradle
+- [一、Gradle 简介](#%E4%B8%80gradle-%E7%AE%80%E4%BB%8B)
+- [二、Gradle 的工作流程](#%E4%BA%8Cgradle-%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B)
+- [三、Task](#%E4%B8%89task)
+- [四、Extension](#%E5%9B%9Bextension)
+- [五、自定义 Plugin](#%E4%BA%94%E8%87%AA%E5%AE%9A%E4%B9%89-plugin)
+  - [5.1 模块内 build.gradle](#51-%E6%A8%A1%E5%9D%97%E5%86%85-buildgradle)
+  - [5.2 buildSrc](#52-buildsrc)
+  - [5.3 library](#53-library)
+- [六、Transform](#%E5%85%ADtransform)
 
-## 简介
+<!-- /TOC -->
+# 一、Gradle 简介
 
-Gradle 是基于 Groovy(语言) 的项目自动化构建开源工具。它可以管理项目中的差异(例如资源目录)、依赖、编译、打包、部署等等。
+Gradle 是基于依赖关系的项目自动化构建开源工具。它可以管理项目中的差异、依赖、编译、打包、部署等等。
 
-## Groovy
+Gradle 不单单是一个配置脚本，它的背后是几门语言，大体上可为分：
 
-Groovy是一门 jvm语言，它最终是要编译成class文件然后在jvm上执行，所以Java语言的特性Groovy都支持，我们完全可以混写Java和Groovy。
-Groovy提供了更加灵活简单的语法，大量的语法糖以及闭包特性可以让你用更少的代码来实现和Java同样的功能。
+- [Groovy Language](http://www.groovy-lang.org/api.html)
+- [Gradle DSL](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html)
+- [Android DSL](http://google.github.io/android-gradle-dsl/current/index.html)
 
-### Groovy API 文档
+DSL 的全称是 Domain Specific Language，领域特定语言，即只能用于特定的某个领域。
 
-学习Groovy最好的方式便是查 API 文档，因此本文的Demo都以实例为主，更详细的用法应当按需查找 API 学习和使用。
+对于 Android 开发者来说，Gradle 的架构可以分为三层：
 
-[http://www.groovy-lang.org/api.html](http://www.groovy-lang.org/api.html)
+- 最下层的是底层 Gradle 框架，它主要提供一些基础服务，如 Task 的依赖以及有向无环图的构建等；
+- 再上面的则是 Google 编译工具团队的 Android Gradle Plugin（即 com.android.tools.build:gradle:+），它在 Gradle 框架的基础上，创建了很多与 Android 项目打包有关的 Task、artifacts。
+- 最上面的则是开发者自定义的 Plugin，一般是在 Android Gradle plugin 提供的 Task 的基础上，插入一些自定义的 Task，或者是使用 Transform 在编译期进行字节码修改。
 
-[http://docs.groovy-lang.org/latest/html/groovy-jdk/index-all.html](http://docs.groovy-lang.org/latest/html/groovy-jdk/index-all.html)
+# 二、Gradle 的工作流程
 
+Gradle 的工作流程可以分为 3 个阶段：
 
-### 数据类型
+- 初始化阶段：setting.gradle 执行，确定主 project 和子 project。 
+- 配置阶段：执行所有在 setting.gradle 中配置的 project 下的 build.gradle（一般会包含很多 plugin），根据每一个的 Task 的依赖关系构建出一个有向无环图。
+- 执行阶段：根据确定的有向无环图，按顺序执行 Task（被依赖的 Task 会先于依赖它的 Task 执行，且每一个 Task 只会执行一次）。
 
-- Java中的基本数据类型
-- Java中的对象
-- Closure（闭包）
-- 加强的List、Map等集合类型
-- 加强的File、Stream等IO类型
+<div align="center">  <img src="../pictures//Gradle%20执行时序.webp"/> </div>
 
-类型可以显示声明，也可以用 def 来声明，用 def 声明的类型Groovy将会进行类型推断。
+因此:
 
-##### String
+- 若要在初始化阶段和配置阶段间插入执行代码，可写在 setting.gradle 文件的 **include()** 之后。
+- 若要在配置阶段和执行阶段间插入执行代码，则写在 Project.afterEvaluate() 方法的闭包回调中。
 
-```groovy
-def a = "hello"
-def b = "world"
-def c = "${a} ${b}"
-println c
+# 三、Task
 
-outputs:
-hello world
-```
-
-##### Closure（闭包）
-
-闭包类似于C语言中函数指针的东西，可以作为方法的参数和返回值，也可以作为一个变量而存在。
-
-```groovy
-def closure1 = { a, b ->
-   a + b
-}
-// 如果闭包不指定参数，那么它会有一个隐含的参数 it
-def closure2 = {
-   println "find ${it}, I am a closure!"
-}
-
-println closure1(100,200)
-println closure2(300)
-
-outputs:
-300
-find 300, I am a closure!
-```
-
-##### List 和 Map
-
-Groovy加强了Java中的集合类，比如List、Map、Set等。具体的实例如下：
-
-List:
-```groovy
-def test = [100, "hello", true]
-test[1] = "world"
-println test[0]
-println test[1]
-test << 200 // 列表尾部添加一个元素 200
-println test.size
-
-outputs:
-100
-world
-4
-```
-
-Map:
-```groovy
-def test = ["id":1, "name":"passin"]
-// value 可直接修改为其它类型
-test.id = "2" 
-println test.id
-
-outputs: 
-2
-```
-
-##### IO 
-
-在Groovy中，文件访问要比Java简单的多，不管是普通文件还是xml文件。
-
-```
-text.txt 文本内容：
-345
-123
-234
-```
+定义 Task 的方式很多，例如我们可以直接在 gradle 文件下添加一个 Task：
 
 ```groovy
-def file = new File("test.txt")
-println "read file using two parameters"
-file.eachLine {line,lineNo ->
-    println("${lineNo} ${line}")
-}
-println "read file using one parameters"
-file.eachLine { line ->
-    println "${line}"
+
+task task1{
+    println "configuration task1"
 }
 
-outputs: 
-read file using two parameters
-1 345
-2 123
-3 234
-read file using one parameters
-345
-123
-234    
-```
+task task2{
+    println "configuration task2"
+    // 发生在 configuration 阶段，在 task 创建过程中就会被执行。（例如 Sync Project with Gradle Files）
+    // 可以在配置阶段调用 dependsOn() 方法设置该 Task 执行所依赖的其它 Task。
+    doLast{
+        println "execution task2 doLast"
+        // 发生在 execution 阶段。
+        // 在当前 Task 的执行队列的后面插入代码。
+    }
+    doFirst{
+        println "execution task2 doFirst"
+        // 发生在 execution 阶段。
+        // 在当前 Task 的执行队列的头部插入代码。
+    }
+}
 
-除了eachLine，File还提供了很多Java所没有的方法，需要浏览下大概有哪些方法，然后需要用的时候再去查就行了，这就是学习Groovy的方式。
-
-而Groovy访问xml有两个类：XmlParser和XmlSlurper，二者几乎一样，主要是性别有些差别，XmlParser主要以 list的形式来表述GPath的，因此Node在可显性有着明显的优势,但需要额外的内存存储。而GPathResult采用iterators方式没有了额外空间消耗，但如果要访问最后一个node时候较费时。
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorPrimary">#F44336</color>
-    <color name="colorPrimaryDark">#D32F2F</color>
-    <color name="colorAccent">#536DFE</color>
-</resources>
-```
-
-```groovy
-def xml = new XmlParser().parse(new File("colors.xml"))
-println xml['color'].@name[0]
-println xml.color[1].@name
-println xml.color[2].text()
-
-outputs: 
-colorPrimary
-colorPrimaryDark
-#536DFE
-```
-
-### 语法和特性
-
-#### 常规语法
-
-- 语句后面的分号是可以省略的
-- 变量的类型和方法的返回值也是可以省略的
-- 方法调用时，括号也是可以省略的
-- 甚至语句中的return都是可以省略的
-
-在Groovy中很多东西都可以省略，他和kotlin的许多语法也相似，具体的写法选择一个适合自己或公司的写法便好。
-
-```groovy
-// 省略参数类型
-int hello(msg) {
-   // 省略括号
-   println msg 
-   // 省略 return
-   1            
+// 定义一个名为 task3 的 Task，属于 taskGroup 分组，并且依赖 task1 和 task2 两个 Task。
+project.task('task3', group: "taskGroup", description: "我是Task3", dependsOn: ["task1", "task2"]).doLast {
+    println "execution task3"
 }
 ```
 
-#### Class是一等公民
+在命令界面 Terminal 输入 gradlew task3，则相关的输出结果为：
 
-所有的Class类型对象，都可以省略.class。
+```
+> Configure project :app
+configuration task1
+configuration task2
+
+> Task :app:task2
+execution task2 doFirst
+execution task2 doLast
+
+> Task :app:task3
+execution task3
+```
+
+也可以自定义一个 Task 类：
 
 ```groovy
-func(File.class)
-func(File)
+class MyTask extends DefaultTask {
 
-def func(Class clazz) {
+    // 被 @TaskAction 注解的方法在该 Task 被调用时执行。
+    @TaskAction
+    def hello(){
+        println "Hello task"
+    }
+}
+
+
+// 注册 Task。
+project.getTasks().create("taskName", MyTask);
+```
+
+# 四、Extension
+
+（1）Extension 用于在 gradle 文件的数据配置。先看如何实现一个固定数量的配置项：
+
+```groovy
+class MyPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        // fruit 是配置名，project 是 Fruit 构造函数传参。
+        def extension = project.extensions.create("fruit", Fruit, project)
+    }
+
+    static class Fruit {
+        String versionName
+
+        Fruit(Project project) {
+            project.extensions.create("apple", Apple)
+            project.extensions.create("banana", Banana)
+        }
+    }
+
+    static class Apple {
+        String name
+        float weight
+    }
+
+    static class Banana {
+        String name
+        int size
+    }
 }
 ```
 
-#### Getter 和 Setter
-
-下面两个类完全一致，只有有属性就有Getter/Setter；同理，只要有Getter/Setter，那么它就有隐含属性。
+之后可在 gradle 文件进行配置：
 
 ```groovy
-class Book {
-    private String name;
+fruit{
+    versionName "fruit"
+    apple{
+        name "good apple"
+        weight 10f
+    }
 
-    String getName() { return name }
-
-    void setName(String name) { this.name = name }
+    banana{
+        name 'good banana'
+        size 10
+    }
 }
+```
 
-class Book {
-    String name
+（2）下面则是定义一个包含不定数量的配置项的 Extension：
+
+```groovy
+class MyPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        def instantiator = ((DefaultGradle) project.getGradle()).getServices().get(Instantiator.class)
+        NamedDomainObjectContainer<Student> studentContainer = project.container(Student, new StudentExtFactory(instantiator))
+        project.extensions.add('students', studentContainer)
+
+        project.afterEvaluate {
+            // 拿到 students 的配置信息并输出。
+            NamedDomainObjectContainer<Student> students = (NamedDomainObjectContainer<Student>) project.extensions.getByName("students");
+
+            students.forEach{
+                String format = String.format("name: %s , age: %s", it.getName(), it.getAge());
+                println("student : ${format}")
+            };
+        }
+    }
+
+    static class Student {
+        // 必须有一个 String name 属性，以及一个以 name 作为参数的构造函数。
+        String name
+        int age
+        boolean isMale
+
+        Student(String name) {
+            this.name = name
+        }
+    }
+
+    static class StudentExtFactory implements NamedDomainObjectFactory<Student> {
+        private Instantiator instantiator
+
+        StudentExtFactory(Instantiator instantiator) {
+            this.instantiator = instantiator
+        }
+
+        @Override
+        Student create(String name) {
+            // NamedDomainObjectFactory 是命名对象容器，创建的对象必须要有 name 属性作为容器内元素的标识。
+            return instantiator.newInstance(Student.class, name)
+        }
+    }
 }
 ```
 
-#### 判断是否为真
+之后便可在 gradle 文件进行配置：
 
 ```groovy
-if (name != null && name.length > 0) {}
+students{
+    passin{
+        age = 24
+        isMale = true
+    }
 
-if (name) {}
+    xiaohong{
+        age = 24
+        isMale = false
+    }
+}
 ```
 
-#### 简洁的三元表达式
+# 五、自定义 Plugin
+
+自定义 Gradle Plugin 有三种途径：
+
+- 模块内直接编写；
+- buildSrc 中编写；
+- library 模块中编写再发布到仓库进行依赖。
+
+## 5.1 模块内 build.gradle
+
+可以在 build.gradle 中直接编写并直接应用；
 
 ```groovy
-def result = name != null ? name : "Unknown"
+apply plugin: 'com.android.application'
 
-def result = name ?: "Unknown"
-```
-
-#### 简洁的非空判断
-
-```groovy
-if (order != null) {
-    if (order.getCustomer() != null) {
-        if (order.getCustomer().getAddress() != null) {
-            System.out.println(order.getCustomer().getAddress());
+class MyPlugin implements Plugin<Project>{
+    @Override
+    void apply(Project target) {
+        // 定义一个名为 Hello 的 Task。
+        target.task("Hello"){
+            println('Hello World')
         }
     }
 }
 
-println order?.customer?.address
+apply plugin: MyPlugin
 ```
 
-#### 使用断言
+接着在 Terminal 输入 gradlew -q Hello，其中 -q 是为了只输出关键信息，不输出日志信息。便可只执行指定的 Task **Hello**，最后的输出结果如下：
 
-使用assert来设置断言，当断言的条件为false时，程序将会抛出异常：
+```
+Hello World
+```
+
+缺点：只能在当前模块使用。
+
+## 5.2 buildSrc 
+
+buildSrc 的原理是：运行 Gradle 时，它会检查项目根目录是否存在一个名为 buildSrc 的目录。然后 Gradle 会自动编译目录下的代码，并将其放入构建脚本的类路径中。因此还可以利用它去 [管理项目的依赖](https://juejin.im/post/5b0fb0e56fb9a00a012b7fda)，让依赖支持自动补全和单击跳转。
+
+buildSrc 和 library 配置和使用 gradle 插件的方式几乎一致，区别在于 library 需要发布到 maven，因此具体的配置统一在下一小节说明。
+
+缺点：只能在当前工程中使用。但是可以用于 plugin 开发阶段的调试。
+
+## 5.3 library
+
+1. 新建一个模块，并对模块下的的 build.gradle 添加依赖：
 
 ```groovy
-def check(String name) {
-    // name 不能为null或者empty
-    assert name
-    // name 不能为null或者empty 并且长度大于3
-    assert name?.length() > 3
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+}
+repositories {
+    jcenter()
+}
+
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def artifactory_user = properties.getProperty("artifactory_user")
+def artifactory_password = properties.getProperty("artifactory_password")
+def artifactory_contextUrl = properties.getProperty("artifactory_contextUrl")
+def artifactory_snapshot_repoKey = properties.getProperty("artifactory_snapshot_repoKey") // 快照 key
+def artifactory_release_repoKey = properties.getProperty("artifactory_release_repoKey") // 正式版 key
+
+def artifact_group = 'me.passin' 
+def artifact_id = 'plugin' // 默认为项目名
+def artifact_version='0.0.1'
+
+group = 'me.passin'
+version = artifact_version
+
+def maven_type_snapshot = true // 是否是快照版本。
+def debug_flag = true // true: 部署到本地 maven 仓库，false：部署到 maven 私服。
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if (debug_flag) {
+                // 部署到本地
+                repository(url: uri('../repo-local')) 
+            } else {
+                //部署到远程 maven 仓库。
+                def repoKey = maven_type_snapshot ? artifactory_snapshot_repoKey : artifactory_release_repoKey
+                repository(url: "${artifactory_contextUrl}/${repoKey}") {
+                    authentication(userName: artifactory_user, password: artifactory_password)
+                }
+            }
+
+            pom.groupId = artifact_group
+            pom.artifactId = artifact_id
+            pom.version = artifact_version + (maven_type_snapshot ? '-SNAPSHOT' : '')
+
+            pom.project {
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+def siteUrl = '' // 项目主页。
+def gitUrl = '' // Git 仓库的 url。
+
+install {
+    repositories.mavenInstaller {
+        // 生成 pom.xml 和参数
+        pom {
+            project {
+                packaging 'jar' // 打包成 jar 包。
+                name 'Plugin'// 可选，项目名称。
+                description 'This is a plugin demo'// 可选，项目描述。
+                url siteUrl // 项目主页，这里是引用上面定义好。
+
+                // 开源协议
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'passin95' // 填写 Bintray 的用户名。
+                        name 'passin' // 开发者名字。
+                        email 'zengbinbinpassin@foxmail.com' // 开发者邮箱。
+                    }
+                }
+
+                scm {
+                    connection gitUrl // Git 仓库地址。
+                    developerConnection gitUrl // Git 仓库地址。
+                    url siteUrl // 项目主页。
+                }
+            }
+        }
+    }
+}
+
+//Properties properties = new Properties()
+//properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user") // Bintray 的用户名。
+    key = properties.getProperty("bintray.apikey") // Bintray 的 ApiKey。
+
+    pkg {
+        repo = "maven"  // 在 Bintray 创建的 maven 仓库名。
+        name = "Plugin"  // 发布到 Bintray 上的项目名。
+        licenses = ["Apache-2.0"] // 协议。
+        websiteUrl = siteUrl // 项目主页。
+        vcsUrl = gitUrl // Git 仓库的 url。
+        publish = true // 是否是公开项目。
+//        userOrg = properties.getProperty("bintray.userOrg") // Bintray 的用户名。
+    }
+    configurations = ['archives']
+}
+
+task sourcesJar(type: Jar) {
+    from project.file('src/main/groovy')
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
 }
 ```
 
-#### switch方法
+2. 若使用 kotlin、java 则在 src/main/java 目录下编写代码；若使用 groovy 则在 src/main/groovy 目录下编写代码。
 
 ```groovy
-def switchTest(def x) {
-    def result = ""
-    switch (x) {
-        case "foo": result = "found foo "
-        case "bar": result += "bar"
-            break
-        case [4, 5, 6, 'inList']: result = "list"
-            break
-        case 12..30: result = "range"
-            break
-        case Integer: result = "integer"
-            break
-        case Number: result = "number"
-            break
-        case { it > 3 }: result = "number > 3"
-            break
-        default: result = "default"
-    }
-    return result
-}
-```
+package me.passin.plugin
 
-#### ==和equals
-
-在Groovy中，==相当于Java的equals，，如果需要比较两个对象是否是同一个，需要使用.is()。
-
-```groovy
-class Book {
-    private String name;
-
-    Book(String name) {
-        this.name = name
-    }
+class MyPlugin implements Plugin<Project> {
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return new Book(name)
+    void apply(Project target) {
+        def extension = target.extensions.create("passin", Extension)
+        target.afterEvaluate {
+            println "Hello ${extension.name}"
+        }
+    }
+
+    class Extension {
+        // groovy 会默认自动实现 set/get 方法。
+        def name = "Default"
     }
 }
-
-def a = new Book()
-def b = a.clone()
-assert a == b
-assert a.is(b)
 ```
 
-```groovy
+3. 新建文件 src/resources/META-INF/gradle-plugins/plugin.demo.properties，文件名（plugin.demo）即对应着使用时的插件名:
 
-allprojects {
+```
+apply plugin: 'plugin-demo'
+```
+
+文件内容：
+
+```
+// 指向实现接口 Plugin 的类。
+implementation-class=me.passin.plugin.MyPlugin
+```
+
+4. 输入命令 gradlew -p plugin（library name） clean build uploadArchives -info 发布到本地 maven 仓库。输入命令 gradle install + gradle bintrayUpload 上传到 bintray 远程仓库。
+
+5. 引入发布的 plugin 并使用。
+
+Project 下的 build.gradle:
+
+```groovy
+buildscript {
     repositories {
         google()
         jcenter()
-    }
-}
-
-allprojects(new Action<Project>() {
-    @Override
-    void execute(Project project) {
-        project.repositories{
-            google()
-            jcenter()
+        maven{
+            //本地 maven 仓库。
+            url uri('./repo-local')
         }
     }
-})
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.3'
+        // 上传到远程仓库 bintray 的插件 
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        // 依赖自定义的插件
+        classpath 'me.passin:plugin:0.0.1-SNAPSHOT'
+    }
+}
 ```
 
-### Gradle 实战
-
-#### 配置构建
+使用自定义插件的模块下的 build.gradle:
 
 ```groovy
+apply plugin: 'com.android.application'
+apply plugin: 'plugin-demo'
 
+passin {
+    // 和配置 android.compileSdkVersion 是一样的原理。本质上是调用了 setName('world')。
+    name 'world'
+}
 android {
-    
-    defaultConfig {
-        applicationId "me.passin.pmvp.demo"
-        minSdkVersion rootProject.ext.android["minSdkVersion"]
-        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
-        versionCode rootProject.ext.android["versionCode"]
-        versionName rootProject.ext.android["versionName"]
-        testInstrumentationRunner rootProject.ext.dependencies["androidJUnitRunner"]
-
-        flavorDimensions "versionCode"
-        multiDexEnabled true
-    }
-
-    productFlavors {
-        pay {
-            applicationId "me.passin.pmvp.pay"
-        }
-        free {
-            // 不写则默认使用 defaultConfig 的配置。
-        }
-    }
-
+    compileSdkVersion 29
+    ……
 }
 ```
 
-初始化阶段：setting.gradle 执行
-定义阶段：所有setting.gradle中的gradle的执行
-执行阶段：执行具体的task
+最后在命令界面 Terminal 输入 gradlew 模块名:assembleDebug 执行整个打 debug 包过程，其中就会输出自定义的插件结果:
 
+```
+Hello world
+```
 
-# 参考资料
+# 六、Transform
 
-- [Configure your build](https://developer.android.com/studio/build/)
-- [Gradle从入门到实战 - 任玉刚](https://blog.csdn.net/singwhatiwanna/article/details/76084580)
+Transform 是 Android Gradle plugin 团队提供给开发者使用的一个抽象类，它的作用是提供接口让开发者可以在源文件编译成为 class 文件之后，dex 之前进行字节码层面的修改。
 
+借助 javaassist，ASM 这样的字节码处理工具，可在自定义的 Transform 中进行代码的插入，修改，替换，甚至是新建类与方法。
+
+```groovy
+class MyPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        def transform = new TransformDeme()
+        // 拿到所有 Android 插件的基本扩展，并注册新的 Transform。
+        def baseExtension = project.extensions.getByType(BaseExtension)
+        baseExtension.registerTransform(transform)
+    }
+
+    static class TransformDeme extends Transform {
+        @Override
+        String getName() {
+            // 返回转换的唯一名称，也是 Task 名称的组成部分。
+            return "passinTransform"
+        }
+
+        @Override
+        Set<QualifiedContent.ContentType> getInputTypes() {
+            // 筛选修改的文件类型,例如 class 文件，jar 包等。
+            // 这里修改 class 文件。
+            return TransformManager.CONTENT_CLASS
+        }
+
+        @Override
+        Set<? super QualifiedContent.Scope> getScopes() {
+            // 作用范围。
+            // 这里选择了整个打包项目的代码。
+            return TransformManager.SCOPE_FULL_PROJECT
+        }
+
+        @Override
+        boolean isIncremental() {
+            // 是否支持增量编译。
+            return false
+        }
+
+        @Override
+        void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+            // 具体的转换代码，默认情况下拿到输入后，不会自动原样输出，需要手动开发者实现。
+
+            // 转换前的输入。
+            def inputs = transformInvocation.inputs
+            // 转换后的输出。
+            def outputProvider = transformInvocation.outputProvider
+
+            inputs.each {
+                it.jarInputs.each {
+                    println("start：${it.file}")
+                    File dest = outputProvider.getContentLocation(it.name, it.contentTypes, it.scopes, Format.JAR)
+                    println("dest：${dest}")
+
+                    // 复制 gradle 的缓存 jar 包中到模块下的 build 文件夹下。例如：
+                    // start：C:\Users\passin\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-stdlib-jdk8\1.3.50\bf65725d4ae2cf00010d84e945fcbc201f590e11\kotlin-stdlib-jdk8-1.3.50.jar
+                    // dest：D:\MyApplication\app\build\intermediates\transforms\passinTransform\debug\0.jar
+                    FileUtils.copyFile(it.file, dest)
+                }
+
+                it.directoryInputs.each {
+                    println(it.file)
+                    File dest = outputProvider.getContentLocation(it.name, it.contentTypes, it.scopes, Format.DIRECTORY)
+                    FileUtils.copyDirectory(it.file, dest)
+                }
+            }
+        }
+    }
+}
+
+```
