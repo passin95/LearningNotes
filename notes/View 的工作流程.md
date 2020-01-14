@@ -195,7 +195,7 @@ public static int resolveSizeAndState(int size, int measureSpec, int childMeasur
     switch (specMode) {
         // 父 View 限制了上限。
         case MeasureSpec.AT_MOST:
-            // 超过了限制的大小,返回 specSize。
+            // 超过了限制的大小，返回 specSize。
             if (specSize < size) {
                 // MEASURED_STATE_TOO_SMALL 用于标识着测量的尺寸比视图所期望的尺寸小。
                 result = specSize | MEASURED_STATE_TOO_SMALL;
@@ -230,13 +230,13 @@ ViewGroup.measureChildren() 用于给与一定的尺寸限制去测量所有子 
 
 ```java
 /**
- * @param widthMeasureSpec  传入的宽度限制
- * @param heightMeasureSpec  传入的高度限制
+ * @param widthMeasureSpec  传入的宽度限制。
+ * @param heightMeasureSpec  传入的高度限制。
  */
 protected void measureChildren(int widthMeasureSpec, int heightMeasureSpec) {
     final int size = mChildrenCount;
     final View[] children = mChildren;
-    // 遍历所以子 View
+    // 遍历所以子 View。
     for (int i = 0; i < size; ++i) {
         final View child = children[i];
         // Visibility 属性值为 GONE 的子 View 时，不测量。
@@ -263,8 +263,8 @@ protected void measureChild(View child, int parentWidthMeasureSpec,
 
 /**
  * 
- * @param widthMeasureSpec  传入的宽度限制
- * @param heightMeasureSpec  传入的高度限制
+ * @param widthMeasureSpec  传入的宽度限制。
+ * @param heightMeasureSpec  传入的高度限制。
  */
 protected void measureChildWithMargins(View child,
         int parentWidthMeasureSpec, int widthUsed,

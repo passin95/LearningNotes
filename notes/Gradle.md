@@ -539,10 +539,11 @@ class MyPlugin implements Plugin<Project> {
 
             // 转换前的输入。
             def inputs = transformInvocation.inputs
-            // 转换后的输出。
+            // 转换后的输出。下一个 Task 的 inputs 则是上一个Task的 outputs。
             def outputProvider = transformInvocation.outputProvider
 
             inputs.each {
+                // inputs 有 2 种类型，一种是目录，一种是 jar 包。
                 it.jarInputs.each {
                     println("start：${it.file}")
                     File dest = outputProvider.getContentLocation(it.name, it.contentTypes, it.scopes, Format.JAR)

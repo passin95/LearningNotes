@@ -6,7 +6,7 @@
 - [一、元注解](#%E4%B8%80%E5%85%83%E6%B3%A8%E8%A7%A3)
   - [1.1 @Retention](#11-retention)
   - [1.2 @Target](#12-target)
-- [二、APT 实现](#%E4%BA%8Capt-%E5%AE%9E%E7%8E%B0)
+- [二、APT](#%E4%BA%8Capt)
   - [2.1 Module 结构](#21-module-%E7%BB%93%E6%9E%84)
   - [2.2 AbstractProcessor](#22-abstractprocessor)
   - [2.3 Element](#23-element)
@@ -16,8 +16,8 @@
     - [2.3.4 ExecutableElement](#234-executableelement)
     - [2.3.5 TypeElement](#235-typeelement)
     - [2.3.6 PackageElement](#236-packageelement)
-  - [2.3 JavaPoet 的使用](#23-javapoet-%E7%9A%84%E4%BD%BF%E7%94%A8)
-- [三、APT 实战](#%E4%B8%89apt-%E5%AE%9E%E6%88%98)
+  - [2.4 JavaPoet 的使用](#24-javapoet-%E7%9A%84%E4%BD%BF%E7%94%A8)
+- [三、手写 ButterKnife](#%E4%B8%89%E6%89%8B%E5%86%99-butterknife)
   - [3.1 butterknife-annotations](#31-butterknife-annotations)
   - [3.2 butterknife-api](#32-butterknife-api)
   - [3.3 butterknife-compiler](#33-butterknife-compiler)
@@ -30,31 +30,31 @@
 
 元注解就是用来定义注解的注解，java.lang.annotation 提供了四种元注解：
 
-- @Target：注解用于什么地方 
-- @Retention：什么时候使用该注解
-- @Documented：是否将注解信息添加在 JavaDoc 文档中
-- @Inherited：是否允许子类继承该注解
+- @Target：注解用于什么地方；
+- @Retention：什么时候使用该注解；
+- @Documented：是否将注解信息添加在 JavaDoc 文档中；
+- @Inherited：是否允许子类继承该注解。
 
 ## 1.1 @Retention
 
 - RetentionPolicy.SOURCE：在编译阶段丢弃。这些注解在开始编译阶段就不再有任何意义，所以它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解。
-- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。多用于写编译时注解框架，注解默认使用这种方式。
+- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。注解默认使用这种方式。
 - RetentionPolicy.RUNTIME：注释将由编译器记录在类文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解的信息的时候。
 
 ## 1.2 @Target
 
-- ElementType.TYPE：类、接口 (包括注解类型) 或 Enum 声明
-- ElementType.FIELD：成员变量、对象、属性（包括 Enum 实例）
-- ElementType.METHOD：方法
-- ElementType.PARAMETER：方法参数
-- ElementType.CONSTRUCTOR：构造器
-- ElementType.LOCAL_VARIABLE：局部变量
-- ElementType.PACKAGE：用于描述包
-- ElementType.ANNOTATION_TYPE：注解
-- ElementType.TYPE_PARAMETER：类型参数（例如泛型）
-- ElementType.TYPE_USE：类型使用声明
+- ElementType.TYPE：类、接口 (包括注解类型) 或 Enum 声明；
+- ElementType.FIELD：成员变量、对象、属性（包括 Enum 实例）；
+- ElementType.METHOD：方法；
+- ElementType.PARAMETER：方法参数；
+- ElementType.CONSTRUCTOR：构造器；
+- ElementType.LOCAL_VARIABLE：局部变量；
+- ElementType.PACKAGE：用于描述包；
+- ElementType.ANNOTATION_TYPE：注解；
+- ElementType.TYPE_PARAMETER：类型参数（例如泛型）；
+- ElementType.TYPE_USE：类型使用声明。
 
-# 二、APT 实现
+# 二、APT
 
 APT（Annotation Processing Tool） 即为编译时注解处理器，可以用来在编译时扫描和处理注解。通过获取到注解和被注解对象的相关信息后，再根据需求自动生成类文件以及类中的代码，省去了手动编写。
 
@@ -364,7 +364,7 @@ public interface PackageElement extends Element, QualifiedNameable {
 }
 ```
 
-## 2.3 JavaPoet 的使用
+## 2.4 JavaPoet 的使用
 
 - MethodSpec：代表一个构造函数或方法声明。
 - TypeSpec：代表一个类，接口，或者枚举。
@@ -506,7 +506,7 @@ public class HelloWorld<K extends String> extends Test implements TestInterface 
 ```
 
 
-# 三、APT 实战
+# 三、手写 ButterKnife
 
 基本的配置不在赘述。主要从围绕具体的代码去看代码结构和编写思路。
 

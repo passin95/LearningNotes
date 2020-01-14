@@ -304,7 +304,7 @@ public class MyService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        // 若一个 Service 被 startService() 或 bindServivce() 多次启动或绑定，onCreate() 也只会调用一次。
+        // 若一个 Service 被 startService() 或 bindServivce() 时调用，多次启动或绑定，onCreate() 也只会调用一次。
         // 即在回调 onDestroy() 前，onCreate() 只会在启动时调用一次。
     }
     
@@ -332,7 +332,7 @@ public class MyService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        // 调用 bindService 后回调 onBind()，但同一个 Intent 类型只会回调一次 onBind()。
+        // 调用 bindService 后回调 onBind()，但同一个 Intent 对象只会回调一次 onBind()。
         return null;
     }
 
@@ -361,16 +361,15 @@ private ServiceConnection connection = new ServiceConnection() {
         // 取消关联的时候调用。 
     }
 
-    //在 Activity 与 Service 解除关联的时候调用
+    // 在 Activity 与 Service 解除关联的时候调用
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         // 建立关联的时候调用（异步回调）。
         myBinder = (MyService.MyBinder) service;
-        //在 Activity 调用 Service 类的方法
+        // 在 Activity 调用 Service 类的方法。
         myBinder.service_connect_Activity();
     }
 };
-
 
 Intent bindIntent = new Intent(this, MyService.class);
 bindService(bindIntent,connection,BIND_AUTO_CREATE);
@@ -406,10 +405,10 @@ public class MyService extends Service {
 
         // 新建 Builder 对象。
         Notification.Builder builer = new Notification.Builder(this);
-        builer.setContentTitle("前台服务通知的标题");// 设置通知的标题
-        builer.setContentText("前台服务通知的内容");// 设置通知的内容
-        builer.setSmallIcon(R.mipmap.ic_launcher);// 设置通知的图标
-        builer.setContentIntent(pendingIntent);// 设置点击通知后的操作
+        builer.setContentTitle("前台服务通知的标题");// 设置通知的标题。
+        builer.setContentText("前台服务通知的内容");// 设置通知的内容。
+        builer.setSmallIcon(R.mipmap.ic_launcher);// 设置通知的图标。
+        builer.setContentIntent(pendingIntent);// 设置点击通知后的操作。
 
         Notification notification = builer.getNotification();
         // 让 Service 变成前台 Service,并在系统的状态栏显示出来。

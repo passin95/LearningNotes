@@ -14,8 +14,8 @@
   - [2.2 自定义 LayoutManager 流程](#22-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
   - [2.3 回收复用的实现思路](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
   - [2.4 技巧](#24-%E6%8A%80%E5%B7%A7)
-  - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
-  - [2.4.2 滑动时回收](#242-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
+    - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
+    - [2.4.2 滑动时回收](#242-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
   - [三、RecyclerView 性能优化](#%E4%B8%89recyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
     - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
     - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
@@ -486,11 +486,11 @@ RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setVie
 
 ## 2.4 技巧
 
-## 2.4.1 getChildDrawingOrder()
+### 2.4.1 getChildDrawingOrder()
 
 重写 getChildDrawingOrder() 可改变子 View 的绘制顺序。
 
-## 2.4.2 滑动时回收
+### 2.4.2 滑动时回收
 
 在滑动过程中，可以把 mAttachedScrap 中的缓存全部放进 mRecyclerPool 中，mAttachedScrap 中可重用的 ViewHolder 已经在 onLayoutChildren() 中复用。
 
