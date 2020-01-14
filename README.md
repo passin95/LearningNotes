@@ -80,10 +80,14 @@
 
 ### :pencil2: 算法 
 
+- [算法](./notes/排序算法.md)
+
+  基础排序算法。
+
 - [算法](./notes/算法.md)
 
   常用数据结构。
-
+  
 ### :hammer: 工具 
 
 - [Git](./notes/Git.md)

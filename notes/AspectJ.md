@@ -24,7 +24,6 @@ AspectJ 可支持以下两种语言进行编写：
 **（1）** 完全使用 AspectJ 自身的语言，语法和 Java 很类似。
 
 ```java
-
 public aspect AspectDemo {
 
     pointcut XX():
@@ -41,7 +40,6 @@ public aspect AspectDemo {
 **（2）** 纯 Java 语言开发，需要配合注解使用，本文示例都使用该种语言。
 
 ```java
-
 @Aspect
 public class AspectDemo {
 
@@ -59,7 +57,6 @@ public class AspectDemo {
 		//...
     }
 }
-
 ```
 
 ## 1.2 JoinPoint
