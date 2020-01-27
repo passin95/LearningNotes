@@ -530,6 +530,10 @@ class MyPlugin implements Plugin<Project> {
         @Override
         boolean isIncremental() {
             // 是否支持增量编译。
+            // 如果支持的话在 input 的数据中根据场景可能会包含 changed/removed/added 的文件。通过 jarInputs.state 判断该 jar 包文件在该次打包的状态。
+            // 一般情况下处理可以分为 2 类：
+            // 第一类是 removed 状态文件，应该在输出流进行手动删除。
+            // 第二类是 notchanged、added、changed，在此基础上进行需求开发即可。
             return false
         }
 
@@ -539,7 +543,7 @@ class MyPlugin implements Plugin<Project> {
 
             // 转换前的输入。
             def inputs = transformInvocation.inputs
-            // 转换后的输出。下一个 Task 的 inputs 则是上一个Task的 outputs。
+            // 转换后的输出。下一个 Task 的 inputs 则是上一个 Task 的 outputs。
             def outputProvider = transformInvocation.outputProvider
 
             inputs.each {

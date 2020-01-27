@@ -81,7 +81,7 @@ JoinPoint（连接点）表示程序运行时的一些执行点。理论上说�
 
 ## 1.3 Pointcuts
 
-Pointcuts 可以理解为 JoinPoint 的过滤器，通过编写规则筛选出需要的 JoinPoint。
+Pointcuts 通过编写规则筛选出需要的 JoinPoint 集。
 
 ### 1.3.1 通配符
 
@@ -118,7 +118,6 @@ public void pointcutName() {
 - this(Type)：Type 是一个类，即该类下所有的 JoinPoint；
 - target(Type)：Type 是一个类，所有调用该类的 JoinPoint；
 - args(TypeSignature)：例如 args(int,..)，表示第一个参数是 int，后面参数个数和类型不限的 JoinPoint。
-
 
 ### 1.3.3 过滤规则
 

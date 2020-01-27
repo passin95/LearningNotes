@@ -1,53 +1,53 @@
 <!-- TOC -->
 
-- [一、基础类型](#一基础类型)
-    - [1.1 缓存池](#11-缓存池)
-    - [1.2 BigDecimal](#12-bigdecimal)
-- [二、String](#二string)
-    - [2.1 String 不可变的好处](#21-string-不可变的好处)
-    - [2.2 String, StringBuffer and StringBuilder](#22-string-stringbuffer-and-stringbuilder)
-    - [2.3 new String("abc")](#23-new-stringabc)
-    - [2.4 String.intern()](#24-stringintern)
-- [三、参数传递](#三参数传递)
-- [四、继承](#四继承)
-    - [4.1 访问权限](#41-访问权限)
-    - [4.2 抽象类与接口](#42-抽象类与接口)
-        - [4.2.1 抽象类](#421-抽象类)
-        - [4.2.2 接口](#422-接口)
-        - [4.2.3 比较](#423-比较)
-    - [4.3 super](#43-super)
-    - [4.4 重写与重载](#44-重写与重载)
-- [五、Object 通用方法](#五object-通用方法)
-    - [5.1 equals](#51-equals)
-        - [5.1.1 equals() 与 == 的区别](#511-equals-与--的区别)
-        - [5.1.2 重写 equals()](#512-重写-equals)
-    - [5.2 hashCode()](#52-hashcode)
-        - [5.2.1 hashCode 与 equals 的关系](#521-hashcode-与-equals-的关系)
-        - [5.2.2 如何重写 hashCode](#522-如何重写-hashcode)
-    - [5.3 toString()](#53-tostring)
-    - [5.4 clone()](#54-clone)
-- [六、关键字](#六关键字)
-    - [6.1 final](#61-final)
-    - [6.2 static](#62-static)
-- [七、反射](#七反射)
-    - [7.1 反射的基本运用](#71-反射的基本运用)
-        - [7.1.1 Class 对象的获取](#711-class-对象的获取)
-        - [7.2.2 反射 API](#722-反射-api)
-    - [7.2 反射的优缺点](#72-反射的优缺点)
-- [八、异常](#八异常)
-- [九、泛型](#九泛型)
-- [十、注解](#十注解)
-    - [10.1 元注解](#101-元注解)
-        - [10.1.1 @Retention](#1011-retention)
-        - [10.1.2 @Target](#1012-target)
-        - [10.1.3 @Inherited](#1013-inherited)
-- [十一、Type](#十一type)
-    - [11.1 Class](#111-class)
-    - [11.2 ParameterizedType](#112-parameterizedtype)
-    - [11.3 GenericArrayType](#113-genericarraytype)
-    - [11.4 TypeVariable](#114-typevariable)
-- [十二、JDK 和 JRE](#十二jdk-和-jre)
-- [参考资料](#参考资料)
+- [一、基础类型](#%E4%B8%80%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B)
+  - [1.1 缓存池](#11-%E7%BC%93%E5%AD%98%E6%B1%A0)
+  - [1.2 BigDecimal](#12-bigdecimal)
+- [二、String](#%E4%BA%8Cstring)
+  - [2.1 String 不可变的好处](#21-string-%E4%B8%8D%E5%8F%AF%E5%8F%98%E7%9A%84%E5%A5%BD%E5%A4%84)
+  - [2.2 String, StringBuffer and StringBuilder](#22-string-stringbuffer-and-stringbuilder)
+  - [2.3 new String("abc")](#23-new-string%22abc%22)
+  - [2.4 String.intern()](#24-stringintern)
+- [三、参数传递](#%E4%B8%89%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92)
+- [四、继承](#%E5%9B%9B%E7%BB%A7%E6%89%BF)
+  - [4.1 访问权限](#41-%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90)
+  - [4.2 抽象类与接口](#42-%E6%8A%BD%E8%B1%A1%E7%B1%BB%E4%B8%8E%E6%8E%A5%E5%8F%A3)
+    - [4.2.1 抽象类](#421-%E6%8A%BD%E8%B1%A1%E7%B1%BB)
+    - [4.2.2 接口](#422-%E6%8E%A5%E5%8F%A3)
+    - [4.2.3 比较](#423-%E6%AF%94%E8%BE%83)
+  - [4.3 super](#43-super)
+  - [4.4 重写与重载](#44-%E9%87%8D%E5%86%99%E4%B8%8E%E9%87%8D%E8%BD%BD)
+- [五、Object 通用方法](#%E4%BA%94object-%E9%80%9A%E7%94%A8%E6%96%B9%E6%B3%95)
+  - [5.1 equals](#51-equals)
+    - [5.1.1 equals() 与 == 的区别](#511-equals-%E4%B8%8E--%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [5.1.2 重写 equals()](#512-%E9%87%8D%E5%86%99-equals)
+  - [5.2 hashCode()](#52-hashcode)
+    - [5.2.1 hashCode 与 equals 的关系](#521-hashcode-%E4%B8%8E-equals-%E7%9A%84%E5%85%B3%E7%B3%BB)
+    - [5.2.2 如何重写 hashCode](#522-%E5%A6%82%E4%BD%95%E9%87%8D%E5%86%99-hashcode)
+  - [5.3 toString()](#53-tostring)
+  - [5.4 clone()](#54-clone)
+- [六、关键字](#%E5%85%AD%E5%85%B3%E9%94%AE%E5%AD%97)
+  - [6.1 final](#61-final)
+  - [6.2 static](#62-static)
+- [七、反射](#%E4%B8%83%E5%8F%8D%E5%B0%84)
+  - [7.1 反射的基本运用](#71-%E5%8F%8D%E5%B0%84%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%BF%90%E7%94%A8)
+    - [7.1.1 Class 对象的获取](#711-class-%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%8E%B7%E5%8F%96)
+    - [7.2.2 反射 API](#722-%E5%8F%8D%E5%B0%84-api)
+  - [7.2 反射的优缺点](#72-%E5%8F%8D%E5%B0%84%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9)
+- [八、异常](#%E5%85%AB%E5%BC%82%E5%B8%B8)
+- [九、泛型](#%E4%B9%9D%E6%B3%9B%E5%9E%8B)
+- [十、注解](#%E5%8D%81%E6%B3%A8%E8%A7%A3)
+  - [10.1 元注解](#101-%E5%85%83%E6%B3%A8%E8%A7%A3)
+    - [10.1.1 @Retention](#1011-retention)
+    - [10.1.2 @Target](#1012-target)
+    - [10.1.3 @Inherited](#1013-inherited)
+- [十一、Type](#%E5%8D%81%E4%B8%80type)
+  - [11.1 Class](#111-class)
+  - [11.2 ParameterizedType](#112-parameterizedtype)
+  - [11.3 GenericArrayType](#113-genericarraytype)
+  - [11.4 TypeVariable](#114-typevariable)
+- [十二、JDK 和 JRE](#%E5%8D%81%E4%BA%8Cjdk-%E5%92%8C-jre)
+- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- /TOC -->
 
@@ -988,17 +988,17 @@ public Object invoke(Object obj, Object... args)
 数组在 Java 里是比较特殊的一种类型，它可以赋值给一个 Object Reference。
 
 ```java
-        Class<?> cls = Class.forName("java.lang.String");
-        // 第一个参数为数组中的字段类型，第二个参数为容器大小
-        Object array = Array.newInstance(cls,25);
-        // 往数组里添加内容
-        Array.set(array,0,"hello");
-        Array.set(array,1,"Java");
-        Array.set(array,2,"fuck");
-        Array.set(array,3,"Scala");
-        Array.set(array,4,"Clojure");
-        // 获取某一项的内容
-        System.out.println(Array.get(array,3));
+Class<?> cls = Class.forName("java.lang.String");
+// 第一个参数为数组中的字段类型，第二个参数为容器大小
+Object array = Array.newInstance(cls,25);
+// 往数组里添加内容
+Array.set(array,0,"hello");
+Array.set(array,1,"Java");
+Array.set(array,2,"fuck");
+Array.set(array,3,"Scala");
+Array.set(array,4,"Clojure");
+// 获取某一项的内容
+System.out.println(Array.get(array,3));
 ```
 
 ## 7.2 反射的优缺点

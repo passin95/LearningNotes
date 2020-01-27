@@ -204,7 +204,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 （1）standard：标准模式，系统的默认格式。每次启动 Activity 都在 **当前栈内** 创建新的 Activity。
 
-（2）singleTop：栈顶复用模式，**当前栈顶** 存在同一个 Activity 则不再重新创建,并回调 onNewIntent()，其余情况同 standard。
+（2）singleTop：栈顶复用模式，**当前栈顶** 存在同一个 Activity 则不再重新创建，并回调 onNewIntent()，其余情况同 standard。
 
 （3）singleTask：栈内复用模式，只要 Activity **在栈内存在**，则不再重新创建，并移除该 Activity **所在栈内** 上面的其它 Activity，同时回调 onNewIntent()，若不存在，则创建在所属 TaskAffinity 的栈中，其余情况同 standard。
 
