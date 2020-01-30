@@ -29,7 +29,7 @@
     - [3.3.3 有序性](#333-%E6%9C%89%E5%BA%8F%E6%80%A7)
   - [3.4 volatile](#34-volatile)
 - [四、线程安全和锁](#%E5%9B%9B%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%92%8C%E9%94%81)
-  - [4.1 不可变](#41-%E4%B8%8D%E5%8F%AF%E5%8F%98)
+  - [4.1 不可变的对象](#41-%E4%B8%8D%E5%8F%AF%E5%8F%98%E7%9A%84%E5%AF%B9%E8%B1%A1)
   - [4.2 互斥同步（阻塞同步）](#42-%E4%BA%92%E6%96%A5%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5)
     - [4.2.1 synchronized](#421-synchronized)
       - [4.2.1.1 synchronized 锁优化](#4211-synchronized-%E9%94%81%E4%BC%98%E5%8C%96)
@@ -577,7 +577,7 @@ volatile 的本质是使用机器指令 **lock** ，**lock**相当于一个内�
 
 线程安全的实现方式主要有以下几种：
 
-## 4.1 不可变
+## 4.1 不可变的对象
 
 不可变（Immutable）的对象一定是线程安全的，不需要再采取任何的线程安全保障措施。多线程环境下，应当尽量使对象成为不可变，来满足线程安全。
 
@@ -629,7 +629,7 @@ synchronized 关键字提供了一种锁的机制，它设计的初衷是锁资�
 
 ```java
 private String test() {
-     // 变量 stringBuffer 没有逃逸出方法 test() 之外，因此 JVM 会消除 stringBuffer 所以方法的锁。
+     // 变量 stringBuffer 没有逃逸出方法 test() 之外，因此 JVM 会消除 stringBuffer 所有方法的锁。
     StringBuffer stringBuffer = new StringBuffer();
     for (int i = 0; i < 10; i++) {
         stringBuffer.append(i);
