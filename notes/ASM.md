@@ -8,17 +8,17 @@
   - [1.2 字节码](#12-%E5%AD%97%E8%8A%82%E7%A0%81)
     - [1.2.1 类型对照表](#121-%E7%B1%BB%E5%9E%8B%E5%AF%B9%E7%85%A7%E8%A1%A8)
     - [1.2.2 JVM 指令集](#122-jvm-%E6%8C%87%E4%BB%A4%E9%9B%86)
-- [一、ASM 简介](#%E4%B8%80asm-%E7%AE%80%E4%BB%8B)
-- [二、ASM 核心类](#%E4%BA%8Casm-%E6%A0%B8%E5%BF%83%E7%B1%BB)
-  - [2.1 Visitor](#21-visitor)
-    - [2.1.1 ClassVisitor](#211-classvisitor)
-    - [2.1.2 FieldVisitor](#212-fieldvisitor)
-    - [2.1.3 MethodVisitor](#213-methodvisitor)
-    - [2.1.4 AnnotationVisitor](#214-annotationvisitor)
-    - [2.1.5 SignatureVisitor](#215-signaturevisitor)
-- [三、ASM 实战](#%E4%B8%89asm-%E5%AE%9E%E6%88%98)
-  - [3.1 初探 ASM](#31-%E5%88%9D%E6%8E%A2-asm)
-  - [3.2 统计方法耗时（Gradle + ASM）](#32-%E7%BB%9F%E8%AE%A1%E6%96%B9%E6%B3%95%E8%80%97%E6%97%B6gradle--asm)
+- [二、ASM 简介](#%E4%BA%8Casm-%E7%AE%80%E4%BB%8B)
+- [三、ASM 核心类](#%E4%B8%89asm-%E6%A0%B8%E5%BF%83%E7%B1%BB)
+  - [3.1 Visitor](#31-visitor)
+    - [3.1.1 ClassVisitor](#311-classvisitor)
+    - [3.1.2 FieldVisitor](#312-fieldvisitor)
+    - [3.1.3 MethodVisitor](#313-methodvisitor)
+    - [3.1.4 AnnotationVisitor](#314-annotationvisitor)
+    - [3.1.5 SignatureVisitor](#315-signaturevisitor)
+- [四、ASM 实战](#%E5%9B%9Basm-%E5%AE%9E%E6%88%98)
+  - [4.1 初探 ASM](#41-%E5%88%9D%E6%8E%A2-asm)
+  - [4.2 统计方法耗时（Gradle + ASM）](#42-%E7%BB%9F%E8%AE%A1%E6%96%B9%E6%B3%95%E8%80%97%E6%97%B6gradle--asm)
 
 <!-- /TOC -->
 
@@ -325,7 +325,7 @@ table th:nth-of-type(3) {
 | 0×fe       | impdep1            |              | 为调试程序中依赖于实现的操作保留；不应出现在任何类文件中 |
 | 0×ff       | impdep2            |              | 为调试程序中依赖于实现的操作保留；不应出现在任何类文件中 |
 
-# 一、ASM 简介
+# 二、ASM 简介
 
 ASM 是一个 Java 字节码操作与分析框架，它可以对字节码文件以及字节码内容进行增删改查。ASM 通过读取类文件中的元素信息（例如类名称、方法、属性以及指令等）来选择性的改变原有类的行为。
 
@@ -344,7 +344,7 @@ implementation 'org.ow2.asm:asm-commons:+'
 implementation 'com.android.tools.build:gradle:+'
 ```
 
-# 二、ASM 核心类
+# 三、ASM 核心类
 
 ASM Javadoc：https://asm.ow2.io/javadoc/overview-summary.html
 
@@ -374,9 +374,9 @@ ASM 主要有以下几个核心的类、接口：
 - Opcodes：包括很多常量定义，包括 ASM API 版本号、访问标识（包含了所有修饰符）、JVM 指令、处理标签、数组类型代码等。
 - Type 类：类型相关的常量定义。
 
-## 2.1 Visitor
+## 3.1 Visitor
 
-### 2.1.1 ClassVisitor
+### 3.1.1 ClassVisitor
 
 一个 Java 类中会存在方法、注解、属性等，ClassReader 在解析字节码文件时会回调 ClassVisitor 中对应的 visitXXX() 方法。
 
@@ -503,13 +503,13 @@ visitMethod() run，name：method3，desc：()Ljava/lang/Object;
 visitEnd() run
 ```
 
-### 2.1.2 FieldVisitor
+### 3.1.2 FieldVisitor
 
 - visitAnnotation：访问字段上的注解；
 - visitTypeAnnotation：访问字段的类型注解（Java 8 的特性，很少使用）；
 - visitEnd：访问结束通知。
 
-### 2.1.3 MethodVisitor
+### 3.1.3 MethodVisitor
 
 MethodVisitor 的方法比较多，其中以 Insn 结尾的方法，需要配合具体的 JVM 指令，具体的指令的意义可查看 [JVM 指令集](#122-jvm-%E6%8C%87%E4%BB%A4%E9%9B%86)
 
@@ -543,7 +543,7 @@ MethodVisitor 的方法比较多，其中以 Insn 结尾的方法，需要配合
 - visitMaxs：访问操作数栈最大值和本地变量表最大值；
 - visitEnd：访问结束通知。
 
-### 2.1.4 AnnotationVisitor
+### 3.1.4 AnnotationVisitor
 
 - visit：访问注解的原始值；
 - visitEnum：访问注解的枚举类型值；
@@ -551,7 +551,7 @@ MethodVisitor 的方法比较多，其中以 Insn 结尾的方法，需要配合
 - visitArray: 访问注解的数组值；
 - visitEnd：访问结束通知。
 
-### 2.1.5 SignatureVisitor
+### 3.1.5 SignatureVisitor
 
 SignatureVisitor 用于访问泛型。
 
@@ -572,13 +572,13 @@ SignatureVisitor 用于访问泛型。
 - visitTypeArgument(final char wildcard)：访问上次访问的类或内部类类型的类型参数；
 - visitEnd：访问结束通知。
 
-# 三、ASM 实战
+# 四、ASM 实战
 
 若对字节码指令不熟悉，可先编写 Java 代码，然后通过 [ASM Bytecode Viewer](https://plugins.jetbrains.com/plugin/10302-asm-bytecode-viewer/) 查看 Java 文件对应的字节码或者使用 ASM 生成该类编译成字节码文件时对应的代码。
 
 所有的练习代码皆在该项目：https://github.com/passin95/ASM_Demo。
 
-## 3.1 初探 ASM 
+## 4.1 初探 ASM 
 
 需求：对一个类插入一个常量、一个方法以及对一个方法插入代码块。
 
@@ -738,7 +738,7 @@ class Demo1$Passin {
 
 ```
 
-## 3.2 统计方法耗时（Gradle + ASM）
+## 4.2 统计方法耗时（Gradle + ASM）
 
 需求：对需要统计耗时的方法添家指定注解 @MethodConsumedTime，并输出以下 Java 代码格式的 Log：
 
@@ -928,7 +928,7 @@ class MethodConsumedTimeVisitor extends ClassVisitor {
 }
 ```
 
-**（3）** 应用耗时检测 plugin。
+**（3）** 应用 plugin。
 
 测试：检测 MainActivity.onCreate() 方法耗时。
 
