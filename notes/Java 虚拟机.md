@@ -87,6 +87,7 @@ JDK1.8 及之后：
 ### 2.2.1 局部变量表
 
 局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（refrence）类型和 returnAddress 类型（指向了一条字节码指令的地址）。
+
 系统不会为局部变量赋予初始值，也就是说不存在类变量那样的准备阶段。
 
 ### 2.2.2 操作数栈

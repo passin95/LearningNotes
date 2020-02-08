@@ -26,9 +26,9 @@ DSL 的全称是 Domain Specific Language，领域特定语言，即只能用于
 
 对于 Android 开发者来说，Gradle 的架构可以分为三层：
 
-- 最下层的是底层 Gradle 框架，它主要提供一些基础服务，如 Task 的依赖以及有向无环图的构建等；
-- 再上面的则是 Google 编译工具团队的 Android Gradle Plugin（即 com.android.tools.build:gradle:+），它在 Gradle 框架的基础上，创建了很多与 Android 项目打包有关的 Task、artifacts。
-- 最上面的则是开发者自定义的 Plugin，一般是在 Android Gradle plugin 提供的 Task 的基础上，插入一些自定义的 Task，或者是使用 Transform 在编译期进行字节码修改。
+- 最下层是底层 Gradle 框架，它主要提供一些基础服务，如 Task 的依赖以及有向无环图的构建等；
+- 再上面则是 Google 编译工具团队的 Android Gradle Plugin（即 com.android.tools.build:gradle:+），它在 Gradle 框架的基础上，创建了很多与 Android 项目打包有关的 Task、artifacts。
+- 最上面则是开发者自定义的 Plugin，一般是在 Android Gradle plugin 提供的 Task 的基础上，插入一些自定义的 Task，或者是使用 Transform 在编译期进行字节码修改。
 
 # 二、Gradle 的工作流程
 
@@ -111,7 +111,9 @@ project.getTasks().create("taskName", MyTask);
 
 # 四、Extension
 
-（1）Extension 用于在 gradle 文件的数据配置。先看如何实现一个固定数量的配置项：
+Extension 用于 gradle 文件的数据配置。
+
+（1）定义一个固定数量的配置项：
 
 ```groovy
 class MyPlugin implements Plugin<Project> {
@@ -160,7 +162,7 @@ fruit{
 }
 ```
 
-（2）下面则是定义一个包含不定数量的配置项的 Extension：
+（2）定义一个包含不定数量的配置项的 Extension：
 
 ```groovy
 class MyPlugin implements Plugin<Project> {
@@ -491,9 +493,9 @@ Hello world
 
 # 六、Transform
 
-Transform 是 Android Gradle plugin 团队提供给开发者使用的一个抽象类，它的作用是提供接口让开发者可以在源文件编译成为 class 文件之后，dex 之前进行字节码层面的修改。
+Transform 是 Android Gradle plugin 团队提供给开发者使用的一个抽象类，它提供接口让开发者可以在项目构建阶段，即在源文件编译成为 .class 文件之后，dex 之前进行字节码层面的修改。Transform 本质上也是执行在 Task 中。
 
-借助 javaassist，ASM 这样的字节码处理工具，可在自定义的 Transform 中进行代码的插入，修改，替换，甚至是新建类与方法。
+借助 javaassist，ASM 这样的字节码处理工具，可在自定义的 Transform 中进行代码的插入、修改、替换、新建类等。
 
 ```groovy
 class MyPlugin implements Plugin<Project> {
@@ -547,7 +549,10 @@ class MyPlugin implements Plugin<Project> {
             def outputProvider = transformInvocation.outputProvider
 
             inputs.each {
-                // inputs 有 2 种类型，一种是目录，一种是 jar 包。
+                // inputs 有 2 种：
+                // 1.directoryInput 集合：以源码方式参与项目编译的所有目录结构及其目录下的源码文件。
+                // 2.JarInput 集合：参与项目编译的所有本地 jar 包和远程 jar 包。
+
                 it.jarInputs.each {
                     println("start：${it.file}")
                     File dest = outputProvider.getContentLocation(it.name, it.contentTypes, it.scopes, Format.JAR)
