@@ -418,7 +418,7 @@ static class ThreadLocalMap {
 
 ThreadLocal 在 ThreadLocalMap 中是以一个弱引用身份被 Entry 中的 Key 引用的，若 ThreadLocal 没有了外部强引用来引用它，那么 ThreadLocal 会在下次 GC 被回收，从而导致 Entry 中的 Key 被回收，出现 null Key 的情况，如果某个线程的生命周期很长（例如主线程），则会一直存在一条强引用链：Thread --> ThreadLocalMap--> Entry --> Value，这条强引用链会导致 Entry、Value 不会回收，造成内存泄漏。
 
-ThreadLocal 也添加了一些措施来保证 ThreadLocal 尽量不会内存泄漏：在 ThreadLocal 的 get()、set()、remove() 方法调用的时候会清除掉线程 ThreadLocalMap 中所有 Entry 中 Key 为 null 的 Value，因此尽可能在每次使用完 ThreadLocal 后手动调用 remove()。
+ThreadLocal 也添加了一些措施来保证 ThreadLocal 尽量不会内存泄漏：在 ThreadLocal 的 get()、set()、remove() 方法调用的时候会清除掉线程 ThreadLocalMap 中所有 Entry 中 Key 为 null 的 Value，但是也应该在每次使用完 ThreadLocal 后手动调用 remove()。
 
 ## 2.5 线程间协作
 

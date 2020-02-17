@@ -31,15 +31,15 @@
 元注解就是用来定义注解的注解，java.lang.annotation 提供了四种元注解：
 
 - @Target：注解用于什么地方；
-- @Retention：什么时候使用该注解；
+- @Retention：注解的生命周期；
 - @Documented：是否将注解信息添加在 JavaDoc 文档中；
 - @Inherited：是否允许子类继承该注解。
 
 ## 1.1 @Retention
 
-- RetentionPolicy.SOURCE：在编译阶段丢弃。这些注解在开始编译阶段就不再有任何意义，所以它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解。
-- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。注解默认使用这种方式。
-- RetentionPolicy.RUNTIME：注释将由编译器记录在类文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解的信息的时候。
+- RetentionPolicy.SOURCE：在 javac 编译之后丢弃，因此它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解，APT 也可使用该注解。
+- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。注解默认使用这种方式。与 SOURCE 的作用区别在于，CLASS 修饰的注解可以作为字节码修改或插桩的依据。
+- RetentionPolicy.RUNTIME：注释将由编译器记录在类文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解信息的时候。
 
 ## 1.2 @Target
 

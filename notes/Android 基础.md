@@ -70,7 +70,7 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 （4）onViewCreated：Fragment 视图创建完成，执行于 Activity 的 super.onCreate() 中。
 
-（5）onActivityCreated：Activity 的 onCreate() 已经执行完成，该方法执行于 Activity 的 super.onStart() 期间。
+（5）onActivityCreated：Activity 的 onCreate() 已经执行完成，该方法执行于 Activity 的 super.onStart() 期间，但只在 Actitivity 第一次创建时执行。
 
 （6）onStart：Fragment 处于 **可见** 的，但还没有出现在 **前台**，不可交互。
 
@@ -88,7 +88,7 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 若 Fragment 在 Activity super.onCreate() 后调用 commitNow() add Fragment，则 Activity onCreate() 到 onContentChanged() 之间的 Fragment 生命周期执行顺序向后顺延，不同在于 onViewCreated 执行在 Activity super.onStart() 期间。
 
-同样的场景，若调用 commit(),则被 Hanlder post 出去直至 Activity super.onStart() 期间顺延执行所有 Fragment onStart() 之前的生命周期。
+同样的场景，若调用 commit()，则被 Hanlder post 出去，直至 Activity super.onStart() ，期间顺延执行所有 Fragment onStart() 之前的生命周期。
 
 其它时候的调用，同理按照 Fragment action 执行的时机去变化相应 Fragment 的生命周期执行时机。
 

@@ -1033,7 +1033,7 @@ Java 异常又可以分为不受检查异常（Unchecked Exception）和检查�
 - 不受检查异常：编译器不要求强制处理的异常，除了 RuntimeException 及其子类以外，其他的 Exception 类和 Error 类都属于这种异常。
 - 检查异常：则是编译器要求必须处置的异常。当程序中可能出现这类异常，要么使用 try-catch 语句进行捕获，要么用 throws 抛出，否则无法编译通过。
 
-注意：当 try 语句和 finally 语句中都有 return 语句时，在方法返回之前，finally 语句的内容将被执行，并且 finally 语句的返回值将会覆盖原始的返回值
+注意：当 try 语句和 finally 语句中都有 return 语句时，在方法返回之前，finally 语句的内容将被执行，并且 finally 语句的返回值将会覆盖原始的返回值。
 
 # 九、泛型
 
@@ -1046,7 +1046,9 @@ public class Box<T> {
 }
 ```
 
-- [Java 泛型详解](http://www.importnew.com/24029.html)
+- 泛型是通过类型擦除来实现的，编译器在编译时擦除了所有类型相关的信息，然后在运行期拿到泛型元数据进行隐式强转。
+- 泛型通过 IDE 的支持，可以尽量保证编译期的类型安全（例如 List 可以而 Array 却不能）。
+
 - [10 道 Java 泛型面试题](https://cloud.tencent.com/developer/article/1033693)
 
 # 十、注解
@@ -1059,29 +1061,29 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 
 元注解就是用来定义注解的注解，java.lang.annotation 提供了四种元注解：
 
-- @Target：注解用于什么地方 
-- @Retention：什么时候使用该注解
-- @Documented：是否将注解信息添加在 JavaDoc 文档中
-- @Inherited：是否允许子类继承该注解
+- @Target：注解用于什么地方；
+- @Retention：什么时候使用该注解；
+- @Documented：是否将注解信息添加在 JavaDoc 文档中；
+- @Inherited：是否允许子类继承该注解。
 
 ### 10.1.1 @Retention
 
-- RetentionPolicy.SOURCE：在编译阶段丢弃。这些注解在开始编译阶段就不再有任何意义，所以它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解。
-- RetentionPolicy.CLASS：在类加载的时候丢弃。多用于写编译时注解框架，注解默认使用这种方式。
-- RetentionPolicy.RUNTIME：始终不会丢弃，运行期也保留该注解，因此使用在需要反射机制读取该注解的信息的时候。
+- RetentionPolicy.SOURCE：在 javac 编译之后丢弃，因此它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解，APT 也可使用该注解。
+- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。注解默认使用这种方式。与 SOURCE 的作用区别在于，CLASS 修饰的注解可以作为字节码修改或插桩的依据。
+- RetentionPolicy.RUNTIME：注释将由编译器记录在类文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解信息的时候。
 
 ### 10.1.2 @Target
 
-- ElementType.TYPE：类、接口 (包括注解类型) 或 Enum 声明
-- ElementType.FIELD：成员变量、对象、属性（包括 Enum 实例）
-- ElementType.METHOD：方法
-- ElementType.PARAMETER：方法参数
-- ElementType.CONSTRUCTOR：构造器
-- ElementType.LOCAL_VARIABLE：局部变量
-- ElementType.PACKAGE：用于描述包
-- ElementType.ANNOTATION_TYPE：注解
-- ElementType.TYPE_PARAMETER：类型参数（例如泛型）
-- ElementType.TYPE_USE：类型使用声明
+- ElementType.TYPE：类、接口 (包括注解类型) 或 Enum 声明；
+- ElementType.FIELD：成员变量、对象、属性（包括 Enum 实例）；
+- ElementType.METHOD：方法；
+- ElementType.PARAMETER：方法参数；
+- ElementType.CONSTRUCTOR：构造器；
+- ElementType.LOCAL_VARIABLE：局部变量；
+- ElementType.PACKAGE：用于描述包；
+- ElementType.ANNOTATION_TYPE：注解；
+- ElementType.TYPE_PARAMETER：类型参数（例如泛型）；
+- ElementType.TYPE_USE：类型使用声明。
 
 ### 10.1.3 @Inherited 
 
@@ -1130,7 +1132,7 @@ public interface ParameterizedType extends Type {
 
 ## 11.3 GenericArrayType
 
-泛型数组类型，例如 List<String>[],T[],而 List<String> 不属于 GenericArrayType（属于 ParameterizedType），String[] 不属于 GenericArrayType（属于原始类型）。
+泛型数组类型，例如 List<String>[],T[]，而 List<String> 不属于 GenericArrayType（属于 ParameterizedType），String[] 不属于 GenericArrayType（属于原始类型）。
 
 ```java
 public interface GenericArrayType extends Type {

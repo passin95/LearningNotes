@@ -19,6 +19,7 @@
 - [四、ASM 实战](#%E5%9B%9Basm-%E5%AE%9E%E6%88%98)
   - [4.1 初探 ASM](#41-%E5%88%9D%E6%8E%A2-asm)
   - [4.2 统计方法耗时（Gradle + ASM）](#42-%E7%BB%9F%E8%AE%A1%E6%96%B9%E6%B3%95%E8%80%97%E6%97%B6gradle--asm)
+  - [4.3 更多 ASM 的实战应用](#43-%E6%9B%B4%E5%A4%9A-asm-%E7%9A%84%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8)
 
 <!-- /TOC -->
 
@@ -970,3 +971,7 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
+
+## 4.3 更多 ASM 的实战应用
+
+更多 ASM 的实战应用可参考 didi 的开源库 [booster](https://github.com/didi/) 或 luckybilly 的 [AutoRegister](https://github.com/luckybilly/AutoRegister)，很适合实战学习使用。
