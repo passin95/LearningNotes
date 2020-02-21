@@ -119,6 +119,7 @@ FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onSto
 
 当 Activity 被意外终止时或容易被销毁时，Activity 调用 onSaveInstanceState() 去保存数据，然后 Activity 委托 Window 去保存数据，接着 Window 再委托它上面的顶级容器去保存数据，一般是 DecordView。顶层容器再去一一通知它的子元素保存数据（写在 super 上面先于子元素保存，反之后于）。
 
+
 onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause() 之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
 
 例如以下情况皆会调用：
@@ -138,7 +139,7 @@ onPause -> onStop-> onSaveInstanceState -> onDestroy -> onCreate -> onStart -> o
 
 （2）除了 Fragment 通过设置 setRetainInstance(true) 可以在 **系统配置发送改变** 导致的重建时保留原来的实例对象之外。其它情况（例如被系统杀死或系统配置发生变化）的 Activity 和 Fragment 发生的重建，都是生成新的实例对象，这些情况若要对数据进行恢复，依旧需要使用 onSaveInstanceState() 和 onRestoreInstanceState()。此外若想在 **系统配置发送改变** 导致的重建保留想要的数据还可以通过 ViewModel 去实现。
 
-（3）对于异常重建的 Fragment，Fragment onCreate() 之前（包括 onCreate()）的生命周期按照 **生命周期图** 走，之后的生命周期（onCreateView() - onStart()）执行于 Activity onStart() 期间。
+（3）对于异常重建的 Fragment，Fragment 的生命周期按照 **生命周期图** 走。
 
 （4）各种复杂场景下的方法执行顺序：
 
@@ -174,7 +175,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 以下是常用的 Activity 标签属性。
 
-- launchMode：Activity 启动模式
+- launchMode：Activity 启动模式。
 
 - taskAffinity：Activity 所属任务栈。
 

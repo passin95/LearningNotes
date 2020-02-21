@@ -3,28 +3,28 @@
 
 <!-- TOC -->
 
-- [RxJava2 源码分析](#rxjava2-源码分析)
-    - [前言](#前言)
-    - [初探 RxJava](#初探-rxjava)
-        - [Single.just()](#singlejust)
-        - [single.subscribe(observer)](#singlesubscribeobserver)
-        - [小结](#小结)
-    - [再探 RxJava](#再探-rxjava)
-        - [RxJava 链式调用结构的本质](#rxjava-链式调用结构的本质)
-        - [Map 和 FlapMap](#map-和-flapmap)
-            - [map](#map)
-            - [flatMap](#flatmap)
-        - [线程切换](#线程切换)
-            - [subscribeOn](#subscribeon)
-            - [observeOn](#observeon)
-            - [小结](#小结-1)
-    - [终看 RxJava](#终看-rxjava)
-        - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-和-doafterterminate-有何不同)
-        - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-写在-observeon-之前和之后有何区别)
-        - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
-        - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#为什么连用两个-subscribeon-操作符只有第一个有效)
-        - [defer 到底有何作用？](#defer-到底有何作用)
-        - [Demo 执行过程梳理](#demo-执行过程梳理)
+- [RxJava2 源码分析](#rxjava2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [前言](#%E5%89%8D%E8%A8%80)
+  - [初探 RxJava](#%E5%88%9D%E6%8E%A2-rxjava)
+    - [Single.just()](#singlejust)
+    - [single.subscribe(observer)](#singlesubscribeobserver)
+    - [小结](#%E5%B0%8F%E7%BB%93)
+  - [再探 RxJava](#%E5%86%8D%E6%8E%A2-rxjava)
+    - [RxJava 链式调用结构的本质](#rxjava-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%9C%AC%E8%B4%A8)
+    - [Map 和 FlapMap](#map-%E5%92%8C-flapmap)
+      - [map](#map)
+      - [flatMap](#flatmap)
+    - [线程切换](#%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2)
+      - [subscribeOn](#subscribeon)
+      - [observeOn](#observeon)
+      - [小结](#%E5%B0%8F%E7%BB%93-1)
+  - [终看 RxJava](#%E7%BB%88%E7%9C%8B-rxjava)
+    - [doFinally 和 doAfterTerminate 有何不同？](#dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C)
+    - [doFinally() 写在 observeOn() 之前和之后有何区别？](#dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB)
+    - [doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84)
+    - [为什么连用两个 subscribeOn 操作符只有第一个有效？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88)
+    - [defer 到底有何作用？](#defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8)
+    - [Demo 执行过程梳理](#demo-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E6%A2%B3%E7%90%86)
 
 <!-- /TOC -->
 
@@ -193,11 +193,11 @@ Single<String> single = Single.just(1)
         
 // 订阅
 single.subscribe(observer);
-````
+```
 
 ### RxJava 链式调用结构的本质
 
-首先我们看被观察者的实例化，这里拿 single.subscribeOn() 方法举例（所有的操作符都基本类似），我们会发现，链式被观察者的实例化过程的本质是**以当前被观察者对象作为新被观察者构造方法的参数生成一个新的观察者并返回**，也就是说被观察者的实例化过程是一个个新的观察者对象生成的过程，且实例化的过程所处线程为当前线程，没有涉及到任何操作符的接口实现或线程切换（在订阅的时候才执行）。
+首先我们看被观察者的实例化，这里拿 single.subscribeOn() 方法举例（所有的操作符都基本类似），我们会发现，链式被观察者的实例化过程的本质是 **以当前被观察者对象作为新被观察者构造方法的参数生成一个新的观察者并返回**，也就是说被观察者的实例化过程是一个个新的观察者对象生成的过程，且实例化的过程所处线程为当前线程，没有涉及到任何操作符的接口实现或线程切换（在订阅的时候才执行）。
 
 ```java
 public final Single<T> subscribeOn(final Scheduler scheduler) {
@@ -282,7 +282,7 @@ public final class SingleJust<T> extends Single<T> {
 }
 ```
 
-整个 RxJava **链式调用结构**便如下图所示（下文都将该过程称之为链式调用结构）：
+整个 **RxJava链式调用结构** 便如下图所示（下文都将该过程称之为链式调用结构）：
 
 <img src="../pictures//RxJavaPic2.png" /> 
 
@@ -499,7 +499,7 @@ public final class SingleObserveOn<T> extends Single<T> {
 
 ## 终看 RxJava
 
-该小节的 Demo 代码较长（该 Demo 是笔者自己给自己出的题目，个人认为理解透该 Demo 对 RxJava 有一个深入的了解），读者可对 Demo 的代码的执行顺序和所处线程尝试自行分析，再向下阅读（向下阅读时请拷贝 Demo 到 Android Studio 方便对比，因为都以 Demo 的代码为基础进行分析）。
+该小节的 Demo 代码较长（该 Demo 是笔者自己给自己出的题目，个人认为理解透该 Demo 对 RxJava 会有一个深入的了解），读者可对 Demo 的代码的执行顺序和所处线程尝试自行分析，再向下阅读（向下阅读时请拷贝 Demo 到 Android Studio 方便对比，因为都以 Demo 的代码为基础进行分析）。
 
 接下来将按照 RxJava **链式调用结构**（自下向上的订阅以及自上向下的数据传递）的过程去对一些可能疑惑的地方展开分析，再对整个代码执行过程梳理。
 
@@ -742,7 +742,7 @@ static final class DoFinallyObserver<T> extends AtomicInteger implements SingleO
 
 我们经常有一种需求，使用 RxJava 结构进行网络请求时，需要在开始请求之前弹个加载提示，可是一般进行网络请求需切换到 io 线程，因此一般便会连用 doOnSubscribe 和 subscribeOn 两个操作符达到在 main 线程执行 UI 操作的效果（Demo 有对此情况进行模拟，因此以 Demo 为例进行解读）。
 
-而它们又是怎么做到的呢？首先我们在通过 subscribeOn(AndroidSchedulers.mainThread()) 在订阅时切换到主线程，接下来看一下 SingleDoOnSubscribe 做了什么。可以看到当调用 DoOnSubscribeSingleObserver.onSubscribe() 时，onSubscribe.accept(d) 被执行。
+而它们又是怎么做到的呢？首先我们在通过 subscribeOn(AndroidSchedulers.mainThread()) 在订阅时切换到主线程，接下来先看一下 SingleDoOnSubscribe 做了什么。可以看到当调用 DoOnSubscribeSingleObserver.onSubscribe() 时，onSubscribe.accept(d) 被执行。
 
 ```java
 public final class SingleDoOnSubscribe<T> extends Single<T> {
@@ -781,7 +781,7 @@ public final class SingleSubscribeOn<T> extends Single<T> {
 
     @Override
     protected void subscribeActual(final SingleObserver<? super T> s) {
-        // 此时处于 main 线程
+        // 此时处于 main 线程。
         final SubscribeOnObserver<T> parent = new SubscribeOnObserver<T>(s, source);
         // 在 main 线程执行 s.onSubscribe() 方法从而一直向下执行其他观察者的 onSubscribe() 方法,
         // 从而在 main 线程执行 DoOnSubscribeSingleObserver.onSubscribe()

@@ -455,7 +455,6 @@ public final class RealInterceptorChain implements Interceptor.Chain {
 }
 ```
 
-
 ## 六、Interceptor
 
 Interceptor 也叫拦截器，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求和问题进行拆分处理。
@@ -468,7 +467,7 @@ Interceptor.Chain 的原理类似于 Android 的触摸事件分发机制，即�
 
 ### 6.1 RetryAndFollowUpInterceptor
 
-RetryAndFollowUpInterceptor 顾名思义，在某些情况进行网络进行重试的作用。
+RetryAndFollowUpInterceptor 顾名思义，用于在某些情况进行网络请求重试的作用。
 
 ```java
 public final class RetryAndFollowUpInterceptor implements Interceptor {

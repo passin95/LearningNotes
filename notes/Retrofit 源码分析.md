@@ -96,7 +96,7 @@ public Retrofit build() {
     Executor callbackExecutor = this.callbackExecutor;
     // 默认根据所在的编译环境去取决于使用哪种具体 platform 的实现类。
     if (callbackExecutor == null) {
-      callbackExecutor =  .defaultCallbackExecutor();
+      callbackExecutor = platform.defaultCallbackExecutor();
     }
 
    
@@ -824,6 +824,7 @@ private okhttp3.Call createRawCall() throws IOException {
   return call;
 }
 ```
+
 serviceMethod.toCall()：
 
 ```java

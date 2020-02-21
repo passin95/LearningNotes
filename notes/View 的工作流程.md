@@ -90,7 +90,7 @@ public static class MeasureSpec {
 - EXACTLY：限制固定值
 - AT_MOST：限制上限
 
-一般情况下，视图的测量尺寸需要根据父布局的 MeasureSpec 属性和自身布局参数共同决定。其中，较为特殊的装饰视图属于根视图，没有父视图，则由窗口（Window）尺寸与自身布局决定。
+一般情况下，视图的测量尺寸需要根据父布局的 MeasureSpec 属性（父 View 的限制）和自身布局参数（开发者的要求）共同决定。其中，较为特殊的装饰视图属于根视图，没有父视图，则由窗口（Window）尺寸与自身布局决定。
 
 ## 2.3 View.onMeasure()
 
@@ -157,6 +157,7 @@ public void layout(int l, int t, int r, int b) {
     if (changed || (mPrivateFlags & PFLAG_LAYOUT_REQUIRED) == PFLAG_LAYOUT_REQUIRED) {
         onLayout(changed, l, t, r, b);
     }
+
     // 下面省略部分代码
 }
 ```
@@ -171,7 +172,7 @@ public void layout(int l, int t, int r, int b) {
 
 ## 4.1 SDK 中常用的计算方法
 
-在自定义布局的过程中，我们可以完全手写计算方法，也可以搭配 View 和 ViewGroup 中的一些常用的计算方法使用。因此下面先简单看一下这些 SDK 提供的计算方法。
+在自定义布局的过程中，我们可以完全手写计算方法，也可以搭配 View 和 ViewGroup 中的一些常用的计算方法使用。下面先简单看一下 Android SDK 提供的计算方法。
 
 ### 4.1.1 View.resolveSize()
 
@@ -188,7 +189,7 @@ public static int resolveSize(int size, int measureSpec) {
 }
 
 public static int resolveSizeAndState(int size, int measureSpec, int childMeasuredState) {
-    // size 为想要的大小，measureSpec 为父 View 的限制。
+    // size 为子 View 想要的大小，measureSpec 为父 View 的限制。
     final int specMode = MeasureSpec.getMode(measureSpec);
     final int specSize = MeasureSpec.getSize(measureSpec);
     final int result;
@@ -222,7 +223,7 @@ public static int resolveSizeAndState(int size, int measureSpec, int childMeasur
 
 ViewGroup.measureChildren() 用于给与一定的尺寸限制去测量所有子 View 所占的大小。
 
-该方法并不会适用任何情况，一般情况下，开发者需要手写自己的测量算法。
+该方法并不会适用任何情况，开发者可能需要自己手写测量算法。
 
 在手写测量算法的过程中，开发者的要求（layout_打头的属性）一般优先级最高。为什么呢？
 
@@ -353,12 +354,12 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
             resultMode = MeasureSpec.EXACTLY;
         } else if (childDimension == LayoutParams.MATCH_PARENT) {
             // View.sUseZeroUnspecifiedMeasureSpec 在 targetSdkVersion < 23 时为 true。
-            // 父 View 的限制为“不限制”且父 View 的大小不固定，因此传递父 View 的限制给子 View 就好。
+            // 父 View 的限制为“不限制”，因此传递父 View 的限制给子 View 就好。
             resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
             resultMode = MeasureSpec.UNSPECIFIED;
         } else if (childDimension == LayoutParams.WRAP_CONTENT) {
             // View.sUseZeroUnspecifiedMeasureSpec 在 targetSdkVersion < 23 时为 true。
-            // 父 View 的限制为“不限制”且父 View 的大小不固定，因此传递父 View 的限制给子 View 就好。
+            // 父 View 的限制为“不限制”，因此传递父 View 的限制给子 View 就好。
             resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
             resultMode = MeasureSpec.UNSPECIFIED;
         }
@@ -385,9 +386,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 
 ## 4.4 重写 onMeasure() 和 onLayout() 来全新计算自定义 ViewGroup 的内部布局
 
-开发者的要求：xml 文件中子 View layout 打头的 API。
-
-大多数情况下重写 onMeasure() 的三个步骤（或者说是思路）：
+大多数情况下重写 onMeasure() 的三个步骤（思路）：
 
 1. 调用每个子 View 的 measure() 来计算子 View 的尺寸;
 2. 计算子 View 的位置并保存子 View 的位置和尺寸;
@@ -395,11 +394,11 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 
 一般情况下重写 onLayout() 的思路：
 
-- 在 onLayout() 里调用每个子 View 的 layout() ，让它们保存自己的位置和尺寸。
+- 在 onLayout() 里调用每个子 View 的 layout()，让它们保存自己的位置和尺寸。
 
 关于保存子 View 位置的两点说明：
 
-1. 不是所有的 Layout 都需要保存子 View 的位置，因为有的 Layout 可以在布局阶段实时推导出子 View 的位置，例如 LinearLayout。
+1. 不是所有 ViewGroup 都需要保存子 View 的位置，因为有的 ViewGroup 可以在布局阶段实时推导出子 View 的位置，例如 LinearLayout。
 2. 有时候对某些子 View 需要重复测量多次才能得到正确的尺寸和位置。
 
 以下举一个重写自定义 ViewGroup onMeasure() 的例子，在重写的过程中可以用 SDK 提供的计算方法（1.3.1 节），也可以自己自定义计算方式。
