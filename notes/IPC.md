@@ -48,7 +48,7 @@ in.close();
 ### Parcelable
 
 Parcelable 序列化的使用方式如下所示，它的本质是将一个完整的对象进行分解，
-而分解后的每一部分都是Intent所支持的数据类型。也可以说是内存级别的序列化。
+而分解后的每一部分都是Intent所支持的数据类型，是内存级别的序列化。
 
 ```java
 public class User implements Parcelable {
@@ -124,7 +124,7 @@ private transient Object[] elementData;
 
 ####
 
-## Android 中的 ICP 方式
+## Android 中的 IPC 方式
 
 
 ### Bunble

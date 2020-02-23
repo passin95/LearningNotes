@@ -609,6 +609,7 @@ ButterKnife：通过反射实例化 APT 生成的绑定类，并在绑定类的�
 
 ```java
 public final class ButterKnife {
+    
     private ButterKnife() {
         throw new AssertionError("No instances.");
     }

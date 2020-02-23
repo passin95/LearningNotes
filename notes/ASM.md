@@ -29,7 +29,7 @@
 
 本文 ASM 主要应用于 Android APK 打包过程中的字节码插桩，因此需要简单了解一下 APK 的打包过程，先看一张 Google 官方的打包流程图：
 
- <div align="center"> <img src="../pictures//APK%20 打包流程图.webp" /> </div>
+ <div align="center"> <img src="../pictures//APK%20打包流程图.webp" /> </div>
 
 **（1）** 打包资源文件
 
@@ -61,7 +61,7 @@ ASM 在就是应用于第（3）步和第（4）步之间。
 
 **（7）** 对签名后的 APK 文件进行对齐处理
 
-如果发布的 apk 是正式版的话，就必须使用 zipalign 对 APK 进行对齐处理，对齐的主要过程是将 APK 包中所有的资源文件距离文件起始偏移为 4 字节整数倍，这样通过内存映射访问 apk 文件时的速度会更快。该工具位于 android-sdk/tools 目录下。
+如果发布的 apk 是正式版的话，就必须使用 zipalign 对 APK 进行对齐处理，对齐的主要过程是将 APK 包中所有的资源文件距离文件起始偏移为 4 字节整数倍，这样通过内存映射访问 apk 文件时的速度会更快（空间换时间）。该工具位于 android-sdk/tools 目录下。
 
 ## 1.2 字节码
 
@@ -745,7 +745,6 @@ class Demo1$Passin {
 
 ```
 Log.d("MethodConsumedTime", 方法所处类 -> 方法描述：方法耗时);
-
 ```
 
 **(1)** 自定义一个 Plugin
@@ -902,7 +901,7 @@ class MethodConsumedTimeVisitor extends ClassVisitor {
                     // 将插入的代码：Log.d("MethodConsumedTime", 方法所处类 -> 方法描述：方法耗时);
 
                     mv.visitLdcInsn("MethodConsumedTime")
-                    // 实例化 StringBuilder 对象
+                    // 实例化 StringBuilder 对象。
                     mv.visitTypeInsn(NEW, "java/lang/StringBuilder")
                     mv.visitInsn(DUP)
                     mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false)

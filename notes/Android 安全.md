@@ -98,7 +98,6 @@ Android 安全防护，从开发者角度来说主要分为三个层面去防护
 
 开发建议：对文件路径进行判断，存在".."时抛出异常，重要的 zip 文件需要验签。
 
-
 ### 3.1.2 WebView 漏洞
 
 [WebView 漏洞](./hybrid%20开发#221-webviewaddjavascriptinterface-%E5%8F%8A%E6%BC%8F%E6%B4%9E%E5%A4%84%E7%90%86)

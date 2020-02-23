@@ -16,10 +16,10 @@
   - [2.4 技巧](#24-%E6%8A%80%E5%B7%A7)
     - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
     - [2.4.2 滑动时回收](#242-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
-  - [三、RecyclerView 性能优化](#%E4%B8%89recyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
-    - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
-    - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
-    - [3.3 DiffUtil](#33-diffutil)
+- [三、RecyclerView 性能优化](#%E4%B8%89recyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
+  - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
+  - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
+  - [3.3 DiffUtil](#33-diffutil)
 
 <!-- /TOC -->
 
@@ -178,7 +178,7 @@ public void detachAndScrapAttachedViews(Recycler recycler) {
 
 private void scrapOrRecycleView(Recycler recycler, int index, View view) {
     final ViewHolder viewHolder = getChildViewHolderInt(view);
-    // shouldIgnore() 为 true 表示 此 ViewHolder 由 LayoutManager 完全管理，除非更换了 LayoutManager，否则不会报废、回收或删除它。
+    // shouldIgnore() 为 true 表示此 ViewHolder 由 LayoutManager 完全管理，除非更换了 LayoutManager，否则不会报废、回收或删除它。
     if (viewHolder.shouldIgnore()) {
         if (DEBUG) {
             Log.d(TAG, "ignoring view " + viewHolder);
@@ -507,17 +507,17 @@ private void recycleChildren(RecyclerView.Recycler recycler) {
 
 // 未完待续
 
-## 三、RecyclerView 性能优化
+# 三、RecyclerView 性能优化
 
-### 3.1 RecyclerView.setHasFixdSize()
+## 3.1 RecyclerView.setHasFixdSize()
 
 若 Adapter 的数据变化不会导致 RecyclerView 的大小变化，则将该方法设置为 true。它可以在 RecyclerView 内容发生变化时不需要调用 requestLayout()，而直接对子 View 进行 layout。
 
-### 3.2 RecyclerView.setRecycledViewPool()
+## 3.2 RecyclerView.setRecycledViewPool()
 
 多个 RecyclerView 在 viewType 一样（布局文件也一致）的情况下可以共用同一个 RecycledViewPool，例如订单的不同状态使用了多个 RecyclerView。
 
-### 3.3 DiffUtil
+## 3.3 DiffUtil
 
 适用于整个页面需要刷新，但是部分数据可能相同的情况（是否相同的标准由开发者决定）。它可以比较出不同的数据源进行局部刷新（局部刷新可以是某个 ViewHolder 的全量刷新或是单单某个 View 的方法调用），达到最小刷新的效果。具体的使用方式可看
 https://github.com/CymChad/BaseRecyclerViewAdapterHelper/blob/master/library/src/main/java/com/chad/library/adapter/base/BaseQuickAdapter.java。
