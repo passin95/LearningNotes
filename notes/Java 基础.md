@@ -989,15 +989,15 @@ public Object invoke(Object obj, Object... args)
 
 ```java
 Class<?> cls = Class.forName("java.lang.String");
-// 第一个参数为数组中的字段类型，第二个参数为容器大小
+// 第一个参数为数组中的字段类型，第二个参数为容器大小。
 Object array = Array.newInstance(cls,25);
-// 往数组里添加内容
+// 往数组里添加内容。
 Array.set(array,0,"hello");
 Array.set(array,1,"Java");
 Array.set(array,2,"fuck");
 Array.set(array,3,"Scala");
 Array.set(array,4,"Clojure");
-// 获取某一项的内容
+// 获取某一项的内容。
 System.out.println(Array.get(array,3));
 ```
 
@@ -1101,7 +1101,7 @@ Type 体系包括的类型：**原始类型**(raw types) 对应 Class，**参数
 
 ## 11.1 Class
 
-Class 不是一个接口，而是对 Type 的一个实现类,是 Java 反射的基础，对 Java 类的抽象。
+Class 不是一个接口，而是对 Type 的一个实现类，是 Java 反射的基础，对 Java 类的抽象。
 
 ## 11.2 ParameterizedType
 
