@@ -489,7 +489,7 @@ public class Demo {
 
 我们可以从输出的结果观察到在 Java 中类、方法、变量在字节码文件中的描述以及解析的顺序。具体输出如下：
 
-```java
+```
 visit() run，类添加了 final 修饰符
 visit() run，name：me/passin/asm/Demo$Passin，superName：java/lang/Objectinterfaces：java/io/Serializable  131120
 visitSource() run，source：Demo.java，debug：null
@@ -592,7 +592,7 @@ class Passin {
     }
 }
 
-// ASM 字节码插桩后对应的 Java 代。
+// ASM 字节码插桩后对应的 Java 代码。
 class Passin {
 
     @NonNull
@@ -916,7 +916,9 @@ class MethodConsumedTimeVisitor extends ClassVisitor {
                     mv.visitLdcInsn("ms")
                     mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false)
                     mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false)
-                    // 此时栈从底到顶的数值为：MethodConsumedTime，方法所处类 -> 方法描述：方法耗时，再使用栈顶 2 个数值作为参数调用 Log.d()。
+                    // 此时栈中最顶端的2个数值从底到顶为：
+                    // 1. MethodConsumedTime ; 2. 字符串：方法所处类 -> 方法描述：方法耗时。
+                    // 再使用栈顶 2 个数值作为参数调用 Log.d()。
                     mv.visitMethodInsn(INVOKESTATIC, "android/util/Log", "d", "(Ljava/lang/String;Ljava/lang/String;)I", false)
                     mv.visitInsn(POP)
                 }
@@ -973,4 +975,4 @@ public class MainActivity extends AppCompatActivity {
 
 ## 4.3 更多 ASM 的实战应用
 
-更多 ASM 的实战应用可参考 didi 的开源库 [booster](https://github.com/didi/) 或 luckybilly 的 [AutoRegister](https://github.com/luckybilly/AutoRegister)，很适合实战学习使用。
+更多 ASM 的实战应用可借鉴 didi 的 [booster](https://github.com/didi/) ，字节跳动的 [ByteX](https://github.com/bytedance/ByteX)，luckybilly 的 [AutoRegister](https://github.com/luckybilly/AutoRegister)，很适合实战学习使用。
