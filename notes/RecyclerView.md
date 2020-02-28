@@ -7,19 +7,19 @@
     - [2.1.1 测量](#211-%E6%B5%8B%E9%87%8F)
     - [2.1.2 布局](#212-%E5%B8%83%E5%B1%80)
     - [2.1.3 回收复用](#213-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
-      - [2.1.3.1 detachAndScrapAttachedViews()](#2131-detachandscrapattachedviews)
-      - [2.1.3.2 removeAndRecycleView()](#2132-removeandrecycleview)
-      - [2.1.3.3 getViewForPosition()](#2133-getviewforposition)
+            - [2.1.3.1 detachAndScrapAttachedViews()](#2131-detachandscrapattachedviews)
+            - [2.1.3.2 removeAndRecycleView()](#2132-removeandrecycleview)
+            - [2.1.3.3 getViewForPosition()](#2133-getviewforposition)
       - [2.1.3.4 缓存池小结](#2134-%E7%BC%93%E5%AD%98%E6%B1%A0%E5%B0%8F%E7%BB%93)
   - [2.2 自定义 LayoutManager 流程](#22-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
   - [2.3 回收复用的实现思路](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
   - [2.4 技巧](#24-%E6%8A%80%E5%B7%A7)
-    - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
+        - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
     - [2.4.2 滑动时回收](#242-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
 - [三、RecyclerView 性能优化](#%E4%B8%89recyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
-  - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
-  - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
-  - [3.3 DiffUtil](#33-diffutil)
+    - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
+    - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
+    - [3.3 DiffUtil](#33-diffutil)
 
 <!-- /TOC -->
 
@@ -35,7 +35,7 @@ public abstract static class ItemDecoration {
     /**
      * @param c：c 为画布，一般情况下只在 getItemOffsets 所撑出来的区域任意绘图，否则可能会被 Item 所覆盖（即该方法先于 Item 的绘制）
      * @param parent：设置当前装饰的 RecyclerView 对象。
-     * @param state：设置当前装饰的 RecyclerView 对象，用在 LayoutManager、 Adapter 等组件之间共享 RecyclerView 状态的。
+     * @param state：用在 LayoutManager、 Adapter 等组件之间共享 RecyclerView 状态的。
      */
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         this.onDraw(c, parent); // 空实现
