@@ -37,7 +37,7 @@ RandomAccess 是一个接口，仅仅起一个标识的作用，标识实现的�
 ### 1.1.2 fail-fast 和 fail—safe
 
 - fail-fast：用迭代器遍历一个集合对象时，如果遍历过程中对集合对象的内容进行了修改（增加、删除、修改时 modCount 会自增），遍历期间 modCount 字段和 expectedmodCount 不同则会抛出 ConcurrentModificationException。
-- fail—safe：支持在多线程下并发使用和修改，也可以在 foreach 中删减，原理是遍历时先复制原有集合内容，在拷贝的集合上进行遍历，也因此在遍历期间原集合元素有所修改时，迭代器并不能访问到修改后的元素。
+- fail—safe：支持在多线程下并发使用和修改，也可以在 foreach 中删减，原理是遍历时先复制原有集合内容，在拷贝的集合上进行遍历，在遍历过程中对原集合所作的修改并不能被迭代器检测到。
 
 ## 1.2 Collection
 
@@ -704,6 +704,7 @@ public boolean add(E e) {
         lock.unlock();
     }
 }
+
 final void setArray(Object[] a) {
     elements = a;
 }
@@ -725,7 +726,7 @@ public void add(int index, E element) {
 
 1. 扩容方面：Vector 扩容为原来容量的 2 倍，ArrayList 扩容为原来容量 1.5 倍，CopyOnWriteArrayList 每次添加元素都是一个新的数组。
 2. 性能方面：没有并发需求的情况下，优先使用 ArrayList。有并发需求的情况下：
-- Collections.synchronizedList() 和 Vector 的读写性能几乎一致，理论 Vector 比  Collections.synchronizedList() 还快一些，因为后者对方法多包了一层。
+- Collections.synchronizedList() 和 Vector 的读写性能几乎一致，理论 Vector 比 Collections.synchronizedList() 还快一些，因为后者对方法多包了一层。
 - 仅在读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，大大提高了读操作的性能，但是在写操作时需要复制一个新的数组，会频繁消耗内存。
 - 其余情况推荐自己控制并发，硬性需求才使用 Collections.synchronizedList() 或 Vector。
 3. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
@@ -1460,13 +1461,15 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     static final int TREEIFY_THRESHOLD = 8; 
     // 当桶 (bucket) 上的结点数小于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
-    // 桶中结构转化为红黑树对应的 table 的最小大小。
+    // 桶中结构转化为红黑树对应的 table 容量的最小值。
     static final int MIN_TREEIFY_CAPACITY = 64;
     // 存储元素的数组，也是 HashMap 的原理所在。
     // 数组容量任何时候总是 2 的幂次倍。
-    // 原因在于（n 代表 table 的容量）：使用 (n - 1) & hash 确定 hash 值在数组中的索引时，(n-1) 的二进制一定是 1111111***111 形式的，从而在按位与的时候，能够充分的散列（利用到每一位），使得添加的节点均匀分布在每个位置上。
+    // 原因在于（n 代表 table 的容量）：使用 (n - 1) & hash 确定 hash 值在数组中的索引时，
+    // (n-1) 的二进制一定是 1111111***111 形式的，从而在按位与的时候，能够充分的散列（利用到每一位），使得添加的节点均匀分布在每个位置上。
     transient Node<k,v>[] table; 
-    // 存放具体节点的 Set，只在使用时才创建（调用 entrySet()）。
+    // 他的实际类型是 EntrySet，只在调用 entrySet() 时才创建，
+    // 该方法并不是返回一个存储数据的集合，它只是一个视图窗口，实际上操纵的还是 HashMap 的键值。
     transient Set<map.entry<k,v>> entrySet;
     // 存放元素的个数，注意这个不等于数组 table 的长度。
     transient int size;
@@ -1552,10 +1555,10 @@ JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体
 ```java
 // 链表结构
 static class Node<K,V> implements Map.Entry<K,V> {
-        final int hash;  // 哈希值，存放元素到 HashMap 时用来与其他元素 hash 值比较。
+        final int hash;  // 键的哈希值，存放元素到 HashMap 时用来与其他元素 hash 值比较。
         final K key;  // 键
         V value;  // 值
-        // 指向下一个节点
+        // 指向的下一个节点。
         Node<K,V> next;
        
         Node(int hash, K key, V value, Node<K,V> next) {

@@ -540,7 +540,7 @@ System.out.println(set.size());   // 2
 - double：Double.hashCode(a)
 - 引用类型：若为 null 则为 0，,否则递归调用该引用类型的 hashCode()。
 - 容器类型：若为 null 则为 0，,否则对每个变量进行 result =  31 * result + [hashCode] 计算。
-- 
+
 ```java
 @Override
 public int hashCode() {
@@ -801,7 +801,6 @@ public class A {
         A a2 = new A();
     }
 }
-
 ```
 
 ```
@@ -976,8 +975,8 @@ public Field getField(String name)
 **（5）调用方法**
 
 ```java
-// 当我们从类中获取了一个方法后，我们就可以用 invoke() 方法来调用这个方法。
-// obj 为相应的 Method 对象，args 为具体的参数值。
+// 当我们从类中获取了一个方法后，我们就可以用 Method.invoke() 方法来调用这个方法。
+// obj 为拥有 Method 的对象，args 为具体的参数值。
 public Object invoke(Object obj, Object... args)
         throws IllegalAccessException, IllegalArgumentException,
            InvocationTargetException
@@ -990,15 +989,15 @@ public Object invoke(Object obj, Object... args)
 ```java
 Class<?> cls = Class.forName("java.lang.String");
 // 第一个参数为数组中的字段类型，第二个参数为容器大小。
-Object array = Array.newInstance(cls,25);
+Object array = Array.newInstance(cls, 25);
 // 往数组里添加内容。
-Array.set(array,0,"hello");
-Array.set(array,1,"Java");
-Array.set(array,2,"fuck");
-Array.set(array,3,"Scala");
-Array.set(array,4,"Clojure");
+Array.set(array, 0, "hello");
+Array.set(array, 1, "Java");
+Array.set(array, 2, "fuck");
+Array.set(array, 3, "Scala");
+Array.set(array, 4, "Clojure");
 // 获取某一项的内容。
-System.out.println(Array.get(array,3));
+System.out.println(Array.get(array, 3));
 ```
 
 ## 7.2 反射的优缺点
@@ -1030,8 +1029,8 @@ Exception 又分为 **运行时异常（RuntimeException）** 和 **非运行时
 
 Java 异常又可以分为不受检查异常（Unchecked Exception）和检查异常（Checked Exception）。
 
-- 不受检查异常：编译器不要求强制处理的异常，除了 RuntimeException 及其子类以外，其他的 Exception 类和 Error 类都属于这种异常。
-- 检查异常：则是编译器要求必须处置的异常。当程序中可能出现这类异常，要么使用 try-catch 语句进行捕获，要么用 throws 抛出，否则无法编译通过。
+- 不受检查异常：编译器不要求强制处理的异常。这些异常包括 RuntimeException（及其子类）以及 Error（及其子类）。
+- 检查异常：则是编译器要求必须处置的异常。当程序中可能出现这类异常，要么使用 try-catch 语句进行捕获，要么用 throws 抛出，否则无法编译通过。这些异常 Exception 及其子类（RuntimeException 及其子类除外）。
 
 注意：当 try 语句和 finally 语句中都有 return 语句时，在方法返回之前，finally 语句的内容将被执行，并且 finally 语句的返回值将会覆盖原始的返回值。
 
@@ -1175,7 +1174,7 @@ public interface TypeVariable<D extends GenericDeclaration> extends Type {
 
 JDK 全名 Java Development Kit，它是功能齐全的 Java SDK。它拥有 JRE 所拥有的一切，还有编译器（javac）和工具（如 javadoc 和 jdb）。它能够创建和编译程序。
 
-JRE 全名 java runtime environment，是 Java 程序的运行环境。它包含了运行已编译 Java 程序所需的所有内容的集合，包括 Java 虚拟机（JVM），Java 类库，Java 命令和其他的一些基础构件。但是，它不能用于创建新程序。
+JRE 全名 java runtime environment，是 Java 程序的运行环境。它包含了运行已编译 Java 程序所需所有内容的集合，包括 Java 虚拟机（JVM），Java 类库，Java 命令和其他的一些基础构件。但是，它不能用于创建新程序。
 
 # 参考资料
 
