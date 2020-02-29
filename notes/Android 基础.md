@@ -107,7 +107,7 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 在先 replace 为 FragmentA 的基础上，replace FragmentB。
 
-FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onStop -> FragmentA onDestroyView ->FragmentA onDestroy -> FragmentA onDetach -> FragmentB onCreateView -> FragmentB onViewCreated -> FragmentB onActivityCreated 
+FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onStop -> FragmentA onDestroyView -> FragmentA onDestroy -> FragmentA onDetach -> FragmentB onCreateView -> FragmentB onViewCreated -> FragmentB onActivityCreated 
 
 若将该次事务加入 Fragment 栈 (调用 addToBackStack())，不会调用 FragmentA onDestroy() 和 onDetach()，replace 回 FragmentA 时则从 onCreateView() 开始。
 
@@ -118,7 +118,6 @@ FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onSto
 ## 1.3 onSaveInstanceState() 和 onRestoreInstanceState()
 
 当 Activity 被意外终止时或容易被销毁时，Activity 调用 onSaveInstanceState() 去保存数据，然后 Activity 委托 Window 去保存数据，接着 Window 再委托它上面的顶级容器去保存数据，一般是 DecordView。顶层容器再去一一通知它的子元素保存数据（写在 super 上面先于子元素保存，反之后于）。
-
 
 onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause() 之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
 
@@ -248,7 +247,7 @@ category 是一个字符串，一个 Intent 或过滤规则中可以添加多个
 
 ## 4.3 data 的匹配规则
 
-如果过滤规则定义了 data，那么 Intent 中必须也要添加至少一个匹配过滤规则的 data。过滤规则的默认 data 的默认 URI 的 scheme 为 content 和 file
+如果过滤规则定义了 data，那么 Intent 中必须也要添加至少一个匹配过滤规则的 data。过滤规则的默认 data 的默认 URI 的 scheme 为 content 和 file。
 
 若要为 Intent 指定完整的 data，必须调用 **setDataAndType()**，单独调用 **setData()** 或 **setType()** 会将对方互相置 null。 
 
@@ -277,7 +276,7 @@ URI 也叫统一资源标识符，它在 data 的结构如下：
 - host：URI 的主机域名或 IP 地址;
 - port：端口号;
 - path：完整的路径信息；
-- pathPattern：完整的路径信息，不过可包含通配符 “*”，它可以表示 0 个或多个任意字符，若想表示真实的字符串需在字符前加 “\\”。
+- pathPattern：完整的路径信息，不过可包含通配符 “*”，它可以表示 0 个或多个任意字符，若想表示真实的字符串需在字符前加 “\\”；
 - pathPrefix：路径的前缀信息。
 
 ## 4.4 注意事项
@@ -378,11 +377,11 @@ bindService(bindIntent,connection,BIND_AUTO_CREATE);
 
 ## 5.1 Androidmanifest Serivce 属性说明
 
-- name：Service 的类名
-- icon：Service 的图标
-- permission：申明此 Service 的权限。
-- process：申明该服务是否在另一个进程中运行（远程服务)。不设置默认为本地服务，设置为 :remote 则设置成远程服务。
-- enable：true：Service 将会默认被系统启动；不设置则默认为 false。
+- name：Service 的类名；
+- icon：Service 的图标；
+- permission：申明此 Service 的权限；
+- process：申明该服务是否在另一个进程中运行（远程服务)。不设置默认为本地服务，设置为 :remote 则设置成远程服务；
+- enable：true：Service 将会默认被系统启动；不设置则默认为 false；
 - exported：该服务是否能够被其他应用程序所控制或连接，包含 intent-filter 时 exported 默认值为 true，反之为 false。
 
 ## 5.2 前台 Service 和后台 Service
@@ -401,8 +400,8 @@ public class MyService extends Service {
         super.onCreate();
 
         // 构建"点击通知后打开 MainActivity"的 Intent 对象。
-        Intent notificationIntent = new Intent(this,MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,0);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         // 新建 Builder 对象。
         Notification.Builder builer = new Notification.Builder(this);
@@ -415,6 +414,7 @@ public class MyService extends Service {
         // 让 Service 变成前台 Service,并在系统的状态栏显示出来。
         startForeground(1, notification);
     }
+
 }
 ```
 
@@ -466,7 +466,7 @@ public abstract class IntentService extends Service {
         // startId 为启动服务的唯一整数。与 {@link #stopSelfResult（int）} 一起使用。
         Message msg = mServiceHandler.obtainMessage();
         msg.arg1 = startId;
-        // 把 Intent 参数 包装到 message 的 obj 发送消息中，这里的 Intent 为启动服务时 startService(Intent) 里传入的 Intent。
+        // 把 Intent 参数包装到 message 的 obj 发送消息中，这里的 Intent 为启动服务时 startService(Intent) 里传入的 Intent。
         msg.obj = intent;
         // 发送消息，添加到消息队列里。
         mServiceHandler.sendMessage(msg);

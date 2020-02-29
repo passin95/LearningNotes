@@ -40,9 +40,9 @@
         - [4.3.1 主动引用](#431-主动引用)
         - [4.3.2 被动引用](#432-被动引用)
 - [五、类加载器](#五类加载器)
-        - [5.1 类与类加载器](#51-类与类加载器)
-        - [5.2 加载器分类](#52-加载器分类)
-        - [5.3 双亲委派模型](#53-双亲委派模型)
+    - [5.1 类与类加载器](#51-类与类加载器)
+    - [5.2 加载器分类](#52-加载器分类)
+    - [5.3 双亲委派模型](#53-双亲委派模型)
 - [参考资料](#参考资料)
 
 <!-- /TOC -->
@@ -191,9 +191,9 @@ public class ReferenceCountingGC {
 
 Java 虚拟机使用该算法来判断对象是否可被回收，在 Java 中 GC Roots 一般包含以下内容：
 
-- **运行中的线程**（包括了 Java 虚拟机栈和本地方法栈中引用的对象）
-- 方法区中类静态属性引用的对象
-- 方法区中的常量引用的对象
+- **运行中的线程**（包括了 Java 虚拟机栈和本地方法栈中引用的对象）；
+- 方法区中类静态属性引用的对象；
+- 方法区中的常量引用的对象。
 
 <div align="center"> <img src="../pictures//0635cbe8.png"/> </div><br>
 
@@ -541,13 +541,13 @@ System.out.println(ConstClass.HELLOWORLD);
 
 数组类型不通过类加载器创建，它由 Java 虚拟机直接创建。
 
-### 5.1 类与类加载器
+## 5.1 类与类加载器
 
 两个类相等：类本身相等，并且使用同一个类加载器进行加载。这是因为每一个类加载器都拥有一个独立的类名称空间。
 
 这里的相等，包括类的 Class 对象的 equals() 方法、isAssignableFrom() 方法、isInstance() 方法的返回结果为 true，也包括使用 instanceof 关键字做对象所属关系判定结果为 true。
 
-### 5.2 加载器分类
+## 5.2 加载器分类
 
 从 Java 虚拟机的角度来讲，只存在以下两种不同的类加载器：
 
@@ -563,7 +563,7 @@ System.out.println(ConstClass.HELLOWORLD);
 
 - 应用程序类加载器（Application ClassLoader）这个类加载器是由 AppClassLoader（sun.misc.Launcher$AppClassLoader）实现的。由于这个类加载器是 ClassLoader 中的 getSystemClassLoader() 方法的返回值，因此一般称为系统类加载器。它负责加载用户类路径（ClassPath）上所指定的类库，开发者可以直接使用这个类加载器，如果应用程序中没有自定义过自己的类加载器，一般情况下这个就是程序中默认的类加载器。
 
-### 5.3 双亲委派模型
+## 5.3 双亲委派模型
 
 应用程序都是由三种类加载器相互配合进行加载的，如果有必要，还可以加入自己定义的类加载器。
 
@@ -595,7 +595,7 @@ public abstract class ClassLoader {
                         c = findBootstrapClassOrNull(name);
                     }
                 } catch (ClassNotFoundException e) {
-                    // 当父类加载器加载失败时抛出 ClassNotFoundException
+                    // 当父类加载器加载失败时抛出 ClassNotFoundException。
                 }
 
                 if (c == null) {
