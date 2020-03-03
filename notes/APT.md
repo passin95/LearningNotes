@@ -3,24 +3,24 @@
 
 <!-- TOC -->
 
-- [一、元注解](#%E4%B8%80%E5%85%83%E6%B3%A8%E8%A7%A3)
-  - [1.1 @Retention](#11-retention)
-  - [1.2 @Target](#12-target)
-- [二、APT](#%E4%BA%8Capt)
-  - [2.1 Module 结构](#21-module-%E7%BB%93%E6%9E%84)
-  - [2.2 AbstractProcessor](#22-abstractprocessor)
-  - [2.3 Element](#23-element)
-    - [2.3.1 基础接口 Element](#231-%E5%9F%BA%E7%A1%80%E6%8E%A5%E5%8F%A3-element)
-    - [2.3.2 VariableElement](#232-variableelement)
-    - [2.3.3 TypeParameterElement](#233-typeparameterelement)
-    - [2.3.4 ExecutableElement](#234-executableelement)
-    - [2.3.5 TypeElement](#235-typeelement)
-    - [2.3.6 PackageElement](#236-packageelement)
-  - [2.4 JavaPoet 的使用](#24-javapoet-%E7%9A%84%E4%BD%BF%E7%94%A8)
-- [三、手写 ButterKnife](#%E4%B8%89%E6%89%8B%E5%86%99-butterknife)
-  - [3.1 butterknife-annotations](#31-butterknife-annotations)
-  - [3.2 butterknife-api](#32-butterknife-api)
-  - [3.3 butterknife-compiler](#33-butterknife-compiler)
+- [一、元注解](#一元注解)
+    - [1.1 @Retention](#11-retention)
+    - [1.2 @Target](#12-target)
+- [二、APT](#二apt)
+    - [2.1 Module 结构](#21-module-结构)
+    - [2.2 AbstractProcessor](#22-abstractprocessor)
+    - [2.3 Element](#23-element)
+        - [2.3.1 基础接口 Element](#231-基础接口-element)
+        - [2.3.2 VariableElement](#232-variableelement)
+        - [2.3.3 TypeParameterElement](#233-typeparameterelement)
+        - [2.3.4 ExecutableElement](#234-executableelement)
+        - [2.3.5 TypeElement](#235-typeelement)
+        - [2.3.6 PackageElement](#236-packageelement)
+    - [2.4 JavaPoet 的使用](#24-javapoet-的使用)
+- [三、手写 ButterKnife](#三手写-butterknife)
+    - [3.1 butterknife-annotations](#31-butterknife-annotations)
+    - [3.2 butterknife-api](#32-butterknife-api)
+    - [3.3 butterknife-compiler](#33-butterknife-compiler)
 
 <!-- /TOC -->
 
@@ -38,8 +38,8 @@
 ## 1.1 @Retention
 
 - RetentionPolicy.SOURCE：在 javac 编译之后丢弃，因此它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解，APT 也可使用该注解。
-- RetentionPolicy.CLASS：注释将由编译器记录在类文件中，但不会加载到 JVM 中。注解默认使用这种方式。与 SOURCE 的作用区别在于，CLASS 修饰的注解可以作为字节码修改或插桩的依据。
-- RetentionPolicy.RUNTIME：注释将由编译器记录在类文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解信息的时候。
+- RetentionPolicy.CLASS：注释将由编译器记录在字节码文件中，但不会加载到 JVM 中。注解默认使用这种方式。与 SOURCE 的作用区别在于，CLASS 修饰的注解可以作为字节码修改或插桩的依据。
+- RetentionPolicy.RUNTIME：注释将由编译器记录在字节码文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解信息的时候。
 
 ## 1.2 @Target
 
