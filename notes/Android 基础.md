@@ -144,7 +144,9 @@ onPause -> onStop-> onSaveInstanceState -> onDestroy -> onCreate -> onStart -> o
 
 onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> onRestart -> onStart -> onRestoreInstanceState -> onActivityResult（B）-> onResume
 
-使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理。若 Intent 添加 FLAG_ACTIVITY_NEW_TASK ，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity。其它正常使用的情况皆为 onActivityResult（B），注意若 Activity 是重建后的 Activity，那么会先初始化 Activity ，再执行 onRestoreInstanceState，再执行 onActivityResult（B），此时应该针对实际业务需求，再 onActivityResult 中进行判断，最后的结果应当是要不完全恢复正确的结果，要不不恢复保留初始化后的结果（即在 onActivityResult 判断当前界面是否是重建后的调用）。
+1. 使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理。
+2. 若 Intent 添加 FLAG_ACTIVITY_NEW_TASK ，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity。
+3. 其它正常使用的情况皆为 onActivityResult（B），注意若 Activity 是重建后的 Activity，那么会先初始化 Activity ，再执行 onRestoreInstanceState，再执行 onActivityResult（B），此时应该针对实际业务需求，在 onActivityResult 中进行判断，最后的做法一般有 2 种选择：1.完全恢复正确的数据和 UI；2.不恢复，即不保存销毁前的数据，并在 onActivityResult 中不处理回调的结果，完全保留刚进该界面时的数据和样式。
 
 （5） Activity A 跳转到 Activity B（不透明）的生命周期为：onPause（A）-> onCreate(B) -> onStart(B) -> onResume(B) -> onStop(A) ，在 onPause(A) post 出去的 Message 先于 onResume(B) 执行。
 
@@ -296,7 +298,7 @@ Service 用于需要在后台长期运行的业务，它可以不与相应的界
 ```java
 
 /**
- * 服务的方法都在主线程执行，因此有时需要在非主线程执行。
+ * 服务的方法都在主线程执行。
  */
 public class MyService extends Service {
     // 
@@ -372,7 +374,7 @@ private ServiceConnection connection = new ServiceConnection() {
 };
 
 Intent bindIntent = new Intent(this, MyService.class);
-bindService(bindIntent,connection,BIND_AUTO_CREATE);
+bindService(bindIntent, connection, BIND_AUTO_CREATE);
 ```
 
 ## 5.1 Androidmanifest Serivce 属性说明
