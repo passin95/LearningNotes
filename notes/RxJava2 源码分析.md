@@ -839,7 +839,7 @@ public final class SingleDefer<T> extends Single<T> {
 Observable<List<User>> observable = retrofit.create(UserService.class).getUserList()
 ```
 
-这是一个以 RxJava 结合 Retrofit 得到的一个被观察者对象过程，但是由于反射的机制，在我们调用 getUserList() 方法时，便会在当前线程（一般此时为 main 线程）去执行 retrofit.create() 中代理对象的 invoke() 方法，而该方法的 ServiceMethod 的实例化是较为耗时的，此时便会堵塞 main 线程。
+这是一个以 RxJava 结合 Retrofit 得到的一个被观察者对象过程，但是由于动态代理的机制，在我们调用 getUserList() 方法时，便会在当前线程（一般此时为 main 线程）去执行 retrofit.create() 中代理对象的 invoke() 方法，而该方法的 ServiceMethod 的实例化是较为耗时的，此时便会堵塞 main 线程。
 
 此时我们便可以使用 defer 操作符，在构建该 observable 前（SingleDefer 被订阅前）对线程进行切换，从而防止堵塞 main 线程。
 

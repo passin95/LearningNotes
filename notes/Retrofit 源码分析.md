@@ -62,7 +62,7 @@ Observable<List<User>> userList = retrofit.create(UserService.class).getUserList
 通过 Builder 设计模式初始化变量。
 ```java
 public final class Retrofit {
-// 以 Method 为单位作为每个网络请求中的请求体的缓存使用
+// 以 Method 为单位作为每个网络请求中的请求体的缓存使用。
 private final Map<Method, ServiceMethod<?, ?>> serviceMethodCache = new ConcurrentHashMap<>();
 // okhttp3.Call 为网络请求器，利用工程模式对外提供拓展并解耦，一般使用 okhttp 提供的默认实现 OkHttpClient
 private @Nullable okhttp3.Call.Factory callFactory;
