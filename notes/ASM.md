@@ -114,7 +114,7 @@ table th:nth-of-type(3) {
 
 ### 1.2.2 JVM 指令集
 
-在初期的学习过程中（不管是字节码还是 ASM），我们常常需要查询 JVM 指令的含义。因此对 JVM 所有指令进行整理，如下表所示，参考自 [Java bytecode instruction listings](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)。
+在初期的学习过程中（不管是字节码还是 ASM），我们常常需要查询 JVM 指令的含义，因此对 JVM 所有指令进行整理，如下表所示（参考自 [Java bytecode instruction listings](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)）：
 
 注：栈变化一列中的内容越前面的值越是栈底，以 arrayref, index, value -> 为例，栈顶为 value。
 
