@@ -113,9 +113,9 @@ http://www.demo.com:8080/path/path1?key=value&key1=value1&key2=value2#demofragme
 - scheme-specific-part：//www.demo.com:8080/path/path1?key=value&key1=value1&key2=value2；
 - authority：www.demo.com:8080；
 - host：URI的主机域名或IP地址，Demo 中为 www.demo.com；
-- Part：端口号，Demo 中为 8080；
+- port：端口号，Demo 中为 8080；
 - path：路径信息，Demo 中为 /yourpath/fileName.htm；
-- query：键对值，Deme 中为 key=value&key1=value1&key2=value2;
+- query：键对值，Deme 中为 key=value&key1=value1&key2=value2；
 - fragment：用来标识次级资源，Demo 中为 demofragment。
 
 ## 1.2 TCP/IP
