@@ -1,28 +1,28 @@
 
 <!-- TOC -->
 
-- [一、前言](#%E4%B8%80%E5%89%8D%E8%A8%80)
-- [二、初探 RxJava](#%E4%BA%8C%E5%88%9D%E6%8E%A2-rxjava)
-  - [2.1 Single.just()](#21-singlejust)
-  - [2.2 single.subscribe(observer)](#22-singlesubscribeobserver)
-  - [2.3 小结](#23-%E5%B0%8F%E7%BB%93)
-- [三、再探 RxJava](#%E4%B8%89%E5%86%8D%E6%8E%A2-rxjava)
-  - [3.1 RxJava 链式调用结构的本质](#31-rxjava-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%9C%AC%E8%B4%A8)
-  - [3.2 Map 和 FlapMap](#32-map-%E5%92%8C-flapmap)
-    - [3.2.1 map](#321-map)
-    - [3.2.2 flatMap](#322-flatmap)
-  - [3.3 线程切换](#33-%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2)
-    - [3.3.1 subscribeOn](#331-subscribeon)
-    - [3.3.2 observeOn](#332-observeon)
-    - [3.3.3 小结](#333-%E5%B0%8F%E7%BB%93)
-- [四、终看 RxJava](#%E5%9B%9B%E7%BB%88%E7%9C%8B-rxjava)
-  - [4.1 doFinally 和 doAfterTerminate 有何不同？](#41-dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C)
-  - [4.2 doFinally() 写在 observeOn() 之前和之后有何区别？](#42-dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB)
-  - [4.3 doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#43-doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84)
-  - [4.4 为什么连用两个 subscribeOn 操作符只有第一个有效？](#44-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88)
-  - [4.5 defer 到底有何作用？](#45-defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8)
-  - [4.6 Demo 执行过程梳理](#46-demo-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E6%A2%B3%E7%90%86)
-- [五、不同被观察者的区别](#%E4%BA%94%E4%B8%8D%E5%90%8C%E8%A2%AB%E8%A7%82%E5%AF%9F%E8%80%85%E7%9A%84%E5%8C%BA%E5%88%AB)
+- [一、前言](#一前言)
+- [二、初探 RxJava](#二初探-rxjava)
+    - [2.1 Single.just()](#21-singlejust)
+    - [2.2 single.subscribe(observer)](#22-singlesubscribeobserver)
+    - [2.3 小结](#23-小结)
+- [三、再探 RxJava](#三再探-rxjava)
+    - [3.1 RxJava 链式调用结构的本质](#31-rxjava-链式调用结构的本质)
+    - [3.2 Map 和 FlapMap](#32-map-和-flapmap)
+        - [3.2.1 map](#321-map)
+        - [3.2.2 flatMap](#322-flatmap)
+    - [3.3 线程切换](#33-线程切换)
+        - [3.3.1 subscribeOn](#331-subscribeon)
+        - [3.3.2 observeOn](#332-observeon)
+        - [3.3.3 小结](#333-小结)
+- [四、终看 RxJava](#四终看-rxjava)
+    - [4.1 doFinally 和 doAfterTerminate 有何不同？](#41-dofinally-和-doafterterminate-有何不同)
+    - [4.2 doFinally() 写在 observeOn() 之前和之后有何区别？](#42-dofinally-写在-observeon-之前和之后有何区别)
+    - [4.3 doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#43-doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
+    - [4.4 为什么连用两个 subscribeOn 操作符只有第一个有效？](#44-为什么连用两个-subscribeon-操作符只有第一个有效)
+    - [4.5 defer 到底有何作用？](#45-defer-到底有何作用)
+    - [4.6 Demo 执行过程梳理](#46-demo-执行过程梳理)
+- [五、不同被观察者的区别](#五不同被观察者的区别)
 
 <!-- /TOC -->
 
@@ -62,13 +62,13 @@ SingleObserver<Integer> observer = new SingleObserver<Integer>() {
 };
 
 // 从语意上看被观察者 “订阅” 观察者，实际是观察者订阅被观察者（下面也将如此描述），
-// 因此多次调用 single.subscribe() 是互不影响的。
+// 多次调用 single.subscribe() 是互不影响的，因为被观察者的成员变量都是被 final 修饰的。
 single.subscribe(observer);
 ```
 
 ## 2.1 Single.just()
 
-被观察者的构建过程，基本上所有的被观察者的构建的 Api 源码都是相似的逻辑。
+被观察者的构建过程：基本上所有的被观察者的构建的 Api 源码都是相似的逻辑。
 
 ```java
 public static <T> Single<T> just(final T item) {
@@ -115,13 +115,13 @@ public final class SingleJust<T> extends Single<T> {
 
 ## 2.2 single.subscribe(observer)
 
-观察者订阅被观察者
+观察者订阅被观察者。
 
 ```java
 public final void subscribe(SingleObserver<? super T> observer) {
     ObjectHelper.requireNonNull(observer, "subscriber is null");
 
-    // 对全局观察者进行转换，默认不转换。
+    // 对观察者进行全局设置的默认转换，默认不转换。
     observer = RxJavaPlugins.onSubscribe(this, observer);
 
     ObjectHelper.requireNonNull(observer, "subscriber returned by the RxJavaPlugins hook is null");
@@ -142,8 +142,9 @@ public final void subscribe(SingleObserver<? super T> observer) {
 
 ## 2.3 小结
 
-- 我们可以发现被观察者 single 的实例化以及观察者 observer 的实例化都处于**当前所在线程**(重点，有利于 RxJava 后续的理解)。
+- 我们可以发现被观察者 single 的实例化以及观察者 observer 的实例化都处于 **当前所在线程（重点，有利于 RxJava 后续的理解）**。
 - 当被观察者 single **被订阅时（调用 single.subscribe(observer)）**，执行的核心方法为被观察者 single 的 subscribeActual(observer) 方法，通过传入观察者 observer 的对象去控制观察者 observer 的方法执行。
+- 第一个被观察者一定是数据的提供者。
 
 <img src="../pictures//RxJavaPic1.png" /> 
 
@@ -151,28 +152,28 @@ public final void subscribe(SingleObserver<? super T> observer) {
 
 我们在上一个 Demo 的基础上加了线程的切换以及 Map 操作符和 FlatMap 操作符的使用。
 
-本小节，皆已以下代码作为 Demo。
+本小节，皆以以下代码作为 Demo。
 
 ```java
-// 实例化观察者
+// 实例化观察者。
 SingleObserver<String> observer = new SingleObserver<String>() {
     @Override
     public void onSubscribe(Disposable d) {
-        // 开始订阅
+        // 开始订阅。
     }
 
     @Override
     public void onSuccess(String integer) {
-        // 成功拿到数据
+        // 成功拿到数据。
     }
 
     @Override
     public void onError(Throwable e) {
-        // 异常
+        // 异常。
     }
 };
 
-// 实例化被观察者
+// 实例化被观察者。
 Single<String> single = Single.just(1)
         .subscribeOn(Schedulers.io())
         .flatMap(new Function<Integer, SingleSource<Integer>>() {
@@ -225,6 +226,7 @@ public final class SingleMap<T, R> extends Single<R> {
 ```
 
 从上面可以看到 single.subscribe(observer) 的本质为实例化一个新的观察者订阅上一个被观察者。
+
 然后我们看一下 MapSingleObserver 拿到 observer（single 的观察者）做了什么。
 
 ```java
@@ -403,7 +405,7 @@ public final class SingleSubscribeOn<T> extends Single<T> {
         // 此处注意，SingleSubscribeOn 被订阅时，便已经调用该方法。
         s.onSubscribe(parent);
 
-        // scheduler 对不同线程 (池) 的使用做了一层接口封装,作为线程调度器使用。
+        // scheduler 对不同线程 (池) 的使用做了一层接口封装，作为线程调度器使用。
         // 调用 scheduler.scheduleDirect() 方法将在 scheduler 所维护的线程 (池) 中执行 SubscribeOnObserver 的 run() 方法，
         // run() 方法执行的是 source（single4）的订阅过程，
         // 也就是说，若之后不再切换线程，从 source（single4）的 subscribeActual() 开始之后的所有代码都在该线程 (池) 中执行。
@@ -951,7 +953,7 @@ Observable<List<User>> observable = retrofit.create(UserService.class).getUserLi
 # 五、不同被观察者的区别
 
 - Observable：发送 **多个信号** + **一个完成信号** 或 **一个错误信号**；
-- Flowable：发送 **多个信号** + **一个完成信号** 或 **一个错误信号**，加上背压的处理（上游信号的发送速度远大于处理的速度时，为了避免导致OOM，可以选择不同的策略处理）；
+- Flowable：发送 **多个信号** + **一个完成信号** 或 **一个错误信号**，加上背压的处理（上游信号的发送速度远大于下游的处理的速度时，为了避免导致 OOM，可以选择不同的策略处理）；
 - Single：发送 **一个完成信号** 或 **一个错误信号**；
 - Completable：发送 **一个完成信号** 或 **一个错误信号**；
 - Maybe：**可能** 发送 **一个信号** + **一个完成信号** 或 **一个错误信号**。
