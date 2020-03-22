@@ -1090,6 +1090,7 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 
 Type 是 Java 中所有类型的公共超级接口。
 Type 体系包括的类型：**原始类型**(raw types) 对应 Class，**参数化类型**(parameterized types) 对应 ParameterizedType，**数组类型**(array types) 对应 GenericArrayType，**类型变量**(type variables) 对应 TypeVariable，**基本类型**(primitive types) 对应 Class。
+
 - 原始类型：不仅仅包含我们平常所指的类，还包括枚举、数组、注解等。
 - 参数化类型：List<T>、Map<K,V> 等带有参数化的容器。
 - 数组类型：不是 String[] 、byte[] 等数组，而是带有泛型的数组 T[]。

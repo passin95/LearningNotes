@@ -56,6 +56,10 @@
 
   Gradle、AOP、APT、AspectJ、ASM。
 
+- [Android IPC](./notes/IPC.md)
+
+  IPC、Android IPC 方式、Binder。
+
 - [Hybrid 开发](./notes/hybrid%20开发.md)
 
   WebView、Android 和 JavaScript 的交互、WebView 存在的漏洞处理方式。
@@ -70,7 +74,7 @@
 
 ### :cloud: 网络 
 
-- [HTTP](./notes/HTTP.md)
+- [网络](./notes/网络.md)
 
   计算器网络结构基础、HTTP、HTTPS、HTTP 的实际应用。
 

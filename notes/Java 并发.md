@@ -91,6 +91,7 @@ Running 状态的线程也属于 Runnable 状态，反之不成立。
 **（3）阻塞（Blocked）**
 
 Blocked 状态一般在以下几种情况发生：
+
 - 调用了 Thread.sleep() 方法。
 - 为了获取某个锁资源，从而加入到该锁的阻塞队列时。
 - 正在进行某个阻塞的 IO 操作，例如网络数据的读写。
@@ -571,6 +572,8 @@ volatile 的本质是使用机器指令 **lock** ，**lock** 相当于一个内�
 - volatile 只能修饰静态变量、实例变量，对于方法参数、局部变量、实例常量以及类常量都不能修饰。
 - 部分虚拟机中，long 与 double 的读写不是原子操作，而是划分为两次 32 位的操作来进行，因此需要加上 volatile 后 long 和 double 类型的变量操作才是原子操作。
 
+从 volatile 的作用我们可以看出：在并发环境下往往需要配合 CAS 才能做到资源的读写安全。但有一种情况除外：存在多线程读取变量，但 **永远只由某个确定的线程** 或 **能保证同一时间内只有单个线程** 进行写操作。
+
 # 四、线程安全和锁
 
 线程安全是指在多线程的条件下运行代码都能表现正确的行为。
@@ -583,10 +586,10 @@ volatile 的本质是使用机器指令 **lock** ，**lock** 相当于一个内�
 
 不可变的类型：
 
-1. final 关键字修饰的基本数据类型
-2. String
-3. 枚举类型
-4. Number 部分子类，如 Long 和 Double 等数值包装类型，BigInteger 和 BigDecimal 等大数据类型。但同为 Number 的原子类 AtomicInteger 和 AtomicLong 则是可变的。
+1. final 关键字修饰的基本数据类型；
+2. String；
+3. 枚举类型；
+4. Number 部分子类，如 Long 和 Double 等数值包装类型，BigInteger 和 BigDecimal 等大数据类型。但同为 Number 的原子类 AtomicInteger 和 AtomicLong 则是可变的；
 5. Collections.unmodifiableXXX() 方法来获取一个不可变的集合。
 
 ## 4.2 互斥同步（阻塞同步）
