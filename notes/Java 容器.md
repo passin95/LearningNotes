@@ -54,7 +54,7 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 没有重复对象的集合。
  
 - TreeSet：基于红黑树实现，支持有序性操作，例如根据一个范围查找元素的操作。但是查找效率不如 HashSet，HashSet 查找的时间复杂度为 O(1)，TreeSet 则为 O(logN)。
-- HashSet：基于哈希表实现，支持快速查找，但不支持有序性操作。也就是说使用 Iterator 遍历 HashSet 得到的结果是不确定的。
+- HashSet：基于哈希表实现，底层实现是 HashMap，支持快速查找，但不支持有序性操作。
 - LinkedHashSet：具有 HashSet 的查找效率，且内部使用双向链表维护元素的插入顺序。
 
 ### 1.2.3 Queue
@@ -63,6 +63,8 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 - PriorityQueue：基于堆结构实现，可以用它来实现优先队列。
 
 ## 1.3 Map
+
+使用键值对存储。
 
 - TreeMap：基于红黑树实现。
 - HashMap：基于哈希表实现。
@@ -1832,7 +1834,7 @@ final Node<K,V>[] resize() {
 
 **（1）HashTable**
 
-HashTable 也是使用的 **数组+链表** 的数据结构，使用 synchronized 来保证线程安全，效率相对低下。当一个线程访问同步方法时，其他线程也访问同步方法时，可能会进入阻塞或轮询状态，例如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，会导致锁竞争会越来越激烈从而导致效率越低。
+HashTable 也是使用的 **数组+链表** 的数据结构，同时对所有和元素相关的方法使用 synchronized 来保证线程安全，效率相对低下。
 
 ```java
 public synchronized V put(K key, V value) {
@@ -1875,7 +1877,8 @@ public synchronized V get(Object key) {
 **（2）ConcurrentHashMap**
 
 在 JDK 1.7 的时候，ConcurrentHashMap（分段锁）对整个桶数组进行了分割分段 (Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，会大大减少锁竞争的可能性，提高并发访问率。 
-到了 JDK1.8 的时候已经摒弃了 Segment 的概念，而是直接使用 **数组+ Node 链表+红黑树** 的数据结构实现，并发使用 synchronized 和 CAS 来控制。（JDK1.6 以后对 synchronized 做了很多优化，从而降低了 synchronized 的性能开销），虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本的方法。
+
+到了 JDK1.8 的时候采用 **数组+ Node 链表+红黑树** 的数据结构实现。并发情况下，依靠 volatile 保持容器元素的可见性，当数组中的元素 Node 节点不存在时，使用 CAS 来确保并发写入的安全；当数组中的元素存在 Node 节点时，则以链表或红黑二叉树的首节点作为 synchronized 的 monitor（即一个数组元素对应一把锁），从而在多并发环境下有更高的效率。
 
 **（3）Collections.synchronizedMap()**
 

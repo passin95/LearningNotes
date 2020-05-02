@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 算法[:pencil2:](#pencil2-算法) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 归纳整理[:couple:](#couple-归纳整理) | 编码规范[:bulb:](#bulb-编码规范) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 编码规范[:bulb:](#bulb-编码规范) | 算法[:pencil2:](#pencil2-算法) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 归纳整理[:couple:](#couple-归纳整理) | 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -22,7 +22,7 @@
 
 - [Java 并发](./notes/Java%20并发.md)
 
-  线程、线程池、线程安全、线程锁、锁优化、Java 内存模型。
+  线程、Java 内存模型、线程安全、线程锁、线程池。
 
 - [Java 虚拟机](./notes/Java%20虚拟机.md)
 
@@ -37,6 +37,8 @@
 - [Android 基础](./notes/Android%20基础.md)
 
   生命周期、启动模式、四大组件等（覆盖了各类异常情况补充）。
+
+- [Android Framework](./notes/Android%20Framework.md)
 
 - [Android 框架](./notes/Android%20常用框架.md)
 
@@ -82,6 +84,16 @@
 
   Base64、序列化、Hash。
 
+### :bulb: 编码规范
+
+- [设计模式](./notes/设计模式.md)
+
+  六大设计原则、24 种设计模式。
+
+- [代码风格规范](./notes/代码风格规范.md)
+
+  阿里巴巴 Java 开发手册、阿里巴巴 Android 开发手册。
+
 ### :pencil2: 算法 
 
 - [排序](./notes/排序算法.md)
@@ -125,12 +137,6 @@
 - [ggtalk](https://talk.swift.gg/)
 
   这是一个接地气、有价值的闲聊节目。
-
-### :bulb: 编码规范
-
-- [代码风格规范](./notes/代码风格规范.md)
-
-  阿里巴巴 Java 开发手册、阿里巴巴 Android 开发手册。
 
 ### :memo: 后记 
 

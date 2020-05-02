@@ -120,7 +120,7 @@ BigDecimal n = m.setScale(3,BigDecimal.ROUND_HALF_DOWN);
 System.out.println(n);// 1.235
 ```
 
-注：实例化 BigDecimal 对象时，优先使用入参为 String 的构造方法或 BigDecimal.valueOf()，否则可能造成精度丢失（例如 double 会精度丢失）。
+注：实例化 BigDecimal 对象时，优先使用入参为 String 的构造方法或 BigDecimal.valueOf()，否则可能造成精度丢失（例如 BigDecimal(double) 会导致精度丢失）。
 
 # 二、String
 
@@ -170,7 +170,7 @@ String 不可变性天生具备线程安全，可以在多个线程中安全地�
 **（1）可变性** 
 
 - String 不可变。
-- StringBuffer 和 StringBuilder 可变。
+- StringBuffer 和 StringBuilder 可变。本质上是一个没添加 final 修饰的 char[]，扩容则是拷贝旧数组的字符到新的数组，因此在字符数可预计的情况下指定容量大小以优化性能。
 
 **（2）线程安全** 
 
