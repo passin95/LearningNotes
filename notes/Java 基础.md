@@ -116,7 +116,7 @@ BigDecimal x = a.subtract(b); // 0.1
 
 ```java
 BigDecimal m = new BigDecimal("1.23543");
-BigDecimal n = m.setScale(3,BigDecimal.ROUND_HALF_DOWN);
+BigDecimal n = m.setScale(3, BigDecimal.ROUND_HALF_DOWN);
 System.out.println(n);// 1.235
 ```
 
