@@ -3,25 +3,31 @@
 
 - [一、自定义 ItemDecoration](#%E4%B8%80%E8%87%AA%E5%AE%9A%E4%B9%89-itemdecoration)
 - [二、自定义 LayoutManager](#%E4%BA%8C%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager)
-  - [2.1 常用方法](#21-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95)
-    - [2.1.1 测量](#211-%E6%B5%8B%E9%87%8F)
-    - [2.1.2 布局](#212-%E5%B8%83%E5%B1%80)
-    - [2.1.3 回收复用](#213-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
-            - [2.1.3.1 detachAndScrapAttachedViews()](#2131-detachandscrapattachedviews)
-            - [2.1.3.2 removeAndRecycleView()](#2132-removeandrecycleview)
-            - [2.1.3.3 getViewForPosition()](#2133-getviewforposition)
-      - [2.1.3.4 缓存池小结](#2134-%E7%BC%93%E5%AD%98%E6%B1%A0%E5%B0%8F%E7%BB%93)
-  - [2.2 自定义 LayoutManager 流程](#22-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
-  - [2.3 回收复用的实现思路](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
-  - [2.4 技巧](#24-%E6%8A%80%E5%B7%A7)
-        - [2.4.1 getChildDrawingOrder()](#241-getchilddrawingorder)
-    - [2.4.2 滑动时回收](#242-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
-- [三、RecyclerView 性能优化](#%E4%B8%89recyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
-    - [3.1 RecyclerView.setHasFixdSize()](#31-recyclerviewsethasfixdsize)
-    - [3.2 RecyclerView.setRecycledViewPool()](#32-recyclerviewsetrecycledviewpool)
-    - [3.3 DiffUtil](#33-diffutil)
+  - [2.1 测量](#21-%E6%B5%8B%E9%87%8F)
+  - [2.2 布局](#22-%E5%B8%83%E5%B1%80)
+  - [2.3 回收复用](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
+    - [2.3.1 缓存池](#231-%E7%BC%93%E5%AD%98%E6%B1%A0)
+    - [2.3.2 detachAndScrapAttachedViews()](#232-detachandscrapattachedviews)
+      - [2.3.2.1 scrapView](#2321-scrapview)
+    - [2.3.3 removeAndRecycleView()](#233-removeandrecycleview)
+      - [2.3.3.1 recycleView](#2331-recycleview)
+    - [2.3.4 getViewForPosition()](#234-getviewforposition)
+  - [2.4 自定义 LayoutManager 流程](#24-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
+  - [2.5 回收复用的实现思路](#25-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
+  - [2.6 技巧](#26-%E6%8A%80%E5%B7%A7)
+    - [2.6.1 getChildDrawingOrder()](#261-getchilddrawingorder)
+    - [2.6.2 滑动时回收](#262-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
+- [三、RecyclerView 源码分析](#%E4%B8%89recyclerview-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [3.1 onMeasure](#31-onmeasure)
+    - [3.1.1 mLayout == null](#311-mlayout--null)
+    - [3.1.2 LayoutManager 开启自动测量](#312-layoutmanager-%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
+      - [3.1.2.1 dispatchLayoutStep1](#3121-dispatchlayoutstep1)
+      - [3.1.2.2 dispatchLayoutStep2](#3122-dispatchlayoutstep2)
+    - [3.1.3 LayoutManager 不开启自动测量](#313-layoutmanager-%E4%B8%8D%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
+  - [3.2 onLayout](#32-onlayout)
 
 <!-- /TOC -->
+
 
 # 一、自定义 ItemDecoration
 
@@ -79,11 +85,9 @@ public abstract static class ItemDecoration {
 
 # 二、自定义 LayoutManager
 
-## 2.1 常用方法
+在测量和布局上，LayoutManager 和 ViewGroup 使用的方法基本上都是一一对应的，不同在于 LayoutManager 需要考虑 ItemDecoration 的偏移。
 
-在测量和布局上，LayoutManager 和 ViewGroup 的方法基本上都是一一对应的，不同在于 LayoutManager 需要考虑 ItemDecoration 的偏移。
-
-### 2.1.1 测量
+## 2.1 测量
 
 在自定义 ViewGroup 的时候，子 View 在 onMeasure() 中统一测量的，而在自定义 LayoutManager 中子 View 是在需要 layout 之前才测量。
 
@@ -116,7 +120,7 @@ public void measureChildWithMargins(@NonNull View child, int widthUsed, int heig
 }
 ```
 
-在 ViewGroup 中测量完毕后就可以通过 View.getMeasureWidth() or View.getMeasureHeight() 拿到测量的宽高，但在 LayoutManager 中，应该通过 LayoutManager.getDecoratedMeasuredWidth(View child) 拿到测量结果，它会将 ItemDecoration 的偏移加入一起计算，从而适配 ItemDecoration.getItemOffsets()。
+在 ViewGroup 中测量完毕后就可以通过 View.getMeasureWidth()、View.getMeasureHeight() 拿到测量的宽高，但在 LayoutManager 中，应该通过 LayoutManager.getDecoratedMeasuredWidth(View child) 拿到测量结果，它会将 ItemDecoration 的偏移加入一起计算，从而适配 ItemDecoration.getItemOffsets()。
 
 ```java
 public int getDecoratedMeasuredWidth(@NonNull View child) {
@@ -130,7 +134,7 @@ public int getDecoratedMeasuredHeight(@NonNull View child) {
 }
 ```
 
-### 2.1.2 布局
+## 2.2 布局
 
 在自定义 ViewGroup 的时候，我们会重写 onLayout()，并在里面去遍历子 View，然后调用子 View 的 layout 方法来进行布局，但在 LayoutManager 里对 Item 进行布局时，不推荐直接使用 layout()，而是使用以下 2 个方法，同样是为了适配 ItemDecoration 的偏移。
 
@@ -151,11 +155,39 @@ public void layoutDecoratedWithMargins(@NonNull View child, int left, int top, i
 }
 ```
 
-### 2.1.3 回收复用
 
-#### 2.1.3.1 detachAndScrapAttachedViews()
+## 2.3 回收复用
 
-detachAndScrapXXX() 用于分离子视图，并将其添加到 Recycler 缓存堆中。一般只用于 onLayoutChildren() 中。
+### 2.3.1 缓存池
+
+RecyclerView 一共有 5 种视图缓存池，按缓存优先级从先到后先进行一个小结：
+
+**（1）mAttachedScrap 和 mChangedScrap**
+
+mAttachedScrap 和 mChangedScrap 不参与滑动过程中的回收复用，主要在布局时（onLayoutChildren()）进行回收复用，缓存的是从 RecyclerView 分离出来的 View，但是又即将添加上去的 ViewHolder。在多次 layout 的情况下，ViewHolder 的位置和数据都是不变的，一般情况下可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
+
+mAttachedScrap 和 mChangedScrap 的主要区别如下：
+
+1. 被标记 update 的 ViewHolder 以及必须设置了 mItemAnimator，且 ItemAnimator 不可以重用 ViewHolder 缓存进 mChangedScrap，其余情况缓存进 mAttachedScrap。
+2. mChangedScrap 仅在预布局下使用（mRunPredictiveAnimations = true）。
+3. 
+**（2）mCachedView**
+
+保存最新被移除的 ViewHolder（调用 recycleViewHolderInternal(ViewHolder holder))，它的作用是在需要新的 ViewHolder 时，精确匹配是不是 **刚移除** 的那个（通过判断 ViewHolder 的 position）。如果是，就直接返回给 RecyclerView 进行展示；如果不是，那么即使 mCachedViews 中有 ViewHolder，也不会返回给 RecyclerView 使用。除非 ViewHolder 有数据上的更新，否则在正常滑动可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
+
+mCachedViews 的默认大小为 2，可通过 RecyclerView.setItemViewCacheSize() 修改该值大小。当 mCachedViews 满了以后，会利用先进先出原则，将出的 ViewHoloder 存放在 mRecyclerPool 中。
+
+**（3）mViewCacheExtension**
+
+RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setViewCacheExtension() 去自定义缓存。一般情况下使用系统自带的缓存即可，它的缓存优先级在比 mCachedView 低，比 mRecyclerPool 高。
+
+**（4）mRecyclerPool**
+
+真正废弃的是存放在 mRecyclerPool 中的 ViewHolder。从 mRecyclerPool 拿到的 ViewHolder 会回调 onBindViewHolder() 重新绑定数据。根据 ViewType 来缓存 ViewHolder，每个 ViewType 的数组大小为 5，可以动态的改变。
+
+### 2.3.2 detachAndScrapAttachedViews()
+
+detachAndScrapXXX() 用于暂时分离子视图，并将其添加到 Recycler 缓存堆中。一般只用于 onLayoutChildren() 中。
 
 ```java
 public void detachAndScrapView(View child, Recycler recycler) {
@@ -178,7 +210,7 @@ public void detachAndScrapAttachedViews(Recycler recycler) {
 
 private void scrapOrRecycleView(Recycler recycler, int index, View view) {
     final ViewHolder viewHolder = getChildViewHolderInt(view);
-    // shouldIgnore() 为 true 表示此 ViewHolder 由 LayoutManager 完全管理，除非更换了 LayoutManager，否则不会报废、回收或删除它。
+    // 忽略的 ViewHolder 不处理。
     if (viewHolder.shouldIgnore()) {
         if (DEBUG) {
             Log.d(TAG, "ignoring view " + viewHolder);
@@ -188,22 +220,69 @@ private void scrapOrRecycleView(Recycler recycler, int index, View view) {
     
     if (viewHolder.isInvalid() && !viewHolder.isRemoved()
             && !mRecyclerView.mAdapter.hasStableIds()) {
-        // 如果 viewholder 被标记为无效，并且还没有被移除，并且没有设置 StableId，就将其从界面上移除并回收到 mRecyclerPool 中。
-        // 这也说明若 Adapter 开启了 StableId，在调用 detachAndScrapXXX() 时，ViewHolder 不会被放到 mRecyclerPool.mScrap 中。
+        // viewHolder.isInvalid() 为 true，一般有 3 种可能：
+        // 1.调用 Adapter.notifyDataSetChanged()；
+        // 2.调用 RecyclerView.invalidateItemDecorations()；
+        // 3.调用 RecyclerView.setAdapter() 或者 RecyclerView.swapAdapter()。
+
+        // 因此一般情况下是调用了 Adapter.notifyDataSetChanged() 会走到该代码块。（同时需要满足没有设置 Adapter.setHasStableIds(true) 且该 ViewHolder 没有被调用 notifyItemRangeRemoved()）
+        // 将 View 从 RecyclerView 中移除，本质上是调 ViewGroup.removeViewXXX()，
         removeViewAt(index);
+        // 将 viewHolder 缓存到 mCachedView 或 mRecyclerPool 中，该方法在下文进行分析。
         recycler.recycleViewHolderInternal(viewHolder);
     } else {
-        // 将 View 从 RecyclerView 上暂时分离，然后放进临时缓存 (mAttachedScrap 或 mChangedScrap)，以便稍后直接重用。
+        // 一般都是局部的视图变化（调用了 Adapter.notifyItemXXX()）或设置了 RecyclerView.setHasFixedSize(true)，会走到这里。
+        // 将 View 从 RecyclerView 上分离，分离的本质是仅仅将 View 和 RecyclerView 互相之间的引用置空，最终调用的是 ViewGroup.detachViewFromParent()。
         detachViewAt(index);
+        // 将 ViewHolder 放进 mAttachedScrap 或 mChangedScrap 中，以便稍后直接重用。
         recycler.scrapView(view);
         mRecyclerView.mViewInfoStore.onViewDetached(viewHolder);
     }
 }
 ```
 
-#### 2.1.3.2 removeAndRecycleView()
+#### 2.3.2.1 scrapView
 
-从 RecyclerView 移除子视图并对其进行缓存或回收。
+该方法可以直接看出 mAttachedScrap 和 mChangedScrap 的区别。
+
+```java
+void scrapView(View view) {
+    final ViewHolder holder = getChildViewHolderInt(view);
+    if (holder.hasAnyOfTheFlags(ViewHolder.FLAG_REMOVED | ViewHolder.FLAG_INVALID)
+            || !holder.isUpdated() || canReuseUpdatedViewHolder(holder)) {
+        if (holder.isInvalid() && !holder.isRemoved() && !mAdapter.hasStableIds()) {
+            throw new IllegalArgumentException("Called scrap view with an invalid view."
+                    + " Invalid views cannot be reused from scrap, they should rebound from"
+                    + " recycler pool." + exceptionLabel());
+        }
+        // 满足以下任意一个条件就存到 mAttachedScrap 中：
+        // 1.被同时标记 remove 和 invalid。
+        // 2.不需要进行更新的 ViewHolder（例如 notifyItemChanged 会标记 ViewHolder 为 update）。
+        // 3.没有设置 mItemAnimator，或者 mItemAnimator 可以重用被标记为 updated 的 ViewHolder（默认的 DefaultItemAnimator 可以重用）。
+        
+        // 因此从上面的限制条件可以得出，一般请下，只有满足以下 2 个条件才会放到 mChangedScrap，其它情况都放到 mAttachedScrap 中，也就是说绝大部分时候都是放到 mAttachedScrap 中。
+        // 1. 被标记 update 的 ViewHolder。
+        // 2. 必须设置了 mItemAnimator，且 ItemAnimator 不可以重用 ViewHolder。
+        holder.setScrapContainer(this, false);
+        mAttachedScrap.add(holder);
+    } else {
+        if (mChangedScrap == null) {
+            mChangedScrap = new ArrayList<ViewHolder>();
+        }
+        holder.setScrapContainer(this, true);
+        mChangedScrap.add(holder);
+    }
+}
+
+boolean canReuseUpdatedViewHolder(ViewHolder viewHolder) {
+    return mItemAnimator == null || mItemAnimator.canReuseUpdatedViewHolder(viewHolder,
+            viewHolder.getUnmodifiedPayloads());
+}
+```
+
+### 2.3.3 removeAndRecycleView()
+
+从 RecyclerView 移除子视图并其缓存到 mCachedView 或 mRecyclerPool 中，一般用于滑动过程中的视图回收。
 
 ```java
 public void removeAndRecycleView(@NonNull View child, @NonNull Recycler recycler) {
@@ -227,18 +306,21 @@ public void removeAndRecycleAllViews(@NonNull Recycler recycler) {
 }
 ```
 
+#### 2.3.3.1 recycleView
+
 ```java
 public void recycleView(@NonNull View view) {
   
     ViewHolder holder = getChildViewHolderInt(view);
     if (holder.isTmpDetached()) {
-        // 移除与 RecyclerView 暂时分离状态的视图。
+        // 完成对分离视图的移除。
         removeDetachedView(view, false);
     }
     if (holder.isScrap()) {
-        // 如果在某种缓存中，应该从当前所处缓存中移除，因为它将要放入 mRecyclerPool 中。
+        // 如果 holder 已在 mAttachedScrap 或 mChangedScrap 缓存，应该从当前所处缓存中移除，因为将要它放入 mRecyclerPool 中。
         holder.unScrap();
     } else if (holder.wasReturnedFromScrap()) {
+        // 清除无用 flag。
         holder.clearReturnedFromScrapFlag();
     }
     recycleViewHolderInternal(holder);
@@ -250,7 +332,7 @@ void recycleViewHolderInternal(ViewHolder holder) {
     boolean recycled = false;
 
     if (forceRecycle || holder.isRecyclable()) {
-        // 满足条件，则先存到 mCachedViews 中。
+        // 先尝试缓存到 mCachedViews 中。
         if (mViewCacheMax > 0
                 && !holder.hasAnyOfTheFlags(ViewHolder.FLAG_INVALID
                 | ViewHolder.FLAG_REMOVED
@@ -278,7 +360,7 @@ void recycleViewHolderInternal(ViewHolder holder) {
                 }
                 targetCacheIndex = cacheIndex + 1;
             }
-            // 将 RecyclerView 最新被移除的 Item 添加到数组最后。
+            // 将 holder 缓存到 mCachedViews 中。
             mCachedViews.add(targetCacheIndex, holder);
             cached = true;
         }
@@ -294,7 +376,9 @@ void recycleViewHolderInternal(ViewHolder holder) {
 
 ```
 
-#### 2.1.3.3 getViewForPosition()
+### 2.3.4 getViewForPosition()
+
+给定一个数据源在容器的位置从而得到一个视图。
 
 ```java
 public View getViewForPosition(int position) {
@@ -315,8 +399,8 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
     }
     boolean fromScrapOrHiddenOrCache = false;
     ViewHolder holder = null;
-    // 1. 如果处于预布局状态，则尝试从缓存 mChangedScrap 中依次对比 ViewHolder.getLayoutPosition()、 StableId 复用 ViewHolder,
-    // mChangedScrap 也只在预布局使用。
+    // 1. 如果处于预布局状态，则尝试从缓存 mChangedScrap 中依次对比 ViewHolder.getLayoutPosition()、StableId 复用 ViewHolder。
+    // 为什么会这样呢？因为处于预布局状态必定会展示预测性动画（mRunPredictiveAnimations=true），也仅在开启动画时，才可能有 ViewHolder 缓存到 mChangedScrap 中。
     if (mState.isPreLayout()) {
         holder = getChangedScrapViewForPosition(position);
         fromScrapOrHiddenOrCache = holder != null;
@@ -324,7 +408,25 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
     if (holder == null) {
         // 2. 依次尝试从 mAttachedScrap、mCachedView 中通过对比 ViewHolder.getLayoutPosition() 复用 ViewHolder。
         holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
-        // 忽略部分代码
+        if (holder != null) {
+            // 如果获取到的 ViewHolder 是无效的。
+            if (!validateViewHolderForOffsetPosition(holder)) {
+                if (!dryRun) {
+                    // 做一些清理操作，然后重新放入 mCacheViews 或 RecyclerViewPool 中。
+                    holder.addFlags(ViewHolder.FLAG_INVALID);
+                    if (holder.isScrap()) {
+                        removeDetachedView(holder.itemView, false);
+                        holder.unScrap();
+                    } else if (holder.wasReturnedFromScrap()) {
+                        holder.clearReturnedFromScrapFlag();
+                    }
+                    recycleViewHolderInternal(holder);
+                }
+                holder = null;
+            } else {
+                fromScrapOrHiddenOrCache = true;
+            }
+        }
     }
     if (holder == null) {
         final int offsetPosition = mAdapterHelper.findPositionOffset(position);
@@ -334,6 +436,7 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
                     + "state:" + mState.getItemCount() + exceptionLabel());
         }
 
+        // 获取第 position 个数据所对应的 ItemViewType，不同的 ItemViewType 会对应不同的视图样式，因此之间是不能复用的。
         final int type = mAdapter.getItemViewType(offsetPosition);
         // 3. 依次尝试从 mAttachedScrap、mCachedView 中通过对比 StableId 复用 ViewHolder。
         if (mAdapter.hasStableIds()) {
@@ -367,7 +470,8 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
                 Log.d(TAG, "tryGetViewHolderForPositionByDeadline("
                         + position + ") fetching from shared pool");
             }
-            // 5. 最后尝试从缓存池 mRecyclerPool 中复用 ViewHolder，这也是我们最常见的缓存方式。
+            // 5. 最后尝试从 mRecyclerPool 中获取 ViewHolder，这也是我们最常见的缓存方式。
+            // mRecyclerPool 中每个 mItemViewType 的最大缓存容量默认是 5 个，实现开发过程中应当根据需求动态调整优化性能。
             holder = getRecycledViewPool().getRecycledView(type);
             if (holder != null) {
                 holder.resetInternal();
@@ -401,8 +505,7 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
                     + " come here only in pre-layout. Holder: " + holder
                     + exceptionLabel());
         }
-        // 若 ViewHolder 没有被绑定或需要更新或视图被标记无效，则尝试重新绑定 viewHolder，
-        // 对于开发者来说，则是回调 Adapter.bindViewHolder()。
+        // 7. 若 ViewHolder 没有被绑定或需要更新或视图被标记无效，则尝试重新绑定 viewHolder，对于开发者来说，则是回调 Adapter.bindViewHolder()。
         final int offsetPosition = mAdapterHelper.findPositionOffset(position);
         bound = tryBindViewHolderByDeadline(holder, offsetPosition, position, deadlineNs);
     }
@@ -424,42 +527,18 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
     return holder;
 }
 ```
+ 
+## 2.4 自定义 LayoutManager 流程
 
-#### 2.1.3.4 缓存池小结
+自定义 LayoutManager 和自定义 ViewGroup 是流程是相似的，只是多了回收复用以及滑动的处理。一般情况下流程如下：
 
-RecyclerView 一共有 5 种视图缓存池：
-
-**（1）mAttachedScrap 和 mChangedScrap**
-
-mAttachedScrap 和 mChangedScrap 皆不参与滑动过程中的回收复用，主要在布局时（onLayoutChildren()）进行回收复用，它们不同在于 mChangedScrap 只在预布局状态使用。
-
-通过对比 mAttachedScrap 中的 StableId 复用的 ViewHolder 会回调 onBindViewHolder()，而通过对比 getLayoutPosition() 复用的 ViewHolder 不会回调 onBindViewHolder()。
-
-**（2）mCachedView**
-
-- mCachedViews：保存最新被移除的 ViewHolder（调用 recycleViewHolderInternal(ViewHolder holder))，它的作用是在需要新的 ViewHolder 时，精确匹配是不是 **刚移除** 的那个。如果是，就直接返回给 RecyclerView 进行展示；如果不是，那么即使 mCachedViews 中有 ViewHolder，也不会返回给 RecyclerView 使用。对开发者来说最直接的区别就是从 mCachedView 拿到的 ViewHolder 并不会调用 onBindViewHolder()。
-
-mCachedViews 的默认大小为 2，当 mCachedViews 满了以后，会利用先进先出原则，将出的 ViewHoloder 存放在 mRecyclerPool 中。
-
-**（3）mViewCacheExtension**
-
-RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setViewCacheExtension() 去自定义缓存。一般情况下使用系统自带的缓存即可，它的缓存优先级在比 mCachedView 低，比 mRecyclerPool 高。
-
-**（4）mRecyclerPool**
-
-在 mCachedViews 中复用的 ViewHolder 都是精确匹配的，真正废弃的是存放在 mRecyclerPool 中的 ViewHolder。从 mRecyclerPool 拿到的 ViewHolder 会回调 onBindViewHolder() 重新绑定数据。
-
-## 2.2 自定义 LayoutManager 流程
-
-自定义 LayoutManager 和自定义 ViewGroup 是流程是相似的，只不过多了回收复用以及滑动的处理。一般情况下流程如下：
-
-1. 进行布局之前，调用 detachAndScrapAttachedViews() 将当前屏幕上所有的 ViewHolder 与屏幕分离（因为不一定是首次布局）；
-2. 遍历 getItemCount()，调用 recycler.getViewForPosition(position) 拿到 view 后通过 addView() 添加到 RecyclerView 中。此处可以进行性能优化，通过计算只添加首屏会出现的 Item，然后在滑动的过程中进行复用。而不是把所有 Item 都变为一个子 View，否则数据量大时可能会直接 OOM；
+1. 在 onLayoutChildren() 方法中，进行布局之前，调用 detachAndScrapAttachedViews() 将当前屏幕上所有的 ViewHolder 与屏幕分离（因为不一定是首次布局）；
+2. 遍历 getItemCount()，调用 recycler.getViewForPosition(position) 拿到子 View ，再通过 addView() 添加到 RecyclerView 中。此处需要进行性能优化，通过计算只添加首屏会出现的 Item，然后在滑动的过程中进行复用，而不是把所有 Item 都变为一个子 View，否则数据量大时可能会直接 OOM 或卡顿；
 3. 调用 measureChild() 或 measureChildWithMargins() 对子 View 进行测量。也可以自己手写限制的测量规格 MeasureSpec，再调用 child.measure(widthSpec, heightSpec)；
 4. 调用 layoutDecorated() 或 layoutDecoratedWithMargins() 对子 View 进行布局；
 5. RecyclerView 滑动过程的回收复用。
 
-## 2.3 回收复用的实现思路
+## 2.5 回收复用的实现思路
 
 以竖直线性布局为例，简述回收复用的主要思路：
 
@@ -484,15 +563,15 @@ RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setVie
 2. 调用 detachAndScrapAttachedViews(recycler)，暂时分离所有子 View。
 2. 重新遍历所有 Item（根据需求可优化遍历的数量），添加撑满一屏的 Item 数即可，不要多创建。
 
-## 2.4 技巧
+## 2.6 技巧
 
-### 2.4.1 getChildDrawingOrder()
+### 2.6.1 getChildDrawingOrder()
 
 重写 getChildDrawingOrder() 可改变子 View 的绘制顺序。
 
-### 2.4.2 滑动时回收
+### 2.6.2 滑动时回收
 
-在滑动过程中，可以把 mAttachedScrap 中的缓存全部放进 mRecyclerPool 中，mAttachedScrap 中可重用的 ViewHolder 已经在 onLayoutChildren() 中复用。
+在滑动过程中，可以把 mAttachedScrap 中的缓存转进 mRecyclerPool 中，mAttachedScrap 中可重用的 ViewHolder 已经在 onLayoutChildren() 中复用。
 
 ```java
 private void recycleChildren(RecyclerView.Recycler recycler) {
@@ -502,16 +581,515 @@ private void recycleChildren(RecyclerView.Recycler recycler) {
         removeAndRecycleView(holder.itemView, recycler);
     }
 }
-
 ```
 
-// 未完待续
+# 三、RecyclerView 源码分析
+
+本文基于 androidx.recyclerview:recyclerview:1.0.0。
+
+Recyclerview 的本质依然是一个 View，因此它的源码分析依旧从 View 的三大流程 onMeasure()、onLayout()、onDraw() 开始。
+
+## 3.1 onMeasure
+
+dispatchLayoutStep1()、dispatchLayoutStep2()、dispatchLayoutStep3() 会在下文经常出现，因此先对这 3 个方法和所对应的的状态进行一个小结，从而对整个测量布局过程有一个大体的认知：
+
+```java
+public static class State {
+    static final int STEP_START = 1;
+    static final int STEP_LAYOUT = 1 << 1;
+    static final int STEP_ANIMATIONS = 1 << 2;
+
+    int mLayoutStep = STEP_START;
+}
+```
+
+- dispatchLayoutStep1：mLayoutStep 处于 STEP_START 状态，在方法执行要结束时状态置为 STEP_LAYOUT。本方法的作用主要有四点：
+  1. 处理 Adapter 更新;
+  2. 决定应运行哪个动画;
+  3. 保存布局前的视图信息。
+  4. 如果有必要，进行预布局并保存布局后的视图信息。
+- dispatchLayoutStep2：一般情况下处于 State.STEP_LAYOUT 状态，也可能由于二次测量的原因处于 State.STEP_ANIMATIONS 状态，在方法执行要结束时置为 State.STEP_ANIMATIONS。该方法主要作用是进行子视图的测量和布局。
+- dispatchLayoutStep3：处于 STEP_ANIMATIONS 状态。在方法执行要结束时状态重新置为 STEP_START， 这个方法的作用执行在 dispatchLayoutStep1 方法里面保存的动画信息。本方法不是本文的介绍重点，后面在介绍 ItemAnimator 时，会重点分析这个方法。
+
+接下来开始正文，下文中变量 mLayout 的类型都是 RecyclerView.LayoutManager。
+
+RecyclerView 的 onMeasure() 可以分为三种情况：
+
+```java
+protected void onMeasure(int widthSpec, int heightSpec) {
+    if (mLayout == null) {
+        // 第一种情况， mLayout==null。对开发者所设置的 padding 值和父视图的限制进行一个默认测量。
+        return;
+    }
+    if (mLayout.isAutoMeasureEnabled()) {
+        // 第二种情况，LayoutManager 启动自动测量，这也是绝大部分 layoutManager 的处理方式，可以分为 2 种情况：
+        // 1.父视图的宽高限制都是 MeasureSpec.EXACTLY，则直接确定 RecyclerView 的宽高。dispatchLayoutStep1() 和 dispatchLayoutStep2() 推迟到 onLayout() 进行。
+        // 2.根据父视图的限制以及子视图想要的宽高去决定 RecyclerView 的测量宽高，子视图的测量和布局直接发生在 onMeasure() 阶段。
+    } else {
+        // 第三种情况。LayoutManager 不启动自动测量，这种情况极少见，可以分为 2 种情况：
+        // 1. 调用方确定 RecyclerView 的大小不跟随子视图的个数、大小变化而变化（mHasFixedSize = true），则直接使用 mLayout 的默认测量方式。
+        // 2. 仅参考数据源的个数和父视图的限制去确定测量算法从而确定 RecyclerView 的测量宽高，子视图的测量和布局发生在 onLayout() 阶段。
+    }
+}
+```
+
+### 3.1.1 mLayout == null
+
+直接看一下源码：
+
+```java
+if (mLayout == null) {
+    defaultOnMeasure(widthSpec, heightSpec);
+    return;
+}
+
+void defaultOnMeasure(int widthSpec, int heightSpec) {
+
+    final int width = LayoutManager.chooseSize(widthSpec,
+            getPaddingLeft() + getPaddingRight(),
+            ViewCompat.getMinimumWidth(this));
+    final int height = LayoutManager.chooseSize(heightSpec,
+            getPaddingTop() + getPaddingBottom(),
+            ViewCompat.getMinimumHeight(this));
+
+    setMeasuredDimension(width, height);
+}
+
+// 该方法在 LayoutManager 中。
+public static int chooseSize(int spec, int desired, int min) {
+    // desired 在 defaultOnMeasure() 就是水平或者垂直方向的 padding 值之和。
+    // min 则是所设置的最小宽度或高度。
+    final int mode = View.MeasureSpec.getMode(spec);
+    final int size = View.MeasureSpec.getSize(spec);
+    switch (mode) {
+        case View.MeasureSpec.EXACTLY:
+            return size;
+        case View.MeasureSpec.AT_MOST:
+        // 限制上线时，取最小。
+            return Math.min(size, Math.max(desired, min));
+        case View.MeasureSpec.UNSPECIFIED:
+        // 不限制时，取最大。
+        default:
+            return Math.max(desired, min);
+    }
+}
+```
+
+### 3.1.2 LayoutManager 开启自动测量
+
+此时的测量阶段（onMeasure）可以主要分为两步，分别调用 dispatchLayoutStep1() 和 dispatchLayoutStep2()，还有一个 dispatchLayoutStep3() 在布局阶段（onLayout）中调用。
+
+接着开始分析源码，可以将其分成以下关键的节点：
+
+```java
+if (mLayout.isAutoMeasureEnabled()) {
+    final int widthMode = MeasureSpec.getMode(widthSpec);
+    final int heightMode = MeasureSpec.getMode(heightSpec);
+    // 1、默认实现是 mRecyclerView.defaultOnMeasure(widthSpec, heightSpec)，除非有特殊需求，否则一般情况下在开启自动测量的情况下，不需要重写。
+    mLayout.onMeasure(mRecycler, mState, widthSpec, heightSpec);
+    final boolean measureSpecModeIsExactly =
+            widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY;
+    // 2、若父视图宽高的限制为确定的大小（MeasureSpec.EXACTLY），则不用再测量子视图去确定 RecyclerView 的测量宽高，dispatchLayoutStep1() 和 dispatchLayoutStep2() 推迟到 onLayout() 进行。
+    if (measureSpecModeIsExactly || mAdapter == null) {
+        return;
+    }
+    if (mState.mLayoutStep == State.STEP_START) {
+    // 2、执行 dispatchLayoutStep1()。
+        dispatchLayoutStep1();
+    }
+    // 3、将父视图的测量限制传给 LayoutManager，之后会在 dispatchLayoutStep2() 中使用该限制对子视图进行测量和布局。
+    mLayout.setMeasureSpecs(widthSpec, heightSpec);
+    mState.mIsMeasuring = true;
+    // 4、dispatchLayoutStep2()，主要是对子视图进行测量和布局。
+    dispatchLayoutStep2();
+
+    // 5、这时可以拿到所有子视图所占的区域和父视图的限制，然后确定最终 RecyclerView 所需的宽高。
+    mLayout.setMeasuredDimensionFromChildren(widthSpec, heightSpec);
+
+    // 6、mLayout 是否需要进行二次测量。例如父视图的限制为不限制（MeasureSpec.UNSPECIFIED），又存在开发者对子视图的要求为铺满父视图时，则需要二次测量。
+    if (mLayout.shouldMeasureTwice()) {
+        // 将第一次的测量结果作为测量的限制。
+        mLayout.setMeasureSpecs(
+                MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
+        mState.mIsMeasuring = true;
+        // 重新测量和布局。
+        dispatchLayoutStep2();
+        // 拿到所有子视图所占的区域和父视图的限制，然后确定最终 RecyclerView 所需的宽高。
+        mLayout.setMeasuredDimensionFromChildren(widthSpec, heightSpec);
+    }
+}
+```
+
+#### 3.1.2.1 dispatchLayoutStep1
+
+```java
+private void dispatchLayoutStep1() {
+    // dispatchLayoutStep1 执行时必须处于 State.STEP_START。
+    mState.assertLayoutStep(State.STEP_START);
+    // 如果处于滑动的过程中发生了重测，则存下剩余滑动的距离。
+    fillRemainingScrollValues(mState);
+    mState.mIsMeasuring = false;
+    startInterceptRequestLayout();
+    // 清空原视图动画信息。
+    mViewInfoStore.clear();
+    onEnterLayoutOrScroll();
+    // 1、处理适配器的更新，并设置动画标识 mRunSimpleAnimations 和 mRunPredictiveAnimations，看下文前先看该方法的解析。
+    processAdapterUpdatesAndSetAnimationFlags();
+    saveFocusInfo();
+    mState.mTrackOldChangeHolders = mState.mRunSimpleAnimations && mItemsChanged;
+    mItemsAddedOrRemoved = mItemsChanged = false;
+    // 可以发现是否是预布局阶段与 mRunPredictiveAnimations 有直接关系。
+    mState.mInPreLayout = mState.mRunPredictiveAnimations;
+    mState.mItemCount = mAdapter.getItemCount();
+    findMinMaxChildLayoutPositions(mMinMaxLayoutPositions);
+
+    if (mState.mRunSimpleAnimations) {
+        int count = mChildHelper.getChildCount();
+        for (int i = 0; i < count; ++i) {
+            final ViewHolder holder = getChildViewHolderInt(mChildHelper.getChildAt(i));
+            if (holder.shouldIgnore() || (holder.isInvalid() && !mAdapter.hasStableIds())) {
+                continue;
+            }
+            
+            // 2、遍历所有子视图，拿到没有被移除（有效）的子视图所对应的 ViewHolder。
+            final ItemHolderInfo animationInfo = mItemAnimator
+                    .recordPreLayoutInformation(mState, holder,
+                            ItemAnimator.buildAdapterChangeFlagsForAnimations(holder),
+                            holder.getUnmodifiedPayloads());
+            // 3、记录布局前的视图信息存入 mViewInfoStore 中（动画肯定是有布局前的样式移动到布局后的样式）。
+            mViewInfoStore.addToPreLayout(holder, animationInfo);
+            if (mState.mTrackOldChangeHolders && holder.isUpdated() && !holder.isRemoved()
+                    && !holder.shouldIgnore() && !holder.isInvalid()) {
+                long key = getChangedHolderKey(holder);
+                // This is NOT the only place where a ViewHolder is added to old change holders
+                // list. There is another case where:
+                //    * A VH is currently hidden but not deleted
+                //    * The hidden item is changed in the adapter
+                //    * Layout manager decides to layout the item in the pre-Layout pass (step1)
+                // When this case is detected, RV will un-hide that view and add to the old
+                // change holders list.
+                mViewInfoStore.addToOldChangeHolders(key, holder);
+            }
+        }
+    }
+    if (mState.mRunPredictiveAnimations) {
+        // 保存 ViewHolder 进行预布局前的位置。
+        saveOldPositions();
+        final boolean didStructureChange = mState.mStructureChanged;
+        mState.mStructureChanged = false;
+        // 4、使用 RecyclerView 旧的宽高进行预布局。
+        mLayout.onLayoutChildren(mRecycler, mState);
+        mState.mStructureChanged = didStructureChange;
+
+        for (int i = 0; i < mChildHelper.getChildCount(); ++i) {
+            final View child = mChildHelper.getChildAt(i);
+            final ViewHolder viewHolder = getChildViewHolderInt(child);
+            if (viewHolder.shouldIgnore()) {
+                continue;
+            }
+            if (!mViewInfoStore.isInPreLayout(viewHolder)) {
+                int flags = ItemAnimator.buildAdapterChangeFlagsForAnimations(viewHolder);
+                boolean wasHidden = viewHolder
+                        .hasAnyOfTheFlags(ViewHolder.FLAG_BOUNCED_FROM_HIDDEN_LIST);
+                if (!wasHidden) {
+                    flags |= ItemAnimator.FLAG_APPEARED_IN_PRE_LAYOUT;
+                }
+                // 记录预布局的后的视图信息
+                final ItemHolderInfo animationInfo = mItemAnimator.recordPreLayoutInformation(
+                        mState, viewHolder, flags, viewHolder.getUnmodifiedPayloads());
+                if (wasHidden) {
+                    recordAnimationInfoIfBouncedHiddenView(viewHolder, animationInfo);
+                } else {
+                    mViewInfoStore.addToAppearedInPreLayoutHolders(viewHolder, animationInfo);
+                }
+            }
+        }
+        // we don't process disappearing list because they may re-appear in post layout pass.
+        clearOldPositions();
+    } else {
+        clearOldPositions();
+    }
+    onExitLayoutOrScroll();
+    stopInterceptRequestLayout(false);
+    mState.mLayoutStep = State.STEP_LAYOUT;
+}
+```
+
+```java
+private void processAdapterUpdatesAndSetAnimationFlags() {
+    // 在触发重测期间，数据源又发生了改变。
+    if (mDataSetHasChangedAfterLayout) {
+        mAdapterHelper.reset();
+        // 若通知整个数据源都发生了变化，则回调给 mLayout 相应的方法。
+        if (mDispatchItemsChangedEvent) {
+            mLayout.onItemsChanged(this);
+        }
+    }
+
+    if (predictiveItemAnimationsEnabled()) {
+    // 简单的说就是若可能处于预布局状态（用于展示动画），则将数据的更新回调推迟执行。
+        mAdapterHelper.preProcess();
+    } else {
+        mAdapterHelper.consumeUpdatesInOnePass();
+    }
+    boolean animationTypeSupported = mItemsAddedOrRemoved || mItemsChanged;
+    // mRunSimpleAnimations 为 true 需要注意的有 2 点：
+    // 1.必须调用过一次 onLayout()，也就是说首次加载出来的视图是没有动画的（mFirstLayoutComplete 为 true）。
+    // 2.mItemAnimator != null。
+    mState.mRunSimpleAnimations = 
+            && mItemAnimator != null
+            && (mDataSetHasChangedAfterLayout
+            || animationTypeSupported
+            || mLayout.mRequestedSimpleAnimations)
+            && (!mDataSetHasChangedAfterLayout
+            || mAdapter.hasStableIds());
+    // 简单动画（mRunSimpleAnimations）是高级动画（mRunPredictiveAnimations）的子集。
+    mState.mRunPredictiveAnimations = mState.mRunSimpleAnimations
+            && animationTypeSupported
+            && !mDataSetHasChangedAfterLayout
+            && predictiveItemAnimationsEnabled();
+}
+```
+
+#### 3.1.2.2 dispatchLayoutStep2
+
+dispatchLayoutStep2() 进行子视图的实际测量和布局。
+
+```java
+private void dispatchLayoutStep2() {
+    startInterceptRequestLayout();
+    onEnterLayoutOrScroll();
+    // 一般情况下处于 State.STEP_LAYOUT 状态，也可能由于二次测量的原因处于 State.STEP_ANIMATIONS 状态。
+    mState.assertLayoutStep(State.STEP_LAYOUT | State.STEP_ANIMATIONS);
+    mAdapterHelper.consumeUpdatesInOnePass();
+    mState.mItemCount = mAdapter.getItemCount();
+    mState.mDeletedInvisibleItemCountSincePreviousLayout = 0;
+
+    mState.mInPreLayout = false;
+    // 核心代码，具体的 LayoutManager 会真正对子视图进行测量和布局。
+    mLayout.onLayoutChildren(mRecycler, mState);
+
+    mState.mStructureChanged = false;
+    mPendingSavedState = null;
+
+    // 调用 mLayout.onLayoutChildren 时可能会关闭 mItemAnimator，重新检查。
+    mState.mRunSimpleAnimations = mState.mRunSimpleAnimations && mItemAnimator != null;
+    mState.mLayoutStep = State.STEP_ANIMATIONS;
+    onExitLayoutOrScroll();
+    stopInterceptRequestLayout(false);
+}
+```
+
+### 3.1.3 LayoutManager 不开启自动测量
+
+```java
+// 不开启自动测量且 mHasFixedSize 为 true 时（使用者确定 RecyclerView 的大小不会随着子视图的变化而变化），直接使用 mLayout 的默认测量方式。
+if (mHasFixedSize) {
+    mLayout.onMeasure(mRecycler, mState, widthSpec, heightSpec);
+    return;
+}
+// 如果在测量前，适配器的数据源有变化。
+if (mAdapterUpdateDuringMeasure) {
+    startInterceptRequestLayout();
+    onEnterLayoutOrScroll();
+    // 处理适配器更新并设置动画标志。
+    processAdapterUpdatesAndSetAnimationFlags();
+    onExitLayoutOrScroll();
+
+    if (mState.mRunPredictiveAnimations) {
+        mState.mInPreLayout = true;
+    } else {
+        // consume remaining updates to provide a consistent state with the layout pass.
+        mAdapterHelper.consumeUpdatesInOnePass();
+        mState.mInPreLayout = false;
+    }
+    mAdapterUpdateDuringMeasure = false;
+    stopInterceptRequestLayout(false);
+} else if (mState.mRunPredictiveAnimations) {
+    // mState.mRunPredictiveAnimations 仅在 processAdapterUpdatesAndSetAnimationFlags() 中可能设为 true。
+    // 直接使用上一次的测量结果。
+    setMeasuredDimension(getMeasuredWidth(), getMeasuredHeight());
+    return;
+}
+
+if (mAdapter != null) {
+    mState.mItemCount = mAdapter.getItemCount();
+} else {
+    mState.mItemCount = 0;
+}
+startInterceptRequestLayout();
+// 参考数据源的个数和父视图的限制去确定测量算法从而确定 RecyclerView 的测量宽高。
+mLayout.onMeasure(mRecycler, mState, widthSpec, heightSpec);
+stopInterceptRequestLayout(false);
+mState.mInPreLayout = false; // clear
+```
+
+## 3.2 onLayout
+
+```java
+@Override
+protected void onLayout(boolean changed, int l, int t, int r, int b) {
+    TraceCompat.beginSection(TRACE_ON_LAYOUT_TAG);
+    dispatchLayout();
+    TraceCompat.endSection();
+    // mFirstLayoutComplete 仅在此处置为 true。
+    mFirstLayoutComplete = true;
+}
+
+主要代码为 dispatchLayout()，目的也很简单，保证 RecyclerView 必须经历 3 个步骤 dispatchLayoutStep1、dispatchLayoutStep2、dispatchLayoutStep3。
+
+```java
+void dispatchLayout() {
+    // Adapter 或者 LayoutManager 任意一个为空，都不会对子视图进行测量布局。
+    if (mAdapter == null) {
+        Log.e(TAG, "No adapter attached; skipping layout");
+        // leave the state in START
+        return;
+    }
+    if (mLayout == null) {
+        Log.e(TAG, "No layout manager attached; skipping layout");
+        // leave the state in START
+        return;
+    }
+    mState.mIsMeasuring = false;
+    if (mState.mLayoutStep == State.STEP_START) {
+        // 执行到这里可能出现的情形：
+        // 1：LayoutManager 不启动自动测量。
+        // 2：LayoutManager 启动自动测量但父视图给 RecyclerView 的宽高限制是确定的（MeasureSpec.EXACTLY）。
+        dispatchLayoutStep1();
+        mLayout.setExactMeasureSpecsFrom(this);
+        dispatchLayoutStep2();
+    } else if (mAdapterHelper.hasUpdates() || mLayout.getWidth() != getWidth()
+            || mLayout.getHeight() != getHeight()) {
+        // 该种情况出现于有数据更新或 RecyclerView 想要的大小和最后父视图给的大小不一致，即测量大小和最终的视图大小不一致。
+        mLayout.setExactMeasureSpecsFrom(this);
+        // 因此需要重新测量和布局子视图。
+        dispatchLayoutStep2();
+    } else {
+        // 确保 layoutManager 最终拿到 RecyclerView 的大小是准确的。
+        mLayout.setExactMeasureSpecsFrom(this);
+    }
+    dispatchLayoutStep3();
+}
+```
+
+### dispatchLayoutStep3
+
+```java
+private void dispatchLayoutStep3() {
+    mState.assertLayoutStep(State.STEP_ANIMATIONS);
+    startInterceptRequestLayout();
+    onEnterLayoutOrScroll();
+    mState.mLayoutStep = State.STEP_START;
+    if (mState.mRunSimpleAnimations) {
+        // Step 3: 获到布局后 ItemView 的位置信息，保存在 ViewInfoStore 里面。
+        for (int i = mChildHelper.getChildCount() - 1; i >= 0; i--) {
+            ViewHolder holder = getChildViewHolderInt(mChildHelper.getChildAt(i));
+            if (holder.shouldIgnore()) {
+                continue;
+            }
+            long key = getChangedHolderKey(holder);
+            final ItemHolderInfo animationInfo = mItemAnimator
+                    .recordPostLayoutInformation(mState, holder);
+            ViewHolder oldChangeViewHolder = mViewInfoStore.getFromOldChangeHolders(key);
+            if (oldChangeViewHolder != null && !oldChangeViewHolder.shouldIgnore()) {
+                // 说明某个 viewHolder 在 2 次布局中都使用
+                final boolean oldDisappearing = mViewInfoStore.isDisappearing(
+                        oldChangeViewHolder);
+                final boolean newDisappearing = mViewInfoStore.isDisappearing(holder);
+                if (oldDisappearing && oldChangeViewHolder == holder) {
+                    // run disappear animation instead of change
+                    mViewInfoStore.addToPostLayout(holder, animationInfo);
+                } else {
+                    final ItemHolderInfo preInfo = mViewInfoStore.popFromPreLayout(
+                            oldChangeViewHolder);
+                    // we add and remove so that any post info is merged.
+                    mViewInfoStore.addToPostLayout(holder, animationInfo);
+                    ItemHolderInfo postInfo = mViewInfoStore.popFromPostLayout(holder);
+                    if (preInfo == null) {
+                        handleMissingPreInfoForChangeError(key, holder, oldChangeViewHolder);
+                    } else {
+                        animateChange(oldChangeViewHolder, holder, preInfo, postInfo,
+                                oldDisappearing, newDisappearing);
+                    }
+                }
+            } else {
+                mViewInfoStore.addToPostLayout(holder, animationInfo);
+            }
+        }
+
+        // 处理视图信息列表并触发动画。
+        mViewInfoStore.process(mViewInfoProcessCallback);
+    }
+
+    mLayout.removeAndRecycleScrapInt(mRecycler);
+    mState.mPreviousLayoutItemCount = mState.mItemCount;
+    mDataSetHasChangedAfterLayout = false;
+    mDispatchItemsChangedEvent = false;
+    mState.mRunSimpleAnimations = false;
+
+    mState.mRunPredictiveAnimations = false;
+    mLayout.mRequestedSimpleAnimations = false;
+    if (mRecycler.mChangedScrap != null) {
+        mRecycler.mChangedScrap.clear();
+    }
+    if (mLayout.mPrefetchMaxObservedInInitialPrefetch) {
+        // Initial prefetch has expanded cache, so reset until next prefetch.
+        // This prevents initial prefetches from expanding the cache permanently.
+        mLayout.mPrefetchMaxCountObserved = 0;
+        mLayout.mPrefetchMaxObservedInInitialPrefetch = false;
+        mRecycler.updateViewCacheSize();
+    }
+
+    mLayout.onLayoutCompleted(mState);
+    onExitLayoutOrScroll();
+    stopInterceptRequestLayout(false);
+    mViewInfoStore.clear();
+    if (didChildRangeChange(mMinMaxLayoutPositions[0], mMinMaxLayoutPositions[1])) {
+        dispatchOnScrolled(0, 0);
+    }
+    recoverFocusFromState();
+    resetFocusInfo();
+}
+```
+
+## 3.3 draw 和 onDraw
+
+RecylcerView 的 draw() 方法主要作用为：加入了 Decorations（装饰）的支持，它的作用从本质上讲，就是在绘制 Item 的前后允许我们插入自己的绘制需求。因此我们从 draw() 开始分析源码：
+
+```java
+public void draw(Canvas c) {
+    super.draw(c);
+
+    final int count = mItemDecorations.size();
+    for (int i = 0; i < count; i++) {
+        mItemDecorations.get(i).onDrawOver(c, this, mState);
+    }
+    // 忽略部分非核心代码。
+}
+
+public void onDraw(Canvas c) {
+    super.onDraw(c);
+
+    final int count = mItemDecorations.size();
+    for (int i = 0; i < count; i++) {
+        mItemDecorations.get(i).onDraw(c, this, mState);
+    }
+}
+```
+
+super.draw(c) 执行的 View.draw(c) ，从它的 [绘制内容和流程](./View%20的工作流程.md#%E4%BA%94%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8Bdraw) 我们可以得出装饰的执行流程为：
+
+1. 在 super.draw(c) 中先执行 onDraw()，也就是先执行所有装饰的 onDraw() 方法。
+2. 在 super.draw(c) 中遍历子视图的 draw()（绘制子视图）。
+3. 最后在 draw() 中执行所有装饰的 onDrawOver() 方法。
 
 # 三、RecyclerView 性能优化
 
 ## 3.1 RecyclerView.setHasFixdSize()
 
-若 Adapter 的数据变化不会导致 RecyclerView 的大小变化，则将该方法设置为 true。它可以在 RecyclerView 内容发生变化时不需要调用 requestLayout()，而直接对子 View 进行 layout。
+若 Adapter 的数据变化不会导致 RecyclerView 的大小变化，则将该方法设置为 true。它可以在 RecyclerView 内容发生变化时不需要调用 requestLayout()，直接对子 View 进行 测量和布局。
 
 ## 3.2 RecyclerView.setRecycledViewPool()
 
