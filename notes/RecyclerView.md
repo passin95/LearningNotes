@@ -8,9 +8,9 @@
   - [2.3 回收复用](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
     - [2.3.1 缓存池](#231-%E7%BC%93%E5%AD%98%E6%B1%A0)
     - [2.3.2 detachAndScrapAttachedViews()](#232-detachandscrapattachedviews)
-      - [2.3.2.1 scrapView](#2321-scrapview)
+      - [2.3.2.1 scrapView()](#2321-scrapview)
     - [2.3.3 removeAndRecycleView()](#233-removeandrecycleview)
-      - [2.3.3.1 recycleView](#2331-recycleview)
+      - [2.3.3.1 recycleView()](#2331-recycleview)
     - [2.3.4 getViewForPosition()](#234-getviewforposition)
   - [2.4 自定义 LayoutManager 流程](#24-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
   - [2.5 回收复用的实现思路](#25-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
@@ -18,13 +18,13 @@
     - [2.6.1 getChildDrawingOrder()](#261-getchilddrawingorder)
     - [2.6.2 滑动时回收](#262-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
 - [三、RecyclerView 源码分析](#%E4%B8%89recyclerview-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [3.1 onMeasure](#31-onmeasure)
+  - [3.1 onMeasure()](#31-onmeasure)
     - [3.1.1 mLayout == null](#311-mlayout--null)
     - [3.1.2 LayoutManager 开启自动测量](#312-layoutmanager-%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
-      - [3.1.2.1 dispatchLayoutStep1](#3121-dispatchlayoutstep1)
-      - [3.1.2.2 dispatchLayoutStep2](#3122-dispatchlayoutstep2)
+      - [3.1.2.1 dispatchLayoutStep1()](#3121-dispatchlayoutstep1)
+      - [3.1.2.2 dispatchLayoutStep2()](#3122-dispatchlayoutstep2)
     - [3.1.3 LayoutManager 不开启自动测量](#313-layoutmanager-%E4%B8%8D%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
-  - [3.2 onLayout](#32-onlayout)
+  - [3.2 onLayout()](#32-onlayout)
 
 <!-- /TOC -->
 
@@ -170,7 +170,7 @@ mAttachedScrap 和 mChangedScrap 的主要区别如下：
 
 1. 被标记 update 的 ViewHolder 以及必须设置了 mItemAnimator，且 ItemAnimator 不可以重用 ViewHolder 缓存进 mChangedScrap，其余情况缓存进 mAttachedScrap。
 2. mChangedScrap 仅在预布局下使用（mRunPredictiveAnimations = true）。
-3. 
+
 **（2）mCachedView**
 
 保存最新被移除的 ViewHolder（调用 recycleViewHolderInternal(ViewHolder holder))，它的作用是在需要新的 ViewHolder 时，精确匹配是不是 **刚移除** 的那个（通过判断 ViewHolder 的 position）。如果是，就直接返回给 RecyclerView 进行展示；如果不是，那么即使 mCachedViews 中有 ViewHolder，也不会返回给 RecyclerView 使用。除非 ViewHolder 有数据上的更新，否则在正常滑动可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
@@ -234,14 +234,14 @@ private void scrapOrRecycleView(Recycler recycler, int index, View view) {
         // 一般都是局部的视图变化（调用了 Adapter.notifyItemXXX()）或设置了 RecyclerView.setHasFixedSize(true)，会走到这里。
         // 将 View 从 RecyclerView 上分离，分离的本质是仅仅将 View 和 RecyclerView 互相之间的引用置空，最终调用的是 ViewGroup.detachViewFromParent()。
         detachViewAt(index);
-        // 将 ViewHolder 放进 mAttachedScrap 或 mChangedScrap 中，以便稍后直接重用。
+        // 将 ViewHolder 缓存到 mAttachedScrap 或 mChangedScrap 中，以便稍后直接重用。
         recycler.scrapView(view);
         mRecyclerView.mViewInfoStore.onViewDetached(viewHolder);
     }
 }
 ```
 
-#### 2.3.2.1 scrapView
+#### 2.3.2.1 scrapView()
 
 该方法可以直接看出 mAttachedScrap 和 mChangedScrap 的区别。
 
@@ -306,7 +306,7 @@ public void removeAndRecycleAllViews(@NonNull Recycler recycler) {
 }
 ```
 
-#### 2.3.3.1 recycleView
+#### 2.3.3.1 recycleView()
 
 ```java
 public void recycleView(@NonNull View view) {
@@ -589,7 +589,7 @@ private void recycleChildren(RecyclerView.Recycler recycler) {
 
 Recyclerview 的本质依然是一个 View，因此它的源码分析依旧从 View 的三大流程 onMeasure()、onLayout()、onDraw() 开始。
 
-## 3.1 onMeasure
+## 3.1 onMeasure()
 
 dispatchLayoutStep1()、dispatchLayoutStep2()、dispatchLayoutStep3() 会在下文经常出现，因此先对这 3 个方法和所对应的的状态进行一个小结，从而对整个测量布局过程有一个大体的认知：
 
@@ -721,7 +721,7 @@ if (mLayout.isAutoMeasureEnabled()) {
 }
 ```
 
-#### 3.1.2.1 dispatchLayoutStep1
+#### 3.1.2.1 dispatchLayoutStep1()
 
 ```java
 private void dispatchLayoutStep1() {
@@ -852,7 +852,7 @@ private void processAdapterUpdatesAndSetAnimationFlags() {
 }
 ```
 
-#### 3.1.2.2 dispatchLayoutStep2
+#### 3.1.2.2 dispatchLayoutStep2()
 
 dispatchLayoutStep2() 进行子视图的实际测量和布局。
 
@@ -925,7 +925,7 @@ stopInterceptRequestLayout(false);
 mState.mInPreLayout = false; // clear
 ```
 
-## 3.2 onLayout
+## 3.2 onLayout()
 
 ```java
 @Override
