@@ -373,7 +373,6 @@ void recycleViewHolderInternal(ViewHolder holder) {
     // 省略部分代码
  
 }
-
 ```
 
 ### 2.3.4 getViewForPosition()
@@ -795,7 +794,7 @@ private void dispatchLayoutStep1() {
                 if (!wasHidden) {
                     flags |= ItemAnimator.FLAG_APPEARED_IN_PRE_LAYOUT;
                 }
-                // 记录预布局的后的视图信息
+                // 记录预布局的后的视图信息。
                 final ItemHolderInfo animationInfo = mItemAnimator.recordPreLayoutInformation(
                         mState, viewHolder, flags, viewHolder.getUnmodifiedPayloads());
                 if (wasHidden) {
@@ -974,7 +973,7 @@ void dispatchLayout() {
 }
 ```
 
-### dispatchLayoutStep3
+### dispatchLayoutStep3()
 
 ```java
 private void dispatchLayoutStep3() {
@@ -1054,7 +1053,7 @@ private void dispatchLayoutStep3() {
 }
 ```
 
-## 3.3 draw 和 onDraw
+## 3.3 draw() 和 onDraw()
 
 RecylcerView 的 draw() 方法主要作用为：加入了 Decorations（装饰）的支持，它的作用从本质上讲，就是在绘制 Item 的前后允许我们插入自己的绘制需求。因此我们从 draw() 开始分析源码：
 
