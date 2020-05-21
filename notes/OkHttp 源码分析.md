@@ -7,21 +7,21 @@
   - [一、说明](#%E4%B8%80%E8%AF%B4%E6%98%8E)
   - [二、OkHttp 的基本使用](#%E4%BA%8Cokhttp-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
   - [三、Request 和 Response](#%E4%B8%89request-%E5%92%8C-response)
-        - [3.1 Request](#31-request)
-        - [3.2 Response](#32-response)
+    - [3.1 Request](#31-request)
+    - [3.2 Response](#32-response)
   - [四、OkHttpClient](#%E5%9B%9Bokhttpclient)
     - [4.1 OkHttpClient 的成员变量](#41-okhttpclient-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
     - [4.2 OkHttpClient 对 Call.Factory 的实现](#42-okhttpclient-%E5%AF%B9-callfactory-%E7%9A%84%E5%AE%9E%E7%8E%B0)
   - [五、RealCall](#%E4%BA%94realcall)
-        - [5.1 Dispatcher](#51-dispatcher)
+    - [5.1 Dispatcher](#51-dispatcher)
     - [5.2 execute() 和 enqueue()](#52-execute-%E5%92%8C-enqueue)
-        - [5.3 getResponseWithInterceptorChain()](#53-getresponsewithinterceptorchain)
+    - [5.3 getResponseWithInterceptorChain()](#53-getresponsewithinterceptorchain)
   - [六、Interceptor](#%E5%85%ADinterceptor)
-        - [6.1 RetryAndFollowUpInterceptor](#61-retryandfollowupinterceptor)
-        - [6.2 BridgeInterceptor](#62-bridgeinterceptor)
-        - [6.3 CacheInterceptor](#63-cacheinterceptor)
-        - [6.4 ConnectInterceptor](#64-connectinterceptor)
-        - [6.5 CallServerInterceptor](#65-callserverinterceptor)
+    - [6.1 RetryAndFollowUpInterceptor](#61-retryandfollowupinterceptor)
+    - [6.2 BridgeInterceptor](#62-bridgeinterceptor)
+    - [6.3 CacheInterceptor](#63-cacheinterceptor)
+    - [6.4 ConnectInterceptor](#64-connectinterceptor)
+    - [6.5 CallServerInterceptor](#65-callserverinterceptor)
 
 <!-- /TOC -->
 
@@ -457,13 +457,12 @@ public final class RealInterceptorChain implements Interceptor.Chain {
 
 ## 六、Interceptor
 
-Interceptor 也叫拦截器，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求和问题进行拆分处理。
+Interceptor 的本质和 Android 的触摸事件分发机制一样，都是责任链模式，它像工厂流水线一样，传递用户发起的请求 Request，每一个拦截器完成相应的功能，目的也是对网络请求可能存在的需求和问题进行拆分处理。
 
-Interceptor.Chain 的原理类似于 Android 的触摸事件分发机制，即在拦截器不拦截的情况下，先执行的拦截器，会拿到最后的 response。
 
-在每一个拦截器 Interceptor 的 intercept() 中，会调用 chain.proceed() 中把它自己组装完的 Request 通过递归发给下一个拦截器，直至最后一个拦截器的 intercept() return 得到 response（调用完 chain.proceed() 得到的 response 并不一定马上返回，还可以对其进行后续操作），上一个拦截器得到 response 后继续向下执行至 return，并一直反复递归至返回得到最终的 response。
+在每一个拦截器 Interceptor 的 intercept() 中，会调用 chain.proceed() 中把它自己组装完的 Request 通过递归发给下一个拦截器，直至最后一个拦截器的 intercept() return 得到 response（调用完 chain.proceed() 得到的 response 并不一定马上返回，还可以对其进行后续操作），上一个拦截器得到 response 后继续向下执行至 return，并一直反复递归至返回得到最终的 response。即在拦截器不拦截的情况下，第一个执行的拦截器，会拿到最后的 response。
 
-同时，如果在特定条件下不想将 Request 向下传递，只需要在特定条件下构建一个新的 response 直接 return 返回（拦截掉），并且不在这之前调用 chain.proceed()。
+如果在特定条件下不想将 Request 向下传递，只需要在特定条件下构建一个新的 response 直接 return 返回（拦截掉），并且不在这之前调用 chain.proceed()。
 
 ### 6.1 RetryAndFollowUpInterceptor
 
