@@ -38,7 +38,9 @@
 
   生命周期、启动模式、四大组件等（覆盖了各类异常情况补充）。
 
-- [Android Framework](./notes/Android%20Framework.md)
+- [Android 系统架构](./notes/Android%20系统架构.md)
+
+  Android 系统架构（开始逐步完善中）。
 
 - [Android 框架](./notes/Android%20常用框架.md)
 

@@ -36,7 +36,7 @@
 
 - [RecyclerView](./RecyclerView.md)
 
-  RecyclerView API、RecyclerView 缓存原理、自定义 ItemDecoration、自定义 LayoutManager。
+  RecyclerView 测量布局原理、RecyclerView 缓存原理、自定义 ItemDecoration、自定义 LayoutManager。
 
 
 ## 参考资料
