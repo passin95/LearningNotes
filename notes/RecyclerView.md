@@ -1,30 +1,36 @@
 
 <!-- TOC -->
 
-- [一、自定义 ItemDecoration](#%E4%B8%80%E8%87%AA%E5%AE%9A%E4%B9%89-itemdecoration)
-- [二、自定义 LayoutManager](#%E4%BA%8C%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager)
-  - [2.1 测量](#21-%E6%B5%8B%E9%87%8F)
-  - [2.2 布局](#22-%E5%B8%83%E5%B1%80)
-  - [2.3 回收复用](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
-    - [2.3.1 缓存池](#231-%E7%BC%93%E5%AD%98%E6%B1%A0)
-    - [2.3.2 detachAndScrapAttachedViews()](#232-detachandscrapattachedviews)
-      - [2.3.2.1 scrapView()](#2321-scrapview)
-    - [2.3.3 removeAndRecycleView()](#233-removeandrecycleview)
-      - [2.3.3.1 recycleView()](#2331-recycleview)
-    - [2.3.4 getViewForPosition()](#234-getviewforposition)
-  - [2.4 自定义 LayoutManager 流程](#24-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
-  - [2.5 回收复用的实现思路](#25-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
-  - [2.6 技巧](#26-%E6%8A%80%E5%B7%A7)
-    - [2.6.1 getChildDrawingOrder()](#261-getchilddrawingorder)
-    - [2.6.2 滑动时回收](#262-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
-- [三、RecyclerView 源码分析](#%E4%B8%89recyclerview-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [3.1 onMeasure()](#31-onmeasure)
-    - [3.1.1 mLayout == null](#311-mlayout--null)
-    - [3.1.2 LayoutManager 开启自动测量](#312-layoutmanager-%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
-      - [3.1.2.1 dispatchLayoutStep1()](#3121-dispatchlayoutstep1)
-      - [3.1.2.2 dispatchLayoutStep2()](#3122-dispatchlayoutstep2)
-    - [3.1.3 LayoutManager 不开启自动测量](#313-layoutmanager-%E4%B8%8D%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
-  - [3.2 onLayout()](#32-onlayout)
+- [一、自定义 ItemDecoration](#一自定义-itemdecoration)
+- [二、自定义 LayoutManager](#二自定义-layoutmanager)
+    - [2.1 测量](#21-测量)
+    - [2.2 布局](#22-布局)
+    - [2.3 回收复用](#23-回收复用)
+        - [2.3.1 缓存池](#231-缓存池)
+        - [2.3.2 detachAndScrapAttachedViews()](#232-detachandscrapattachedviews)
+            - [2.3.2.1 scrapView()](#2321-scrapview)
+        - [2.3.3 removeAndRecycleView()](#233-removeandrecycleview)
+            - [2.3.3.1 recycleView()](#2331-recycleview)
+        - [2.3.4 getViewForPosition()](#234-getviewforposition)
+    - [2.4 自定义 LayoutManager 流程](#24-自定义-layoutmanager-流程)
+    - [2.5 回收复用的实现思路](#25-回收复用的实现思路)
+    - [2.6 技巧](#26-技巧)
+        - [2.6.1 getChildDrawingOrder()](#261-getchilddrawingorder)
+        - [2.6.2 滑动时回收](#262-滑动时回收)
+- [三、RecyclerView 源码分析](#三recyclerview-源码分析)
+    - [3.1 onMeasure()](#31-onmeasure)
+        - [3.1.1 mLayout == null](#311-mlayout--null)
+        - [3.1.2 LayoutManager 开启自动测量](#312-layoutmanager-开启自动测量)
+            - [3.1.2.1 dispatchLayoutStep1()](#3121-dispatchlayoutstep1)
+            - [3.1.2.2 dispatchLayoutStep2()](#3122-dispatchlayoutstep2)
+        - [3.1.3 LayoutManager 不开启自动测量](#313-layoutmanager-不开启自动测量)
+    - [3.2 onLayout()](#32-onlayout)
+        - [3.2.1 dispatchLayoutStep3()](#321-dispatchlayoutstep3)
+    - [3.3 draw() 和 onDraw()](#33-draw-和-ondraw)
+- [四、RecyclerView 性能优化](#四recyclerview-性能优化)
+    - [4.1 RecyclerView.setHasFixdSize()](#41-recyclerviewsethasfixdsize)
+    - [4.2 RecyclerView.setRecycledViewPool()](#42-recyclerviewsetrecycledviewpool)
+    - [4.3 DiffUtil](#43-diffutil)
 
 <!-- /TOC -->
 
@@ -935,8 +941,9 @@ protected void onLayout(boolean changed, int l, int t, int r, int b) {
     // mFirstLayoutComplete 仅在此处置为 true。
     mFirstLayoutComplete = true;
 }
+```
 
-主要代码为 dispatchLayout()，目的也很简单，保证 RecyclerView 必须经历 3 个步骤 dispatchLayoutStep1、dispatchLayoutStep2、dispatchLayoutStep3。
+主要代码为 dispatchLayout()，目的也很简单，保证 RecyclerView 的测量布局必须经历 3 个步骤 dispatchLayoutStep1、dispatchLayoutStep2、dispatchLayoutStep3。
 
 ```java
 void dispatchLayout() {
@@ -973,7 +980,7 @@ void dispatchLayout() {
 }
 ```
 
-### dispatchLayoutStep3()
+### 3.2.1 dispatchLayoutStep3()
 
 ```java
 private void dispatchLayoutStep3() {
@@ -1084,17 +1091,17 @@ super.draw(c) 执行的 View.draw(c) ，从它的 [绘制内容和流程](./View
 2. 在 super.draw(c) 中遍历子视图的 draw()（绘制子视图）。
 3. 最后在 draw() 中执行所有装饰的 onDrawOver() 方法。
 
-# 三、RecyclerView 性能优化
+# 四、RecyclerView 性能优化
 
-## 3.1 RecyclerView.setHasFixdSize()
+## 4.1 RecyclerView.setHasFixdSize()
 
 若 Adapter 的数据变化不会导致 RecyclerView 的大小变化，则将该方法设置为 true。它可以在 RecyclerView 内容发生变化时不需要调用 requestLayout()，直接对子 View 进行 测量和布局。
 
-## 3.2 RecyclerView.setRecycledViewPool()
+## 4.2 RecyclerView.setRecycledViewPool()
 
 多个 RecyclerView 在 viewType 一样（布局文件也一致）的情况下可以共用同一个 RecycledViewPool，例如订单的不同状态使用了多个 RecyclerView。
 
-## 3.3 DiffUtil
+## 4.3 DiffUtil
 
 适用于整个页面需要刷新，但是部分数据可能相同的情况（是否相同的标准由开发者决定）。它可以比较出不同的数据源进行局部刷新（局部刷新可以是某个 ViewHolder 的全量刷新或是单单某个 View 的方法调用），达到最小刷新的效果。具体的使用方式可看
 https://github.com/CymChad/BaseRecyclerViewAdapterHelper/blob/master/library/src/main/java/com/chad/library/adapter/base/BaseQuickAdapter.java。
