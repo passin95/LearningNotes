@@ -1,28 +1,28 @@
 
 <!-- TOC -->
 
-- [一、前言](#一前言)
-- [二、初探 RxJava](#二初探-rxjava)
-    - [2.1 Single.just()](#21-singlejust)
-    - [2.2 single.subscribe(observer)](#22-singlesubscribeobserver)
-    - [2.3 小结](#23-小结)
-- [三、再探 RxJava](#三再探-rxjava)
-    - [3.1 RxJava 链式调用结构的本质](#31-rxjava-链式调用结构的本质)
-    - [3.2 Map 和 FlapMap](#32-map-和-flapmap)
-        - [3.2.1 map](#321-map)
-        - [3.2.2 flatMap](#322-flatmap)
-    - [3.3 线程切换](#33-线程切换)
-        - [3.3.1 subscribeOn](#331-subscribeon)
-        - [3.3.2 observeOn](#332-observeon)
-        - [3.3.3 小结](#333-小结)
-- [四、终看 RxJava](#四终看-rxjava)
-    - [4.1 doFinally 和 doAfterTerminate 有何不同？](#41-dofinally-和-doafterterminate-有何不同)
-    - [4.2 doFinally() 写在 observeOn() 之前和之后有何区别？](#42-dofinally-写在-observeon-之前和之后有何区别)
-    - [4.3 doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#43-doonsubscribe-在-2-个-subscribeon-之间是如何生效的)
-    - [4.4 为什么连用两个 subscribeOn 操作符只有第一个有效？](#44-为什么连用两个-subscribeon-操作符只有第一个有效)
-    - [4.5 defer 到底有何作用？](#45-defer-到底有何作用)
-    - [4.6 Demo 执行过程梳理](#46-demo-执行过程梳理)
-- [五、不同被观察者的区别](#五不同被观察者的区别)
+- [一、前言](#%E4%B8%80%E5%89%8D%E8%A8%80)
+- [二、初探 RxJava](#%E4%BA%8C%E5%88%9D%E6%8E%A2-rxjava)
+  - [2.1 Single.just()](#21-singlejust)
+  - [2.2 single.subscribe(observer)](#22-singlesubscribeobserver)
+  - [2.3 小结](#23-%E5%B0%8F%E7%BB%93)
+- [三、再探 RxJava](#%E4%B8%89%E5%86%8D%E6%8E%A2-rxjava)
+  - [3.1 RxJava 链式调用结构的本质](#31-rxjava-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84%E7%9A%84%E6%9C%AC%E8%B4%A8)
+  - [3.2 Map 和 FlapMap](#32-map-%E5%92%8C-flapmap)
+    - [3.2.1 map](#321-map)
+    - [3.2.2 flatMap](#322-flatmap)
+  - [3.3 线程切换](#33-%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2)
+    - [3.3.1 subscribeOn](#331-subscribeon)
+    - [3.3.2 observeOn](#332-observeon)
+    - [3.3.3 小结](#333-%E5%B0%8F%E7%BB%93)
+- [四、终看 RxJava](#%E5%9B%9B%E7%BB%88%E7%9C%8B-rxjava)
+  - [4.1 doFinally 和 doAfterTerminate 有何不同？](#41-dofinally-%E5%92%8C-doafterterminate-%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C)
+  - [4.2 doFinally() 写在 observeOn() 之前和之后有何区别？](#42-dofinally-%E5%86%99%E5%9C%A8-observeon-%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E6%9C%89%E4%BD%95%E5%8C%BA%E5%88%AB)
+  - [4.3 doOnSubscribe 在 2 个 subscribeOn 之间是如何生效的？](#43-doonsubscribe-%E5%9C%A8-2-%E4%B8%AA-subscribeon-%E4%B9%8B%E9%97%B4%E6%98%AF%E5%A6%82%E4%BD%95%E7%94%9F%E6%95%88%E7%9A%84)
+  - [4.4 为什么连用两个 subscribeOn 操作符只有第一个有效？](#44-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E7%94%A8%E4%B8%A4%E4%B8%AA-subscribeon-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%8F%AA%E6%9C%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%9C%89%E6%95%88)
+  - [4.5 defer 到底有何作用？](#45-defer-%E5%88%B0%E5%BA%95%E6%9C%89%E4%BD%95%E4%BD%9C%E7%94%A8)
+  - [4.6 Demo 执行过程梳理](#46-demo-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E6%A2%B3%E7%90%86)
+- [五、不同被观察者的区别](#%E4%BA%94%E4%B8%8D%E5%90%8C%E8%A2%AB%E8%A7%82%E5%AF%9F%E8%80%85%E7%9A%84%E5%8C%BA%E5%88%AB)
 
 <!-- /TOC -->
 
@@ -963,4 +963,4 @@ Subject 既是Observable，又是observer，这里主要看它作为被观察者
 - PublishSubject：观察者能接收到 **订阅它之后的所有信号**；
 - ReplaySubject：观察者能接收到 **它发出的所有信号**，即包括订阅前和订阅后；
 - BehaviorSubject：观察者能接收到 **订阅它前的最后一条数据和订阅后的所有信号**；
-- BehaviorSubject：观察者能在订阅后接收到 **完成信号之前的一个信号和一个完成信号**。
+- AsyncSubject：观察者能在订阅后接收到 **完成信号之前的一个信号和一个完成信号**。

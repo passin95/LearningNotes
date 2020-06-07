@@ -235,9 +235,9 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 # 四、IntentFilter 的匹配规则 
 
-启动 Activity 分为两种，显示调用和隐式调用，两者如果共存的话以显示调用为主。隐式调用主要是匹配目标 Activity 的 IntentFilter，一个 Activity 可以有多个 IntentFilter。
+启动 Activity 分为两种，显式调用和隐式调用，两者如果共存的话以显式调用为主。隐式调用主要是匹配目标 Activity 的 IntentFilter，一个 Activity 可以有多个 IntentFilter。
 
-IntentFilter 的过滤信息有 action、category、data，只有一个 Intent 同时匹配 action、category、data 的匹配规则才算完全匹配从而成功启动目标 Activity。
+IntentFilter 的过滤信息有 action、category、data，Intent 只有同时满足 action、category、data 的匹配规则才算完全匹配从而成功启动目标 Activity。
 
 ## 4.1 action 的匹配规则
 
