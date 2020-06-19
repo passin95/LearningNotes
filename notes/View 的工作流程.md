@@ -19,7 +19,7 @@
 <!-- /TOC -->
 
 # 一、View 的工作流程
-
+ 
 视图的核心是在页面中展示特定的图像和响应用户的触摸事件。
 
 视图展示的系统架构是由视图根节点（ViewRootImpl）开始，视图根节点负责连接窗口管理器（WindowManager）与装饰视图（DecorView），窗口管理器用于响应用户事件，而装饰视图用于展示特定图像。
@@ -223,7 +223,7 @@ public static int resolveSizeAndState(int size, int measureSpec, int childMeasur
 
 ViewGroup.measureChildren() 用于给与一定的尺寸限制去测量所有子 View 所占的大小。
 
-该方法并不会适用任何情况，开发者可能需要自己手写测量算法。
+该方法并不会适用任何情况，开发者往往需要自己手写测量算法。
 
 在手写测量算法的过程中，开发者的要求（layout_打头的属性）一般优先级最高。为什么呢？
 
@@ -258,7 +258,7 @@ protected void measureChild(View child, int parentWidthMeasureSpec,
             mPaddingLeft + mPaddingRight, lp.width);
     final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
             mPaddingTop + mPaddingBottom, lp.height);
-    // 将父 View 的限制传给子 View 测量自己。
+    // 将父 View 的限制传给子 View 进行子 View 的测量。
     child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
 }
 

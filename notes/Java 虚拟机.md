@@ -57,7 +57,7 @@ Java 语言通过编译成字节码的方式，在一定程度上解决了传统
 
 # 二、运行时数据区域
 
-JDK1.7 之前（Java 1.7 将运行时常量池在堆中）：
+JDK1.7 之前（Java 1.7 运行时常量池在堆中）：
 
 <div align="center"> <img src="../pictures//运行时数据区域.png"/> </div><br>
 

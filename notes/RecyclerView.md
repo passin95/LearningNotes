@@ -1,36 +1,36 @@
 
 <!-- TOC -->
 
-- [一、自定义 ItemDecoration](#一自定义-itemdecoration)
-- [二、自定义 LayoutManager](#二自定义-layoutmanager)
-    - [2.1 测量](#21-测量)
-    - [2.2 布局](#22-布局)
-    - [2.3 回收复用](#23-回收复用)
-        - [2.3.1 缓存池](#231-缓存池)
-        - [2.3.2 detachAndScrapAttachedViews()](#232-detachandscrapattachedviews)
-            - [2.3.2.1 scrapView()](#2321-scrapview)
-        - [2.3.3 removeAndRecycleView()](#233-removeandrecycleview)
-            - [2.3.3.1 recycleView()](#2331-recycleview)
-        - [2.3.4 getViewForPosition()](#234-getviewforposition)
-    - [2.4 自定义 LayoutManager 流程](#24-自定义-layoutmanager-流程)
-    - [2.5 回收复用的实现思路](#25-回收复用的实现思路)
-    - [2.6 技巧](#26-技巧)
-        - [2.6.1 getChildDrawingOrder()](#261-getchilddrawingorder)
-        - [2.6.2 滑动时回收](#262-滑动时回收)
-- [三、RecyclerView 源码分析](#三recyclerview-源码分析)
-    - [3.1 onMeasure()](#31-onmeasure)
-        - [3.1.1 mLayout == null](#311-mlayout--null)
-        - [3.1.2 LayoutManager 开启自动测量](#312-layoutmanager-开启自动测量)
-            - [3.1.2.1 dispatchLayoutStep1()](#3121-dispatchlayoutstep1)
-            - [3.1.2.2 dispatchLayoutStep2()](#3122-dispatchlayoutstep2)
-        - [3.1.3 LayoutManager 不开启自动测量](#313-layoutmanager-不开启自动测量)
-    - [3.2 onLayout()](#32-onlayout)
-        - [3.2.1 dispatchLayoutStep3()](#321-dispatchlayoutstep3)
-    - [3.3 draw() 和 onDraw()](#33-draw-和-ondraw)
-- [四、RecyclerView 性能优化](#四recyclerview-性能优化)
-    - [4.1 RecyclerView.setHasFixdSize()](#41-recyclerviewsethasfixdsize)
-    - [4.2 RecyclerView.setRecycledViewPool()](#42-recyclerviewsetrecycledviewpool)
-    - [4.3 DiffUtil](#43-diffutil)
+- [一、自定义 ItemDecoration](#%E4%B8%80%E8%87%AA%E5%AE%9A%E4%B9%89-itemdecoration)
+- [二、自定义 LayoutManager](#%E4%BA%8C%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager)
+  - [2.1 测量](#21-%E6%B5%8B%E9%87%8F)
+  - [2.2 布局](#22-%E5%B8%83%E5%B1%80)
+  - [2.3 回收复用](#23-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8)
+    - [2.3.1 缓存池](#231-%E7%BC%93%E5%AD%98%E6%B1%A0)
+    - [2.3.2 detachAndScrapAttachedViews()](#232-detachandscrapattachedviews)
+      - [2.3.2.1 scrapView()](#2321-scrapview)
+    - [2.3.3 removeAndRecycleView()](#233-removeandrecycleview)
+      - [2.3.3.1 recycleView()](#2331-recycleview)
+    - [2.3.4 getViewForPosition()](#234-getviewforposition)
+  - [2.4 自定义 LayoutManager 流程](#24-%E8%87%AA%E5%AE%9A%E4%B9%89-layoutmanager-%E6%B5%81%E7%A8%8B)
+  - [2.5 回收复用的实现思路](#25-%E5%9B%9E%E6%94%B6%E5%A4%8D%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
+  - [2.6 技巧](#26-%E6%8A%80%E5%B7%A7)
+    - [2.6.1 getChildDrawingOrder()](#261-getchilddrawingorder)
+    - [2.6.2 滑动时回收](#262-%E6%BB%91%E5%8A%A8%E6%97%B6%E5%9B%9E%E6%94%B6)
+- [三、RecyclerView 源码分析](#%E4%B8%89recyclerview-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [3.1 onMeasure()](#31-onmeasure)
+    - [3.1.1 mLayout == null](#311-mlayout--null)
+    - [3.1.2 LayoutManager 开启自动测量](#312-layoutmanager-%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
+      - [3.1.2.1 dispatchLayoutStep1()](#3121-dispatchlayoutstep1)
+      - [3.1.2.2 dispatchLayoutStep2()](#3122-dispatchlayoutstep2)
+    - [3.1.3 LayoutManager 不开启自动测量](#313-layoutmanager-%E4%B8%8D%E5%BC%80%E5%90%AF%E8%87%AA%E5%8A%A8%E6%B5%8B%E9%87%8F)
+  - [3.2 onLayout()](#32-onlayout)
+    - [3.2.1 dispatchLayoutStep3()](#321-dispatchlayoutstep3)
+  - [3.3 draw() 和 onDraw()](#33-draw-%E5%92%8C-ondraw)
+- [四、RecyclerView 性能优化](#%E5%9B%9Brecyclerview-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96)
+  - [4.1 RecyclerView.setHasFixdSize()](#41-recyclerviewsethasfixdsize)
+  - [4.2 RecyclerView.setRecycledViewPool()](#42-recyclerviewsetrecycledviewpool)
+  - [4.3 DiffUtil](#43-diffutil)
 
 <!-- /TOC -->
 
@@ -161,7 +161,6 @@ public void layoutDecoratedWithMargins(@NonNull View child, int left, int top, i
 }
 ```
 
-
 ## 2.3 回收复用
 
 ### 2.3.1 缓存池
@@ -174,7 +173,7 @@ mAttachedScrap 和 mChangedScrap 不参与滑动过程中的回收复用，主�
 
 mAttachedScrap 和 mChangedScrap 的主要区别如下：
 
-1. 被标记 update 的 ViewHolder 以及必须设置了 mItemAnimator，且 ItemAnimator 不可以重用 ViewHolder 缓存进 mChangedScrap，其余情况缓存进 mAttachedScrap。
+1. 被标记 update 的 ViewHolder 以及必须设置了 mItemAnimator，且 ItemAnimator 不可以重用的 ViewHolder 缓存进 mChangedScrap，其余情况缓存进 mAttachedScrap。
 2. mChangedScrap 仅在预布局下使用（mRunPredictiveAnimations = true）。
 
 **（2）mCachedView**

@@ -190,7 +190,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 - screenOrientation：Activity 在设备上的显示方向。如果 Activity 是在多窗口模式下运行，系统会忽略该属性。 
 
-- allowTaskPeparenting：当应用 A 启动了应用 B 的某个 Activity（C） 后，如果这个 Activity（C）的 allowTaskPeparenting 属性为 true 的话，此 Activity（C）会直接从应用 A 的任务栈转移到应用 B 的任务栈中。此时回到桌面后，若打开应用 A，则 C 不再显示，若打开应用 B，则显示 C。默认值为 false。
+- allowTaskReparenting：当应用 A 启动了应用 B 的某个 Activity（C） 后，如果这个 Activity（C）的 allowTaskReparenting 属性为 true 的话，此 Activity（C）会直接从应用 A 的任务栈转移到应用 B 的任务栈中。此时回到桌面后，若打开应用 A，则 C 不再显示，若打开应用 B，则显示 C。默认值为 false。
 
 - noHistory：用于标记当用户从 Activity 上离开并且它在屏幕上不再可见时 Activity 是否从 Activity stack 中清除并结束（调用 finish()），默认值为 false。
 
@@ -202,7 +202,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 # 三、Activity LaunchMode
 
-以下把每一个 Task 比作为一个任务栈。而 TaskAffinity 可以用来标识 Activity 所属的任务栈。默认情况下，Activity 的所属任务栈为应用包名，该值主要与 singleTask 或 allowTaskPeparenting 配对使用。
+以下把每一个 Task 比作为一个任务栈。而 TaskAffinity 可以用来标识 Activity 所属的任务栈。默认情况下，Activity 的所属任务栈为应用包名，该值主要与 singleTask 或 allowTaskReparenting 配对使用。
 
 （1）standard：标准模式，系统的默认格式。每次启动 Activity 都在 **当前栈内** 创建新的 Activity。
 

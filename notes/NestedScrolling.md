@@ -112,7 +112,7 @@ public int getNestedScrollAxes();
 
 ## 1.2 NestedScrolling 流程
 
-我们先看一下 [传统的事件分发机制](./触摸反馈#%E4%BA%8C%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6)，它是由 Activity 发起事件再传到父 View，一旦父 View 需要自己处理触摸事件就要拦截掉事件，且子 View 再没有机会接手此事件流。而 NestedScrolling 不一样，它是由子 View 发起的，一般的处理流程图如下所示：
+我们先看一下 [传统的事件分发机制](./触摸反馈#%E4%BA%8C%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6)，它是由 Activity 发起事件再传到父 View，一旦父 View 需要自己处理触摸事件就要拦截掉事件，则子 View 再没有机会接手此事件流。而 NestedScrolling 不一样，它是由子 View 发起的，一般的处理流程图如下所示：
 
  <img src="../pictures//NestedScrolling%20流程图.webp" /> </div>
 
@@ -136,7 +136,6 @@ public boolean startNestedScroll(int axes) {
             try {
                 // 调用父 View 的 onStartNestedScroll() 以确定联合嵌套滑动的父 View。
                 if (p.onStartNestedScroll(child, this, axes)) {
-                    // 
                     // mNestedScrollingParent 也是 hasNestedScrollingParent() 方法的判断依据。
                     mNestedScrollingParent = p;
                     // 调用父 View 的 onNestedScrollAccepted()，表示已开启嵌套滑动。
@@ -198,7 +197,7 @@ public boolean dispatchNestedPreScroll(int dx, int dy, @Nullable int[] consumed,
                 }
                 consumed = mTempNestedScrollConsumed;
             }
-            // 重置 consumed 数组，传给父 View 来获取父 View 消耗的滑动巨鹿。
+            // 重置 consumed 数组，传给父 View 来获取父 View 消耗的滑动距离。
             consumed[0] = 0;
             consumed[1] = 0;
             // 调用父 View 的 onNestedPreScroll()。
