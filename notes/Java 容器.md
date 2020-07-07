@@ -2,22 +2,22 @@
 
 - [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
   - [1.1 名词说明](#11-%E5%90%8D%E8%AF%8D%E8%AF%B4%E6%98%8E)
-    - [1.1.1 RandomAccess](#111-randomaccess)
+        - [1.1.1 RandomAccess](#111-randomaccess)
     - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-%E5%92%8C-failsafe)
-  - [1.2 Collection](#12-collection)
-    - [1.2.1 List](#121-list)
-    - [1.2.2 Set](#122-set)
-    - [1.2.3 Queue](#123-queue)
-  - [1.3 Map](#13-map)
-  - [1.4 Arrays.asList()](#14-arraysaslist)
+    - [1.2 Collection](#12-collection)
+        - [1.2.1 List](#121-list)
+        - [1.2.2 Set](#122-set)
+        - [1.2.3 Queue](#123-queue)
+    - [1.3 Map](#13-map)
+    - [1.4 Arrays.asList()](#14-arraysaslist)
 - [二、源码分析](#%E4%BA%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [2.1 ArrayList](#21-arraylist)
+    - [2.1 ArrayList](#21-arraylist)
     - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-vectorcopyonwritearraylistcollectionssynchronizedlist-%E5%AF%B9%E6%AF%94)
-  - [2.2 LinkedList](#22-linkedlist)
-  - [2.3 HashMap](#23-hashmap)
+    - [2.2 LinkedList](#22-linkedlist)
+    - [2.3 HashMap](#23-hashmap)
     - [2.3.1 成员变量和构造函数](#231-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
     - [2.3.2 存储结构](#232-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
-    - [2.3.3 put、get、resize](#233-putgetresize)
+        - [2.3.3 put、get、resize](#233-putgetresize)
     - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-hashtableconcurrenthashmapcollectionssynchronizedmap-%E5%AF%B9%E6%AF%94)
 
 <!-- /TOC -->
@@ -1461,11 +1461,11 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     static final int MAXIMUM_CAPACITY = 1 << 30; 
     // 默认的填充因子。
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    // 当桶 (bucket) 上的结点数大于这个值时会转成红黑树。
+    // 当桶 (bucket) 上的结点数大于等于这个值时为转成红黑树的条件之一。
     static final int TREEIFY_THRESHOLD = 8; 
     // 当桶 (bucket) 上的结点数小于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
-    // 桶中结构转化为红黑树对应的 table 容量的最小值。
+    // 转化为红黑树的另一个条件：table 容量大于 64。
     static final int MIN_TREEIFY_CAPACITY = 64;
     // 存储元素的数组，也是 HashMap 的原理所在。
     // 数组容量任何时候总是 2 的幂次倍。

@@ -261,7 +261,7 @@ void scrapView(View view) {
                     + " recycler pool." + exceptionLabel());
         }
         // 满足以下任意一个条件就存到 mAttachedScrap 中：
-        // 1.被同时标记 remove 和 invalid。
+        // 1.被标记 remove 或 invalid。
         // 2.不需要进行更新的 ViewHolder（例如 notifyItemChanged 会标记 ViewHolder 为 update）。
         // 3.没有设置 mItemAnimator，或者 mItemAnimator 可以重用被标记为 updated 的 ViewHolder（默认的 DefaultItemAnimator 可以重用）。
         
