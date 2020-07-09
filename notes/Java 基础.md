@@ -453,7 +453,7 @@ if (x.equals(y) && y.equals(z))
 
 （四）一致性
 
-多次调用 equals() 方法结果不变
+多次调用 equals() 方法结果不变。
 
 ```java
 x.equals(y) == x.equals(y); // true

@@ -2,22 +2,22 @@
 
 - [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
   - [1.1 名词说明](#11-%E5%90%8D%E8%AF%8D%E8%AF%B4%E6%98%8E)
-        - [1.1.1 RandomAccess](#111-randomaccess)
-    - [1.1.2 fail-fast 和 fail—safe](#112-fail-fast-%E5%92%8C-failsafe)
-    - [1.2 Collection](#12-collection)
-        - [1.2.1 List](#121-list)
-        - [1.2.2 Set](#122-set)
-        - [1.2.3 Queue](#123-queue)
-    - [1.3 Map](#13-map)
-    - [1.4 Arrays.asList()](#14-arraysaslist)
+    - [1.1.1 RandomAccess](#111-randomaccess)
+    - [1.1.2 fail-fast 和 fail-safe](#112-fail-fast-%E5%92%8C-fail-safe)
+  - [1.2 Collection](#12-collection)
+    - [1.2.1 List](#121-list)
+    - [1.2.2 Set](#122-set)
+    - [1.2.3 Queue](#123-queue)
+  - [1.3 Map](#13-map)
+  - [1.4 Arrays.asList()](#14-arraysaslist)
 - [二、源码分析](#%E4%BA%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-    - [2.1 ArrayList](#21-arraylist)
+  - [2.1 ArrayList](#21-arraylist)
     - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-vectorcopyonwritearraylistcollectionssynchronizedlist-%E5%AF%B9%E6%AF%94)
-    - [2.2 LinkedList](#22-linkedlist)
-    - [2.3 HashMap](#23-hashmap)
+  - [2.2 LinkedList](#22-linkedlist)
+  - [2.3 HashMap](#23-hashmap)
     - [2.3.1 成员变量和构造函数](#231-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
     - [2.3.2 存储结构](#232-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
-        - [2.3.3 put、get、resize](#233-putgetresize)
+    - [2.3.3 put、get、resize](#233-putgetresize)
     - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-hashtableconcurrenthashmapcollectionssynchronizedmap-%E5%AF%B9%E6%AF%94)
 
 <!-- /TOC -->
@@ -34,10 +34,10 @@
 
 RandomAccess 是一个接口，仅仅起一个标识的作用，标识实现的类支持快速随机访问功能，即可通过元素的序号快速获取元素对象 (对应于 get(int index) 方法)。
 
-### 1.1.2 fail-fast 和 fail—safe
+### 1.1.2 fail-fast 和 fail-safe
 
 - fail-fast：用迭代器遍历一个集合对象时，如果遍历过程中对集合对象的内容进行了修改（增加、删除、修改时 modCount 会自增），遍历期间 modCount 字段和 expectedmodCount 不同则会抛出 ConcurrentModificationException。
-- fail—safe：支持在多线程下并发使用和修改，也可以在 foreach 中删减，原理是遍历时先复制原有集合内容，在拷贝的集合上进行遍历，在遍历过程中对原集合所作的修改并不能被迭代器检测到。
+- fail-safe：支持在多线程下并发使用和修改，也可以在 foreach 中删减，原理是遍历时先复制原有集合内容，在拷贝的集合上进行遍历，在遍历过程中对原集合所作的修改并不能被迭代器检测到。
 
 ## 1.2 Collection
 
@@ -67,8 +67,8 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 
 使用键值对存储。
 
-- TreeMap：基于红黑树实现。
-- HashMap：基于哈希表实现。
+- TreeMap：基于红黑树实现，支持有序性操作，排序具体的实现有 2 种，一种是 key 元素实现 Comparable 接口，一种是容器初始化时传入 Comparable 接口参数。
+- HashMap：基于哈希表实现。插入的键值对是无序的。
 - ArrayMap：基于数组实现，比 HashMap 更节约内存，但查找速度有所降低，适用于数据量少的情况。
 - HashTable：和 HashMap 类似，区别在于它是线程安全的（方法加锁）。但不推荐使用，更推荐使用 ConcurrentHashMap 来支持线程安全，从而有更高的并发性能。
 - LinkedHashMap：使用双向链表来维护元素的顺序，顺序为插入顺序或者最近最少使用（LRU）顺序。
@@ -112,7 +112,7 @@ public final class System {
      * 从数组 src 的第 srcPos（包含） 开始，复制 length 个元素到数组 dest 第 destPos（包含）个索引依次往后。
      *
      */
-    public static native void arraycopy(Object src,  int  srcPos,
+    public static native void arraycopy(Object src, int srcPos,
                                     Object dest, int destPos,
                                     int length);
 }

@@ -59,11 +59,10 @@ public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] off
 /**
  * 在 dispatchNestedPreScroll() 之后，view 将消费剩余的滑动距离，并告知父 View 消费了多少。
  *
- * @param dxConsumed 父 View x 轴消费的滑动距离。
- * @param dyConsumed 父 View y 轴消费的滑动距离。
+ * @param dxConsumed 子 View x 轴消费的滑动距离。
+ * @param dyConsumed 子 View y 轴消费的滑动距离。
  * @param dxUnconsumed x 轴未消费的滑动距离。
  * @param dyUnconsumed y 轴未消费的滑动距离。
- * @param offsetInWindow 子 View 创建给父 View 使用的数组,保存了子 View 滑动前后的坐标偏移量。
  * @return 如果父级使用了任何嵌套滚动，则为 true。
  */
 public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int[] offsetInWindow);
@@ -73,7 +72,7 @@ public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUncons
  *
  * @param velocityX x 轴的滑动速度。
  * @param velocityY y 轴的滑动速度。
- * @return 如果父项消费了嵌套的 fling 操作，则为 true。若返回 true，则不再调 dispatchNestedFling()。
+ * @return 如果父 View 消费了嵌套的 fling 操作，则为 true。若返回 true，则不再调 dispatchNestedFling()。
  */
 public boolean dispatchNestedPreFling(float velocityX, float velocityY);
 
@@ -81,7 +80,7 @@ public boolean dispatchNestedPreFling(float velocityX, float velocityY);
  * @param dxConsumed x 轴的滑动速度。
  * @param dyConsumed y 轴的滑动速度。
  * @param consumed consumed 代表子 View 是否消费掉了 fling，fling 不存在部分消费，一旦被消费就是指全部。
- * @return 如果父项消费了嵌套的 fling 操作，则为 true。
+ * @return 如果消费了嵌套的 fling 操作，则为 true。
  */ 
 public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed);
 ```
@@ -101,8 +100,17 @@ public boolean dispatchNestedFling(float velocityX, float velocityY, boolean con
 public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes);
 public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes);
 public void onStopNestedScroll(View target);
+/**
+ * 在 dispatchNestedScroll() 调用，dxConsumed、dyConsumed 表示子视图消费的滑动记录。
+ */
 public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed);
+/**
+ * 在 dispatchNestedPreScroll() 中调用，dx、dy 表示子 View 滑动的距离，consumed 用于保存嵌套滑动的父视图滑动的距离。
+ */ 
 public void onNestedPreScroll(View target, int dx, int dy, int[] consumed);
+/**
+ * 在 dispatchNestedFling() 中调用，consumed 用于保存是否已经消费过 fling。
+ */ 
 public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed);
 public boolean onNestedPreFling(View target, float velocityX, float velocityY);
 public int getNestedScrollAxes();

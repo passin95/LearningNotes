@@ -761,7 +761,7 @@ private void dispatchLayoutStep1() {
                     .recordPreLayoutInformation(mState, holder,
                             ItemAnimator.buildAdapterChangeFlagsForAnimations(holder),
                             holder.getUnmodifiedPayloads());
-            // 3、记录布局前的视图信息存入 mViewInfoStore 中（动画肯定是有布局前的样式移动到布局后的样式）。
+            // 3、记录布局前的视图信息存入 mViewInfoStore 中（动画肯定是有布局前的位置移动到布局后的位置）。
             mViewInfoStore.addToPreLayout(holder, animationInfo);
             if (mState.mTrackOldChangeHolders && holder.isUpdated() && !holder.isRemoved()
                     && !holder.shouldIgnore() && !holder.isInvalid()) {
@@ -799,7 +799,7 @@ private void dispatchLayoutStep1() {
                 if (!wasHidden) {
                     flags |= ItemAnimator.FLAG_APPEARED_IN_PRE_LAYOUT;
                 }
-                // 记录预布局的后的视图信息。
+                // 记录预布局后的视图信息。
                 final ItemHolderInfo animationInfo = mItemAnimator.recordPreLayoutInformation(
                         mState, viewHolder, flags, viewHolder.getUnmodifiedPayloads());
                 if (wasHidden) {
@@ -999,7 +999,7 @@ private void dispatchLayoutStep3() {
                     .recordPostLayoutInformation(mState, holder);
             ViewHolder oldChangeViewHolder = mViewInfoStore.getFromOldChangeHolders(key);
             if (oldChangeViewHolder != null && !oldChangeViewHolder.shouldIgnore()) {
-                // 说明某个 viewHolder 在 2 次布局中都使用
+                // 说明某个 viewHolder 在 2 次布局中都使用。
                 final boolean oldDisappearing = mViewInfoStore.isDisappearing(
                         oldChangeViewHolder);
                 final boolean newDisappearing = mViewInfoStore.isDisappearing(holder);
@@ -1084,7 +1084,7 @@ public void onDraw(Canvas c) {
 }
 ```
 
-super.draw(c) 执行的 View.draw(c) ，从它的 [绘制内容和流程](./View%20的工作流程.md#%E4%BA%94%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8Bdraw) 我们可以得出装饰的执行流程为：
+super.draw(c) 执行在 View.draw(c) 中，从它的 [绘制内容和流程](./View%20的工作流程.md#%E4%BA%94%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8Bdraw) 我们可以得出装饰的执行流程为：
 
 1. 在 super.draw(c) 中先执行 onDraw()，也就是先执行所有装饰的 onDraw() 方法。
 2. 在 super.draw(c) 中遍历子视图的 draw()（绘制子视图）。
