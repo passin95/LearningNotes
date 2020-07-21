@@ -99,21 +99,24 @@ public boolean dispatchNestedFling(float velocityX, float velocityY, boolean con
  */ 
 public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes);
 public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes);
-public void onStopNestedScroll(View target);
 /**
- * 在 dispatchNestedScroll() 调用，dxConsumed、dyConsumed 表示子视图消费的滑动记录。
- */
-public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed);
-/**
- * 在 dispatchNestedPreScroll() 中调用，dx、dy 表示子 View 滑动的距离，consumed 用于保存嵌套滑动的父视图滑动的距离。
+ * 在 dispatchNestedPreScroll() 中调用，dx、dy 表示子 View 所提供的滑动距离，准备用于消费，consumed 用于保存嵌套滑动的父视图滑动的距离。
  */ 
 public void onNestedPreScroll(View target, int dx, int dy, int[] consumed);
+/**
+ * 在 dispatchNestedScroll() 中调用，dxConsumed，dyConsumed 子 View 所消耗的距离。
+ */ 
+public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed);
+public boolean onNestedPreFling(View target, float velocityX, float velocityY);
 /**
  * 在 dispatchNestedFling() 中调用，consumed 用于保存是否已经消费过 fling。
  */ 
 public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed);
-public boolean onNestedPreFling(View target, float velocityX, float velocityY);
-public int getNestedScrollAxes();
+/**
+ * 在 stopNestedScroll() 中调用。
+ */ 
+public void onStopNestedScroll(View target);
+
 ```
 
 若想支持 NestedScrollingParent2 和 NestedScrollingChild2 新增的方法（主要是增加一个 type 以支持非手动触摸的情况），则可使用 NestedScrollingParentHelper 和 NestedScrollingChildHelper，这 2 个类包含了 Google 提供的默认嵌套实现以及版本兼容处理。
