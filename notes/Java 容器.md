@@ -1,24 +1,28 @@
 <!-- TOC -->
 
-- [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
-  - [1.1 名词说明](#11-%E5%90%8D%E8%AF%8D%E8%AF%B4%E6%98%8E)
-    - [1.1.1 RandomAccess](#111-randomaccess)
-    - [1.1.2 fail-fast 和 fail-safe](#112-fail-fast-%E5%92%8C-fail-safe)
-  - [1.2 Collection](#12-collection)
-    - [1.2.1 List](#121-list)
-    - [1.2.2 Set](#122-set)
-    - [1.2.3 Queue](#123-queue)
-  - [1.3 Map](#13-map)
-  - [1.4 Arrays.asList()](#14-arraysaslist)
-- [二、源码分析](#%E4%BA%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [2.1 ArrayList](#21-arraylist)
-    - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-vectorcopyonwritearraylistcollectionssynchronizedlist-%E5%AF%B9%E6%AF%94)
-  - [2.2 LinkedList](#22-linkedlist)
-  - [2.3 HashMap](#23-hashmap)
-    - [2.3.1 成员变量和构造函数](#231-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
-    - [2.3.2 存储结构](#232-%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
-    - [2.3.3 put、get、resize](#233-putgetresize)
-    - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88-hashtableconcurrenthashmapcollectionssynchronizedmap-%E5%AF%B9%E6%AF%94)
+- [一、概述](#一概述)
+    - [1.1 名词说明](#11-名词说明)
+        - [1.1.1 RandomAccess](#111-randomaccess)
+        - [1.1.2 fail-fast 和 fail-safe](#112-fail-fast-和-fail-safe)
+    - [1.2 Collection](#12-collection)
+        - [1.2.1 List](#121-list)
+        - [1.2.2 Set](#122-set)
+        - [1.2.3 Queue](#123-queue)
+    - [1.3 Map](#13-map)
+    - [1.4 Arrays.asList()](#14-arraysaslist)
+- [二、源码分析](#二源码分析)
+    - [2.1 ArrayList](#21-arraylist)
+        - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
+    - [2.2 LinkedList](#22-linkedlist)
+    - [2.3 HashMap](#23-hashmap)
+        - [2.3.1 成员变量和构造函数](#231-成员变量和构造函数)
+        - [2.3.2 存储结构](#232-存储结构)
+        - [2.3.3 put、get、resize](#233-putgetresize)
+        - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-线程安全方案-hashtableconcurrenthashmapcollectionssynchronizedmap-对比)
+    - [2.4 ConcurrentHashMap](#24-concurrenthashmap)
+        - [2.4.1 put](#241-put)
+        - [2.4.2 remove](#242-remove)
+        - [2.4.3 get](#243-get)
 
 <!-- /TOC -->
 
@@ -1902,3 +1906,244 @@ public V put(K key, V value) {
 3. 性能方面：没有并发需求的情况下，优先使用 HashMap。低并发需求的情况下使用 Collections.synchronizedList() 即可，高并发需求则使用 ConcurrentHashMap。
 4. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
 5. 3 个并发集合看似已经线程安全，但 Iterator 例外，在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非 Iterator 修改数据会抛 ConcurrentModificationException 异常。
+
+## 2.4 ConcurrentHashMap
+
+### 2.4.1 put 
+
+```java
+public V put(K key, V value) {
+    return putVal(key, value, false);
+}
+
+final V putVal(K key, V value, boolean onlyIfAbsent) {
+    if (key == null || value == null) throw new NullPointerException();
+    // 计算 hash 值。
+    int hash = spread(key.hashCode());
+    // 要插入的元素所在桶的元素个数。
+    int binCount = 0;
+    // 死循环，结合 CAS 使用（如果 CAS 失败，则会重新取对应的桶进行插入）。
+    for (Node<K,V>[] tab = table;;) {
+        Node<K,V> f; int n, i, fh;
+        if (tab == null || (n = tab.length) == 0)
+            // 如果数组未初始化或者数组容量为 0，则初始化数组（桶）。
+            tab = initTable();
+        else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            // 如果要插入的元素所在的桶还没有元素，则把这个元素插入到这个桶中（通过 CAS 保证线程安全）。
+            if (casTabAt(tab, i, null,
+                    new Node<K,V>(hash, key, value, null)))
+                // 如果使用 CAS 插入元素时，发现已经有元素了，则进入下一次循环，重新操作
+                // 如果使用 CAS 插入元素成功，则通过 break 跳出循环，流程结束。
+                break;                   
+        }
+        else if ((fh = f.hash) == MOVED)
+            // 如果要插入的元素所在的桶的第一个元素的 hash 是 MOVED，则当前线程帮忙一起迁移元素。
+            tab = helpTransfer(tab, f);
+        else {
+            // 如果这个桶不为空且不在迁移元素，则锁住这个桶（分段锁）
+            // 并查找要插入的元素是否在这个桶中
+            // 存在，则替换值（onlyIfAbsent=false）
+            // 不存在，则插入到链表结尾或插入树中
+            V oldVal = null;
+            synchronized (f) {
+                // 再次检测第一个元素是否有变化，如果有变化则进入下一次循环，从头来过。
+                if (tabAt(tab, i) == f) {
+                    // 如果第一个元素的 hash 值大于等于 0（说明不是在迁移（MOVED：-1），也不是树（TREEBIN：-2））。
+                    // 也就是说桶中的元素使用的是链表方式存储。
+                    if (fh >= 0) {
+                        // 桶中元素个数赋值为 1。
+                        binCount = 1;
+                        // 遍历整个桶，每次结束 binCount 加 1。
+                        for (Node<K,V> e = f;; ++binCount) {
+                            K ek;
+                            if (e.hash == hash &&
+                                    ((ek = e.key) == key ||
+                                            (ek != null && key.equals(ek)))) {
+                                // 如果找到了这个元素，则用新值覆盖掉旧值（onlyIfAbsent=false），并退出循环。
+                                oldVal = e.val;
+                                if (!onlyIfAbsent)
+                                    e.val = value;
+                                break;
+                            }
+                            Node<K,V> pred = e;
+                            if ((e = e.next) == null) {
+                                // 如果到链表尾部还没有找到元素，就把它插入到链表结尾并退出循环。
+                                pred.next = new Node<K,V>(hash, key,
+                                        value, null);
+                                break;
+                            }
+                        }
+                    }
+                    else if (f instanceof TreeBin) {
+                        // 如果第一个元素是树节点。
+                        Node<K,V> p;
+                        // 桶中元素个数赋值为 2。
+                        binCount = 2;
+                        // 调用红黑树的插入方法插入元素：
+                        // 如果成功插入则返回 null；
+                        // 否则返回寻找到的节点。
+                        if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
+                                value)) != null) {
+                            // 如果找到了这个元素，则用新值覆盖掉旧值（onlyIfAbsent=false），并退出循环。
+                            oldVal = p.val;
+                            if (!onlyIfAbsent)
+                                p.val = value;
+                        }
+                    }
+                }
+            }
+            // 如果 binCount 不为 0，说明成功插入了元素或者寻找到了元素。
+            if (binCount != 0) {
+                // 如果某个桶的链表元素个数达到了 8，则尝试树化。
+                // 因为上面把元素插入到树中时，binCount 只赋值为 2，并没有计算整个树中元素的个数，所以不会重复树化。
+                if (binCount >= TREEIFY_THRESHOLD)
+                    treeifyBin(tab, i);
+                // 如果要插入的元素已经存在，则直接返回旧值。
+                if (oldVal != null)
+                    return oldVal;
+                // 退出外层大循环，流程结束。
+                break;
+            }
+        }
+    }
+    // 成功插入元素，元素个数加 1（是否要扩容也在这个方法里面）。
+    addCount(1L, binCount);
+    // 成功插入元素返回 null。
+    return null;
+}
+```
+
+### 2.4.2 remove
+
+```java
+public V remove(Object key) {
+    return replaceNode(key, null, null);
+}
+
+/**
+ * 用 value 替换 key 所对应的 value 值，前提条件是 cv 与要替换的 value 值相等。
+ */
+final V replaceNode(Object key, V value, Object cv) {
+    // 计算 hash 值。
+    int hash = spread(key.hashCode());
+    // 死循环。
+    for (Node<K,V>[] tab = table;;) {
+        Node<K,V> f; int n, i, fh;
+        if (tab == null || (n = tab.length) == 0 ||
+                (f = tabAt(tab, i = (n - 1) & hash)) == null)
+            // 如果 key 所在的桶不存在，则跳出循环返回 null。
+            break;
+        else if ((fh = f.hash) == MOVED)
+            // 如果要插入的元素所在的桶的第一个元素的 hash 是 MOVED，则当前线程帮忙一起迁移元素。
+            tab = helpTransfer(tab, f);
+        else {
+            V oldVal = null;
+            // 标记是否已处理完毕。
+            boolean validated = false;
+            synchronized (f) {
+                // 再次检测第一个元素是否有变化，如果有变化则进入下一次循环，从头来过。
+                if (tabAt(tab, i) == f) {
+                    // 如果第一个元素的 hash 值大于等于 0（说明不是在迁移（MOVED：-1），也不是树（TREEBIN：-2））。
+                    // 也就是说桶中的元素使用的是链表方式存储。
+                    if (fh >= 0) {
+                        validated = true;
+                        // 遍历链表寻找目标节点。
+                        for (Node<K,V> e = f, pred = null;;) {
+                            K ek;
+                            if (e.hash == hash &&
+                                    ((ek = e.key) == key ||
+                                            (ek != null && key.equals(ek)))) {
+                                // 找到了目标节点。
+                                V ev = e.val;
+                                if (cv == null || cv == ev ||
+                                        (ev != null && cv.equals(ev))) {
+                                    oldVal = ev;
+                                    // value 为要替换的新值，如果 value 不为空则用它替换旧值。
+                                    if (value != null)
+                                        e.val = value;
+                                    else if (pred != null)
+                                        // 如果前置节点不为空，则删除当前节点。
+                                        pred.next = e.next;
+                                    else
+                                        // 如果前置节点为空，说明要删除的节点是桶中第一个元素，
+                                        // 则用下一个节点去作为桶的首节点。
+                                        setTabAt(tab, i, e.next);
+                                }
+                                break;
+                            }
+                            pred = e;
+                            // 遍历到链表尾部还没找到元素，跳出循环。
+                            if ((e = e.next) == null)
+                                break;
+                        }
+                    }
+                    else if (f instanceof TreeBin) {
+                        // 如果第一个元素是树节点。
+                        validated = true;
+                        TreeBin<K,V> t = (TreeBin<K,V>)f;
+                        TreeNode<K,V> r, p;
+                        // 从红黑树中找到了目标节点。
+                        if ((r = t.root) != null &&
+                                (p = r.findTreeNode(hash, key, null)) != null) {
+                            V pv = p.val;
+                            if (cv == null || cv == pv ||
+                                    (pv != null && cv.equals(pv))) {
+                                // value 为要替换的新值，如果 value 不为空则用它替换旧值。
+                                oldVal = pv;
+                                if (value != null)
+                                    p.val = value;
+                                else if (t.removeTreeNode(p))
+                                    // 从树中删除元素，返回值若为 true，则表示树的元素个数较少，需要重新转为链表。
+                                    setTabAt(tab, i, untreeify(t.first));
+                            }
+                        }
+                    }
+                }
+            }
+            if (validated) {
+                // 如果找到了元素，返回其旧值。
+                if (oldVal != null) {
+                    // 如果是删除元素，则个数减一。
+                    if (value == null)
+                        addCount(-1L, -1);
+                    return oldVal;
+                }
+                break;
+            }
+        }
+    }
+    // 没找到元素返回空。
+    return null;
+}
+```
+
+### 2.4.3 get
+
+```java
+public V get(Object key) {
+    Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
+    // 计算 hash 值。
+    int h = spread(key.hashCode());
+    // 如果 key 所在的桶存在且里面有元素。
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+            (e = tabAt(tab, (n - 1) & h)) != null) {
+        // 如果第一个元素就是要找的元素，直接返回。
+        if ((eh = e.hash) == h) {
+            if ((ek = e.key) == key || (ek != null && key.equals(ek)))
+                return e.val;
+        }
+        else if (eh < 0)
+            // hash 小于 0，说明是树或者正在扩容。
+            // 使用 find 寻找元素，find 的寻找方式依据 Node 的不同子类有不同的实现方式。
+            return (p = e.find(h, key)) != null ? p.val : null;
+
+        // 遍历整个链表寻找元素。
+        while ((e = e.next) != null) {
+            if (e.hash == h &&
+                    ((ek = e.key) == key || (ek != null && key.equals(ek))))
+                return e.val;
+        }
+    }
+    return null;
+}
+```
