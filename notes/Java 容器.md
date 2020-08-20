@@ -47,7 +47,7 @@ RandomAccess 是一个接口，仅仅起一个标识的作用，标识实现的�
 
 ### 1.2.1 List
 
-List 接口存储一组不唯一（可以有多个元素引用相同的对象）、有序的对象。
+List 接口存储一组有序的对象。
 
 - ArrayList：基于动态数组实现，支持随机访问。
 - Vector：和 ArrayList 类似，但它是线程安全的（方法加锁）。
@@ -55,7 +55,7 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 
 ### 1.2.2 Set
 
-没有重复对象的集合。
+没有重复对象的容器。
  
 - TreeSet：基于红黑树实现，支持有序性操作，例如根据一个范围查找元素的操作。但是查找效率不如 HashSet，HashSet 查找的时间复杂度为 O(1)，TreeSet 则为 O(logN)。
 - HashSet：基于哈希表实现，底层实现是 HashMap，支持快速查找，但不支持有序性操作。
@@ -64,6 +64,8 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 
 ### 1.2.3 Queue
 
+拥有队列特性的容器。
+
 - LinkedList：可以用它来实现双向队列。
 - PriorityQueue：基于堆结构实现，可以用它来实现优先队列。
 
@@ -71,7 +73,7 @@ List 接口存储一组不唯一（可以有多个元素引用相同的对象）
 
 使用键值对存储。
 
-- TreeMap：基于红黑树实现，支持有序性操作，排序具体的实现有 2 种，一种是 key 元素实现 Comparable 接口，一种是容器初始化时传入 Comparable 接口参数。
+- TreeMap：基于红黑树实现，支持有序性操作，排序具体的实现有 2 种，一种是 key 元素实现 Comparable 接口，一种是容器初始化时传入 Comparator 接口。
 - HashMap：基于哈希表实现。插入的键值对是无序的。
 - ArrayMap：基于数组实现，比 HashMap 更节约内存，但查找速度有所降低，适用于数据量少的情况。
 - HashTable：和 HashMap 类似，区别在于它是线程安全的（方法加锁）。但不推荐使用，更推荐使用 ConcurrentHashMap 来支持线程安全，从而有更高的并发性能。
@@ -243,9 +245,9 @@ public class ArrayList<E> extends AbstractList<E>
     private void ensureExplicitCapacity(int minCapacity) {
         modCount++;
 
-        // 所需最小容量大于当前数组的大小则进行扩容
+        // 所需最小容量大于当前数组的大小则进行扩容。
         if (minCapacity - elementData.length > 0)
-            // 开始扩容
+            // 开始扩容。
             grow(minCapacity);
     }
 
@@ -266,7 +268,7 @@ public class ArrayList<E> extends AbstractList<E>
         // 检查新容量是否大于所需最小容量，若还是小于所需最小容量，那么就把所需最小容量当作数组的新容量。
         if (newCapacity - minCapacity < 0)
             newCapacity = minCapacity;
-        // 再检查新容量是否超出了 ArrayList 所定义的最大容量。
+        // 再检查新容量是否超出了 ArrayList 所定义的最大容量，超过该大小时可能会导致 OutOfMemoryError。
         if (newCapacity - MAX_ARRAY_SIZE > 0)
             // 若超出了，则比较 minCapacity 和 MAX_ARRAY_SIZE，若大于 MAX_ARRAY_SIZE，则返回 Integer.MAX_VALUE 作为容器的最大容量，否则返回 MAX_ARRAY_SIZE。
             newCapacity = hugeCapacity(minCapacity);
@@ -1467,7 +1469,7 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     // 当桶 (bucket) 上的结点数大于等于这个值时为转成红黑树的条件之一。
     static final int TREEIFY_THRESHOLD = 8; 
-    // 当桶 (bucket) 上的结点数小于这个值时树转为链表。
+    // 当桶 (bucket) 上的结点数小于等于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
     // 转化为红黑树的另一个条件：table 容量大于 64。
     static final int MIN_TREEIFY_CAPACITY = 64;
@@ -1558,7 +1560,7 @@ loadFactor 太大导致查找元素效率低，太小导致数组的利用率低
 
 ### 2.3.2 存储结构
 
-JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
+JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
 
 ```java
 // 链表结构
