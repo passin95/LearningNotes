@@ -736,9 +736,9 @@ public void add(int index, E element) {
 
 1. 扩容方面：Vector 扩容为原来容量的 2 倍，ArrayList 扩容为原来容量 1.5 倍，CopyOnWriteArrayList 每次添加元素都是一个新的数组。
 2. 性能方面：没有并发需求的情况下，优先使用 ArrayList。有并发需求的情况下：
-- Collections.synchronizedList() 和 Vector 的读写性能几乎一致，理论 Vector 比 Collections.synchronizedList() 还快一些，因为后者对方法多包了一层。
-- 仅在读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，大大提高了读操作的性能，但是在写操作时需要复制一个新的数组，会频繁消耗内存。
-- 其余情况推荐自己控制并发，硬性需求才使用 Collections.synchronizedList() 或 Vector。
+   - Collections.synchronizedList() 和 Vector 的读写性能几乎一致，理论 Vector 比 Collections.synchronizedList() 还快一些，因为后者对方法多包了一层。
+   - 仅在读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，大大提高了读操作的性能，但是在写操作时需要复制一个新的数组，会频繁消耗内存。
+   - 其余情况推荐自己控制并发，硬性需求才使用 Collections.synchronizedList() 或 Vector。
 3. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
 2. Vector 和 Collections.synchronizedList() 看似已经线程安全，但使用 Iterator 例外，因为在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非迭代器修改数据会抛 ConcurrentModificationException 异常。
 
@@ -1471,7 +1471,7 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     static final int TREEIFY_THRESHOLD = 8; 
     // 当桶 (bucket) 上的结点数小于等于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
-    // 转化为红黑树的另一个条件：table 容量大于 64。
+    // 转化为红黑树的另一个条件：table 容量大于 64，若未达到这个条件则对数组做扩容处理。
     static final int MIN_TREEIFY_CAPACITY = 64;
     // 存储元素的数组，也是 HashMap 的原理所在。
     // 数组容量任何时候总是 2 的幂次倍。
@@ -1744,9 +1744,9 @@ final Node<K,V> getNode(int hash, Object key) {
 ```java
 final Node<K,V>[] resize() {
     Node<K,V>[] oldTab = table;
-    // 旧的数组容量。
+    // 旧的数组 table 大小。
     int oldCap = (oldTab == null) ? 0 : oldTab.length;
-    // 旧的数组容量阈值。
+    // 旧的 Map 容量阈值。
     int oldThr = threshold;
     int newCap, newThr = 0;
     if (oldCap > 0) {
@@ -1781,7 +1781,7 @@ final Node<K,V>[] resize() {
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
     table = newTab;
     if (oldTab != null) {
-        // 遍历旧的数组
+        // 遍历旧的数组。
         for (int j = 0; j < oldCap; ++j) {
             Node<K,V> e;
             // 提取桶中的节点。
@@ -1934,7 +1934,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
             // 如果要插入的元素所在的桶还没有元素，则把这个元素插入到这个桶中（通过 CAS 保证线程安全）。
             if (casTabAt(tab, i, null,
                     new Node<K,V>(hash, key, value, null)))
-                // 如果使用 CAS 插入元素时，发现已经有元素了，则进入下一次循环，重新操作
+                // 如果使用 CAS 插入元素时，发现已经有元素了，则进入下一次循环，重新操作;
                 // 如果使用 CAS 插入元素成功，则通过 break 跳出循环，流程结束。
                 break;                   
         }
@@ -1942,10 +1942,10 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
             // 如果要插入的元素所在的桶的第一个元素的 hash 是 MOVED，则当前线程帮忙一起迁移元素。
             tab = helpTransfer(tab, f);
         else {
-            // 如果这个桶不为空且不在迁移元素，则锁住这个桶（分段锁）
-            // 并查找要插入的元素是否在这个桶中
-            // 存在，则替换值（onlyIfAbsent=false）
-            // 不存在，则插入到链表结尾或插入树中
+            // 如果这个桶不为空且不在迁移元素，则锁住这个桶（分段锁），
+            // 并查找要插入的元素是否在这个桶中，
+            // 存在，则替换值（onlyIfAbsent=false），
+            // 不存在，则插入到链表结尾或插入树中。
             V oldVal = null;
             synchronized (f) {
                 // 再次检测第一个元素是否有变化，如果有变化则进入下一次循环，从头来过。

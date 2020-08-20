@@ -27,7 +27,7 @@
 
 ## 一、说明
 
-本文对 Http 基础知识不会过多描述，若对 Http 基础不够了解请先移步 https://github.com/passin95/LearningNotes/blob/master/notes/HTTP.md 。
+本文对 Http 基础知识不会过多描述，若对 Http 基础不够了解请先移步 https://github.com/passin95/LearningNotes/blob/master/notes/网络.md 。
 
 本文源码为 OkHttp 3.10.0 版本，该版本 OkHttp 底层已不再使用 HttpURLConnection，而是自己重写了 TCP/IP 层的实现。
 

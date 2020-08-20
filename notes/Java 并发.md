@@ -125,7 +125,7 @@ Blocked 状态一般在以下几种情况发生：
 
 ```java
 private void init(ThreadGroup group, Runnable target, String name, long stackSize, AccessControlContext acc) {
-    // 线程组 ThreadGroup 默认为 null
+    // 线程组 ThreadGroup 默认为 null。
     // 线程名 name 默认为"Thread-" + 数字 (递增)，在进程销毁后重新数字从 0 重新开始。
     // 一般情况下，stackSize 越大，方法可递归调用的深度越深，
     // 但由于实际情况和具体的软硬件有关，因此 stackSize 一般使用默认值 0。
@@ -539,7 +539,7 @@ Java 内存模型定义了 8 个操作来完成主内存和工作内存的交互
 
 ## 3.3 内存模型三大特性
 
-### 3.3.1 原子性
+### 3.3.1 原子性 
 
 Java 内存模型保证了 read、load、use、assign、store、write、lock 和 unlock 操作具有原子性，例如对一个 int 类型的变量执行 assign 赋值操作，这个操作就是原子性的。但是 Java 内存模型允许虚拟机将没有被 volatile 修饰的 64 位数据（long，double）的读写操作划分为两次 32 位的操作来进行，即此时的 load、store、read 和 write 操作可以不具备原子性。
 
@@ -619,7 +619,7 @@ Java 提供了两种锁机制来控制多个线程对共享资源的互斥访问
 
 synchronized 关键字提供了一种锁的机制，它设计的初衷是锁资源对象，而不是某个方法或代码块。从本质上说主要提供了 2 种作用：
 
-1. 确保共享变量的线程间互斥访问，原理是对于从一个 Monitor 所监视的所有代码块，只能有一个线程可以访问（拿到 Monitor 的 lock），使得在这些代码块中每次只能有一个线程对变量进行读写。
+1. 确保共享变量的线程间互斥访问，原理是对于从一个 Monitor 所监视的所有代码块，只能有一个线程可以访问（拿到 Monitor 的 lock），使得在这些代码块中每次只能有一个线程对共享变量进行读写。
 
 2. synchronized 包括两个 monitor enter 和 monitor exit 两个指令，它能够保证在任何时候任何线程执行到 monitor enter 成功之前都 **必须从主内存中获取数据**，而不是从缓存（CPU Cache）中取数据，在 monitor exit 执行之后，会将更新后的值刷入主内存中。
 

@@ -53,7 +53,7 @@ ASM 在就是应用于第（3）步和第（4）步之间。
 
 **（5）** 打包生成 APK 文件
 
-所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）和.dex 文件都会通过 apkbuilder 工具打包到一个完成的.apk 文件中。该工具位于 android-sdk/tools 目录下。
+所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）和 .dex 文件都会通过 apkbuilder 工具打包到一个完成的.apk 文件中。该工具位于 android-sdk/tools 目录下。
 
 **（6）** 对 APK 文件进行签名
 
@@ -85,18 +85,6 @@ ASM 是对字节码文件进行操作，并且需要操作具体的 **JVM 指令
 ### 1.2.1 类型对照表
 
 Java 类型和字节码类型描述对照表：
-
-<style>
-table th:first-of-type {
-    width: 90pt;
-}
-table th:nth-of-type(2) {
-    width: 90pt;
-}
-table th:nth-of-type(3) {
-    width: 110pt;
-} 
-</style>
 
 | Java Type | Type Descriptor |
 | :--------- | :------------------- |
