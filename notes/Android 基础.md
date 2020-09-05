@@ -74,7 +74,7 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 （6）onStart：Fragment 处于 **可见** 的，但还没有出现在 **前台**，不可交互。
 
-（7）onResume：Fragment 处于 **可见** 的，但还没有出现在 **前台**，可交互。
+（7）onResume：Fragment 处于 **可见** 的，并出现在 **前台**，可交互。
 
 （8）onPause：Fragment 正在停止，但还处于 **可见的**。该方法不能太耗时，因为该方法先于新 Activity 的 **onResume** 执行。
 
@@ -639,7 +639,7 @@ LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(
 // 设置接收广播的类型。
 intentFilter.addAction(android.net.conn.CONNECTIVITY_CHANGE);
 
-// 调用 LocalBroadcastManager 的 registerReceiver（）方法进行动态注册（也只支持动态注册）。
+// 调用 LocalBroadcastManager.registerReceiver() 方法进行动态注册（也只支持动态注册）。
 localBroadcastManager.registerReceiver(mBroadcastReceiver, intentFilter);
 
 // 取消注册应用内广播接收器。

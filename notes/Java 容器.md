@@ -1471,7 +1471,7 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     static final int TREEIFY_THRESHOLD = 8; 
     // 当桶 (bucket) 上的结点数小于等于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
-    // 转化为红黑树的另一个条件：table 容量大于 64，若未达到这个条件则对数组做扩容处理。
+    // 转化为红黑树的另一个条件：table 容量大于等于 64，若未达到这个条件则对数组做扩容处理。
     static final int MIN_TREEIFY_CAPACITY = 64;
     // 存储元素的数组，也是 HashMap 的原理所在。
     // 数组容量任何时候总是 2 的幂次倍。
@@ -1642,7 +1642,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     // tab 即为 table ，若未初始化或者长度为 0，进行扩容。
     if ((tab = table) == null || (n = tab.length) == 0)
         n = (tab = resize()).length;
-    // 通过 (n - 1) & hash 计算元素存放在哪个桶中。
+    // 通过 (n - 1) & hash 计算元素存放在哪个桶中（将结果限制在数组容量内）。
     if ((p = tab[i = (n - 1) & hash]) == null)
         // 若桶为空，生成一个新节点放入桶中。
         tab[i] = newNode(hash, key, value, null);
@@ -1675,7 +1675,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                 // 当前节点的 key 值与插入的元素的 key 值是否相等。即遍历查找 key 相等的节点。
                 if (e.hash == hash &&
                     ((k = e.key) == key || (key != null && key.equals(k))))
-                    // 相等，跳出循环
+                    // 相等，跳出循环。
                     break;
                 // 用于遍历桶中的链表，与前面的 e = p.next 组合遍历链表。
                 p = e;
@@ -1687,11 +1687,11 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
             V oldValue = e.value;
             // onlyIfAbsent 传入时为 false。
             if (!onlyIfAbsent || oldValue == null)
-                // 用新值替换旧值
+                // 用新值替换旧值。
                 e.value = value;
             // 访问后回调，用于继承 HashMap 的子类 LinkedHashMap。
             afterNodeAccess(e);
-            // 返回旧值
+            // 返回旧值。
             return oldValue;
         }
     }
@@ -1768,7 +1768,7 @@ final Node<K,V>[] resize() {
         newCap = DEFAULT_INITIAL_CAPACITY;
         newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
-    // 计算新的数组容量阈值（从上面可得有 2 种情况会 newThr == 0）
+    // 计算新的数组容量阈值（从上面可得有 2 种情况会 newThr == 0）。
     if (newThr == 0) {
         float ft = (float)newCap * loadFactor;
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ? (int)ft : Integer.MAX_VALUE);
