@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 编码规范[:bulb:](#bulb-编码规范) | 算法[:pencil2:](#pencil2-算法) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio) | 归纳整理[:couple:](#couple-归纳整理) | 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 软件设计[:bulb:](#bulb-软件设计) | 算法[:pencil2:](#pencil2-算法) | 归纳与总结[:couple:](#couple-归纳与总结) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio)| 后记[:memo:](#memo-后记) |
     
 
 <br>
@@ -82,7 +82,7 @@
 
   Base64、序列化、Hash。
 
-### :bulb: 编码规范
+### :bulb: 软件设计
 
 - [设计模式](./notes/设计模式.md)
 
@@ -101,6 +101,28 @@
 - [算法和数据结构](./notes/算法和数据结构.md)
 
   常用算法和数据结构。
+  
+### :couple: 归纳与总结
+
+- [做事方法论](./notes/做事方法论.md)
+
+  做事方法论，例如汇报工作、会议总结、年终总结等。
+
+- [技术面试](./notes/技术面试.md)
+
+  从技术面试看前进方向。
+
+- [优质文章](./notes/优质文章.md)
+
+  对优质文章的归纳整理。
+
+- [博客推荐](./notes/博客推荐.md)
+
+  优质博客推荐。
+
+- [ggtalk](https://talk.swift.gg/)
+
+  这是一个接地气、有价值的闲聊节目。
   
 ### :hammer: 工具 
 
@@ -121,24 +143,6 @@
 - [Android Studio 技巧](./notes/Android%20Studio%20实用技巧.md)
 
   Android Studio 实用功能，例如代码模板。
-
-### :couple: 归纳整理
-
-- [做事方法论](./notes/做事方法论.md)
-
-  做事方法论，例如汇报工作、会议总结、年终总结等。
-
-- [优质文章](./notes/优质文章.md)
-
-  对优质文章的归纳整理。
-
-- [博客推荐](./notes/博客推荐.md)
-
-  优质博客推荐。
-
-- [ggtalk](https://talk.swift.gg/)
-
-  这是一个接地气、有价值的闲聊节目。
 
 ### :memo: 后记 
 

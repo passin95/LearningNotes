@@ -29,7 +29,7 @@
 
 本文对 Http 基础知识不会过多描述，若对 Http 基础不够了解请先移步 https://github.com/passin95/LearningNotes/blob/master/notes/网络.md 。
 
-本文源码为 OkHttp 3.10.0 版本，该版本 OkHttp 底层已不再使用 HttpURLConnection，而是自己重写了 TCP/IP 层的实现。
+本文源码为 OkHttp 3.10.0 版本，该版本 OkHttp 底层已不再使用 HttpURLConnection，而是基于 Socket 重写了应用层协议的实现。
 
 ## 二、OkHttp 的基本使用
 
@@ -816,7 +816,7 @@ public final class CacheInterceptor implements Interceptor {
 
 ### 6.4 ConnectInterceptor
 
-ConnectInterceptor 是 OkHttp 对 TCP 层的封装，此处不再深挖源码。
+OkHttp 本质上是基于 Socket 实现了整个 Http 应用层协议，此处不再深挖源码。
 
 ```java
 public final class ConnectInterceptor implements Interceptor {
