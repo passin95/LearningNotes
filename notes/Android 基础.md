@@ -88,7 +88,7 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 若 Fragment 在 Activity super.onCreate() 后调用 commitNow() add Fragment，则 Activity onCreate() 到 onContentChanged() 之间的 Fragment 生命周期执行顺序向后顺延，不同在于 onViewCreated 执行在 Activity super.onStart() 期间。
 
-同样的场景，若调用 commit()，则被 Hanlder post 出去，直至 Activity super.onStart() ，期间顺延执行所有 Fragment onStart() 之前的生命周期。
+同样的场景，若调用 commit()，则被 Hanlder post 出去，直至 Activity super.onStart()，期间顺延执行所有 Fragment onStart() 之前的生命周期。
 
 其它时候的调用，同理按照 Fragment action 执行的时机去变化相应 Fragment 的生命周期执行时机。
 
@@ -202,15 +202,23 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 # 三、Activity LaunchMode
 
-以下把每一个 Task 比作为一个任务栈。而 TaskAffinity 可以用来标识 Activity 所属的任务栈。默认情况下，Activity 的所属任务栈为应用包名，该值主要与 singleTask 或 allowTaskReparenting 配对使用。
+以下把每一个 Task 比作为一个任务栈。而 TaskAffinity 可以用来标识期望 Activity 所属的任务栈。为什么是期望呢，因为同一任务栈的 TaskAffinity 一定相等，但 TaskAffinity 相等，则并不一定在同一个任务栈，例如 LaunchMode 为 singleInstance。
+
+默认情况下，Activity 的所属任务栈为应用包名，该值主要与 singleTask 或 allowTaskReparenting 配对使用。
 
 （1）standard：标准模式，系统的默认格式。每次启动 Activity 都在 **当前栈内** 创建新的 Activity。
 
-（2）singleTop：栈顶复用模式，**当前栈顶** 存在同一个 Activity 则不再重新创建，并回调 onNewIntent()，其余情况同 standard。
+（2）singleTop：栈顶复用模式。
+
+- **当前栈顶** 存在同一个 Activity 则不再重新创建，并回调 onNewIntent()，其余情况同 standard。
+- 若外部应用调起该启动模式的 Activity，则当前栈会直接叠加到调起方的任务栈上方。
 
 （3）singleTask：栈内复用模式，只要 Activity **在栈内存在**，则不再重新创建，并移除该 Activity **所在栈内** 上面的其它 Activity，同时回调 onNewIntent()，若不存在，则创建在所属 TaskAffinity 的栈中，其余情况同 standard。
 
-（4）singleInstance：单实例模式，该 Activity（它自身）独自在一个栈内，若不存在则创建一个新的任务栈，且 **所有栈** 都复用这一个 Activity，除非这个任务栈或 Activity 销毁了。
+（4）singleInstance：单实例模式。
+
+- 该 Activity（它自身）独自在一个栈内，若不存在则创建一个新的任务栈，且 **所有栈** 都复用这一个 Activity，除非这个任务栈或 Activity 销毁了。
+- 若外部应用调起该启动模式的 Activity，则当前栈会直接叠加到调起方的任务栈上方。
 
 注：以 startActivityForResult 启动目标 activity 时，会忽略目标 activity 的 lanchMode。
 

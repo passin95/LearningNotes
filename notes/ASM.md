@@ -611,6 +611,7 @@ public class Demo1 {
     public static void main(String[] args) throws Exception {
         // 读取对应文件或流的字节码。
         ClassReader classReader = new ClassReader("me/passin/asm/Demo1$Passin");
+        // 由于局地变量表的最大数和操作数栈的最大深度是在编译时就确定的，所以在使用 ASM 进行字节码操作后需要调用 ASM 提供的 visitMaxs 方法来设置 maxLocal 和 maxStack 数。
         // 第二个参数为 0 时，表明需要手动计算栈帧大小、局地变量和操作数栈的大小；
         // 为 ClassWriter.COMPUTE_MAXS 时，自动计算操作数栈大小和局部变量的最大个数，但需要自己计算栈帧大小；
         // 为 ClassWriter.COMPUTE_FRAMES 时，从头开始自动计算方法的堆栈映射框架，不需要调用 visitFrame() 和 visitMaxs()，即使调用也会被忽略。
