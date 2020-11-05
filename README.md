@@ -40,7 +40,7 @@
 
 - [Android 系统架构](./notes/Android%20系统架构.md)
 
-  Android 系统架构（开始逐步完善中）。
+  Android 系统架构。
 
 - [Android 框架](./notes/Android%20常用框架.md)
 
