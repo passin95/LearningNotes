@@ -384,7 +384,7 @@ public final void removeMessages(int what, @Nullable Object object) {
 
 ### 1.4 MessageQueue
 
-MessageQueue 是消息机制的 Java 层和  native 层的连接纽带，大部分核心方法都交给 native 层来处理，关于这些 native 方法的介绍，见。
+MessageQueue 是消息机制的 Java 层和 native 层的连接纽带，大部分核心方法都交给 native 层来处理，关于这些 native 方法的介绍，见 [二、Native 篇](#二native-篇)。
 
 #### 1.4.1 构造函数
 
@@ -768,7 +768,7 @@ public final class Message {
 
 ## 二、Native 篇
 
-除了 MessageQueue 的 native 方法，native 层本身也有一套完整的消息机制，用于处理 native 的消息，如下图 Native 层的消息机制。
+除了 MessageQueue 的 native 方法，native 层本身也有一套完整的消息机制，用于处理 native 的消息。
 
 在整个消息机制中，而 MessageQueue 是连接 Java 层和 Native 层的纽带，换言之，Java 层可以向 MessageQueue 消息队列中添加消息，Native 层也可以向 MessageQueue 消息队列中添加消息。
 

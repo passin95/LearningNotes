@@ -1,31 +1,50 @@
+
 <!-- TOC -->
 
 - [一、概述](#一概述)
-    - [1.1 名词说明](#11-名词说明)
-        - [1.1.1 RandomAccess](#111-randomaccess)
-        - [1.1.2 fail-fast 和 fail-safe](#112-fail-fast-和-fail-safe)
-    - [1.2 Collection](#12-collection)
-        - [1.2.1 List](#121-list)
-        - [1.2.2 Set](#122-set)
-        - [1.2.3 Queue](#123-queue)
-    - [1.3 Map](#13-map)
-    - [1.4 Arrays.asList()](#14-arraysaslist)
+  - [1.1 名词说明](#11-名词说明)
+    - [1.1.1 RandomAccess](#111-randomaccess)
+    - [1.1.2 fail-fast 和 fail-safe](#112-fail-fast-和-fail-safe)
+  - [1.2 Collection](#12-collection)
+    - [1.2.1 List](#121-list)
+    - [1.2.2 Set](#122-set)
+    - [1.2.3 Queue](#123-queue)
+  - [1.3 Map](#13-map)
+  - [1.4 Arrays.asList()](#14-arraysaslist)
 - [二、源码分析](#二源码分析)
-    - [2.1 ArrayList](#21-arraylist)
-        - [2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#211-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
-    - [2.2 LinkedList](#22-linkedlist)
-    - [2.3 HashMap](#23-hashmap)
-        - [2.3.1 成员变量和构造函数](#231-成员变量和构造函数)
-        - [2.3.2 存储结构](#232-存储结构)
-        - [2.3.3 put、get、resize](#233-putgetresize)
-        - [2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#234-线程安全方案-hashtableconcurrenthashmapcollectionssynchronizedmap-对比)
-    - [2.4 ConcurrentHashMap](#24-concurrenthashmap)
-        - [2.4.1 put](#241-put)
-        - [2.4.2 remove](#242-remove)
-        - [2.4.3 get](#243-get)
+  - [2.1 List](#21-list)
+    - [2.1.1 ArrayList](#211-arraylist)
+      - [2.1.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比](#2111-线程安全方案-vectorcopyonwritearraylistcollectionssynchronizedlist-对比)
+    - [2.1.2 LinkedList](#212-linkedlist)
+  - [2.2 Map](#22-map)
+    - [2.2.1 HashMap](#221-hashmap)
+      - [2.2.1.1 成员变量和构造函数](#2211-成员变量和构造函数)
+      - [2.2.1.2 存储结构](#2212-存储结构)
+      - [2.2.1.3 put](#2213-put)
+      - [2.2.1.4 get](#2214-get)
+      - [2.2.1.5 resize](#2215-resize)
+      - [2.2.1.6 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比](#2216-线程安全方案-hashtableconcurrenthashmapcollectionssynchronizedmap-对比)
+    - [2.2.2 ArrayMap](#222-arraymap)
+      - [2.2.2.1 成员变量和构造函数](#2221-成员变量和构造函数)
+      - [2.2.2.2 缓存机制](#2222-缓存机制)
+        - [2.2.2.2.1 allocArrays](#22221-allocarrays)
+        - [2.2.2.2.2 freeArrays](#22222-freearrays)
+      - [2.2.2.3 put](#2223-put)
+      - [2.2.2.4 append](#2224-append)
+      - [2.2.2.5 remove](#2225-remove)
+      - [2.2.2.6 clear 和 erase](#2226-clear-和-erase)
+    - [2.2.3 SparseArray](#223-sparsearray)
+      - [2.2.3.1 成员变量](#2231-成员变量)
+      - [2.2.3.1 delete](#2231-delete)
+      - [2.2.3.2 put](#2232-put)
+      - [2.2.3.3 gc](#2233-gc)
+    - [2.2.4 Map 对比](#224-map-对比)
+    - [2.2.5 ConcurrentHashMap](#225-concurrenthashmap)
+      - [2.2.5.1 put](#2251-put)
+      - [2.2.5.2 remove](#2252-remove)
+      - [2.2.5.3 get](#2253-get)
 
 <!-- /TOC -->
-
 # 一、概述
 
 容器主要包括 Collection 和 Map 两种，Collection 存储着对象的集合，而 Map 存储着键值对（两个对象）的映射表。
@@ -102,7 +121,9 @@ List list = new ArrayList<>(Arrays.asList("a", "b", "c"))
 
 若非单独说明，本文源码分析都基于 JDK1.8。
 
-## 2.1 ArrayList
+## 2.1 List
+
+### 2.1.1 ArrayList
 
 ArrayList 的特性：
 
@@ -665,7 +686,7 @@ public class ArrayList<E> extends AbstractList<E>
 
 ```
 
-### 2.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比
+#### 2.1.1.1 线程安全方案 Vector、CopyOnWriteArrayList、Collections.synchronizedList() 对比
 
 **（1）Vector**
 
@@ -742,7 +763,7 @@ public void add(int index, E element) {
 3. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
 2. Vector 和 Collections.synchronizedList() 看似已经线程安全，但使用 Iterator 例外，因为在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非迭代器修改数据会抛 ConcurrentModificationException 异常。
 
-## 2.2 LinkedList
+### 2.1.2 LinkedList
 
 LinkedList 的特性：
 
@@ -1451,11 +1472,13 @@ public class LinkedList<E>
 }
 ```
 
-## 2.3 HashMap
+## 2.2 Map
+
+### 2.2.1 HashMap
 
 由于 HashMap 的源码相对复杂了一些，因此拆分为几个部分阅读。
 
-### 2.3.1 成员变量和构造函数
+#### 2.2.1.1 成员变量和构造函数
 
 ```java
 public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneable, Serializable {
@@ -1558,7 +1581,7 @@ loadFactor 太大导致查找元素效率低，太小导致数组的利用率低
 
 以给定的默认容量为 16，负载因子为 0.75 举例。 不断的往 Map 存储数据，当元素数量达到了 16 * 0.75 = 12 时就需要进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以比较消耗性能，因此应当尽量减少扩容的次数。
 
-### 2.3.2 存储结构
+#### 2.2.1.2 存储结构
 
 JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
 
@@ -1615,9 +1638,7 @@ static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> {
         }
 ```
 
-### 2.3.3 put、get、resize
-
-**（1）put**
+#### 2.2.1.3 put
 
 ```java
 public V put(K key, V value) {
@@ -1706,7 +1727,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 } 
 ```
 
-**（2）get**
+#### 2.2.1.4 get
 
 ```java
 public V get(Object key) {
@@ -1739,7 +1760,7 @@ final Node<K,V> getNode(int hash, Object key) {
 }
 ```
 
-**（3）resize**
+#### 2.2.1.5 resize
 
 ```java
 final Node<K,V>[] resize() {
@@ -1838,7 +1859,7 @@ final Node<K,V>[] resize() {
 }
 ```
 
-### 2.3.4 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比
+#### 2.2.1.6 线程安全方案 HashTable、ConcurrentHashMap、Collections.synchronizedMap() 对比
 
 **（1）HashTable**
 
@@ -1909,9 +1930,579 @@ public V put(K key, V value) {
 4. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
 5. 3 个并发集合看似已经线程安全，但 Iterator 例外，在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非 Iterator 修改数据会抛 ConcurrentModificationException 异常。
 
-## 2.4 ConcurrentHashMap
+### 2.2.2 ArrayMap
 
-### 2.4.1 put 
+ArrayMap 是 Android 专门针对内存优化而设计的，用于在千位数量级以下的数据条件下（时间换空间，但耗时差距极小），取代 HashMap 以节约内存。
+
+#### 2.2.2.1 成员变量和构造函数
+
+```java
+public final class ArrayMap<K, V> implements Map<K, V> {
+    private static final boolean CONCURRENT_MODIFICATION_EXCEPTIONS = true;
+
+    /**
+     * 容量元素增量的最小值
+     */
+    private static final int BASE_SIZE = 4;
+
+    /**
+     * 缓存数组 mBaseCache 容量的最大值。
+     */
+    private static final int CACHE_SIZE = 10;
+
+    /**
+     * 构造函数传入的 capacity 小于 0 时使用，同时也代表该 ArrayMap 不可变。
+     */
+    static final int[] EMPTY_IMMUTABLE_INTS = new int[0];
+
+    /**
+     * 用于缓存容量为 4 的 ArrayMap。
+     */
+    static Object[] mBaseCache;
+    /**
+     * 已缓存的容器数量，超过 10 个则不再缓存。
+     */
+    static int mBaseCacheSize;
+    /**
+     * 用于缓存容量为 8 的 ArrayMap。
+     */
+    static Object[] mTwiceBaseCache;
+    /**
+     * 已缓存的容器数量，超过 10 个则不再缓存。
+     */
+    static int mTwiceBaseCacheSize;
+
+    /**
+     * 由 key 的 hashcode 所组成的数组。
+     */
+    int[] mHashes;
+    /**
+     * 由 key-value 对所组成的数组，因此大小是 mHashes 的 2 倍。
+     */
+    Object[] mArray;
+    /**
+     * 元素数量（一对 key-value 算一个元素）。
+     */
+    int mSize;
+    MapCollections<K, V> mCollections;
+   public ArrayMap() {
+        this(0, false);
+    }
+
+    public ArrayMap(int capacity) {
+        this(capacity, false);
+    }
+
+    public ArrayMap(int capacity, boolean identityHashCode) {
+        mIdentityHashCode = identityHashCode;
+
+        if (capacity < 0) {
+            // capacity 小于 0，整个 ArrayMap 将是不可变的（扩容会抛异常）。
+            mHashes = EMPTY_IMMUTABLE_INTS;
+            mArray = EmptyArray.OBJECT;
+        } else if (capacity == 0) {
+            mHashes = EmptyArray.INT;
+            mArray = EmptyArray.OBJECT;
+        } else {
+            allocArrays(capacity);
+        }
+        mSize = 0;
+    }
+```
+
+#### 2.2.2.2 缓存机制
+
+对于 Android 客户端的开发场景中，元素的数量级往往都很小，为了减少数组的频繁地创建和回收，特意设计了两个缓存池，分别是容器大小为 4 和 8 的 ArrayMap。
+
+缓存机制的实现主要体现在内存分配(allocArrays)和内存释放(freeArrays)。它的数据结构如下：
+
+<div align ="center"> <img src ="../pictures//ArrayMap%20缓存结构.webp" /> </div><br>
+
+核心在于当前缓存 mArray 中的 a[0] 指向上一个缓存，a[1] 存的是与当前缓存一起的 mHashes 缓存。
+
+##### 2.2.2.2.1 allocArrays
+
+```java
+private void allocArrays(final int size) {
+    if (mHashes == EMPTY_IMMUTABLE_INTS) {
+        throw new UnsupportedOperationException("ArrayMap is immutable");
+    }
+    // 容器容量为 8。
+    if (size == (BASE_SIZE*2)) {
+        synchronized (ArrayMap.class) {
+            // 如果缓存池不为 null。
+            if (mTwiceBaseCache != null) {
+                final Object[] array = mTwiceBaseCache;
+                // 使用缓存 array。
+                mArray = array;
+                // mTwiceBaseCache 指向上一个缓存。
+                mTwiceBaseCache = (Object[])array[0];
+                // 提取 mHashes 缓存。
+                mHashes = (int[])array[1];
+                // 缓存提取完毕，置空所有元素准备使用。
+                array[0] = array[1] = null;
+                // 缓存池大小减 1。
+                mTwiceBaseCacheSize--;
+                if (DEBUG) Log.d(TAG, "Retrieving 2x cache " + mHashes
+                        + " now have " + mTwiceBaseCacheSize + " entries");
+                return;
+            }
+        }
+    } else if (size == BASE_SIZE) {
+        // 容器容量为 4，其它逻辑与上面一致。
+        synchronized (ArrayMap.class) {
+            if (mBaseCache != null) {
+                final Object[] array = mBaseCache;
+                mArray = array;
+                mBaseCache = (Object[])array[0];
+                mHashes = (int[])array[1];
+                array[0] = array[1] = null;
+                mBaseCacheSize--;
+                if (DEBUG) Log.d(TAG, "Retrieving 1x cache " + mHashes
+                        + " now have " + mBaseCacheSize + " entries");
+                return;
+            }
+        }
+    }
+
+    // 若不从缓存拿，则直接实例化创建。
+    mHashes = new int[size];
+    mArray = new Object[size<<1];
+}
+```
+
+##### 2.2.2.2.2 freeArrays
+
+```java
+private static void freeArrays(final int[] hashes, final Object[] array, final int size) {
+    // 若要缓存的容器大小为 8。
+    if (hashes.length == (BASE_SIZE*2)) {
+        synchronized (ArrayMap.class) {
+            // 缓存链长最长为 10.
+            if (mTwiceBaseCacheSize < CACHE_SIZE) {
+                // array 即将成为新的缓存，array[0]、array[1] 指向上一个缓存。
+                array[0] = mTwiceBaseCache;
+                array[1] = hashes;
+                for (int i=(size<<1)-1; i>=2; i--) {
+                    // 清空其他数据。
+                    array[i] = null;
+                }
+                // mTwiceBaseCache 指向新加入缓存池的 array。
+                mTwiceBaseCache = array;
+                mTwiceBaseCacheSize++;
+                if (DEBUG) Log.d(TAG, "Storing 2x cache " + array
+                        + " now have " + mTwiceBaseCacheSize + " entries");
+            }
+        }
+    } else if (hashes.length == BASE_SIZE) {
+        // 若要缓存的容器大小为 4，其它逻辑与上面一致。
+        synchronized (ArrayMap.class) {
+            if (mBaseCacheSize < CACHE_SIZE) {
+                array[0] = mBaseCache;
+                array[1] = hashes;
+                for (int i=(size<<1)-1; i>=2; i--) {
+                    array[i] = null;
+                }
+                mBaseCache = array;
+                mBaseCacheSize++;
+                if (DEBUG) Log.d(TAG, "Storing 1x cache " + array
+                        + " now have " + mBaseCacheSize + " entries");
+            }
+        }
+    }
+}
+```
+
+#### 2.2.2.3 put
+
+```java
+public V put(K key, V value) {
+    final int osize = mSize;
+    final int hash;
+    int index;
+    if (key == null) {
+        hash = 0;
+        index = indexOfNull();
+    } else {
+        // mIdentityHashCode 默认为 false。
+        hash = mIdentityHashCode ? System.identityHashCode(key) : key.hashCode();
+        // 采用二分查找法，从 mHashes 数组中查找值等于 hash 的 key 的索引下标。
+        index = indexOf(key, hash);
+    }
+    if (index >= 0) {
+        // 代表从数据 mHashes 中找到相同的 key，直接修改相应位置的 value。
+        index = (index<<1) + 1;
+        final V old = (V)mArray[index];
+        mArray[index] = value;
+        return old;
+    }
+
+    // 当 index < 0，则代表对应的 key 不存在，需要插入新元素。
+    // 直接对 index 进行位非运算符，得到的正数将刚好是插入 mHashes 的位置，
+    // 因为该 index 在二分查找中若找不到，则会刚好返回要插入位置的 index 的位非。
+    index = ~index;
+    if (osize >= mHashes.length) {
+        // 扩容，新的容量大小为：
+        // 1、原先容量大小大于等于 8，则扩容到 1.5 倍;
+        // 2、原先容量大小小于 8，大于等于 4，则扩容为 8;
+        // 3、原先容量小于小于 4，则扩容为 4。
+        final int n = osize >= (BASE_SIZE*2) ? (osize+(osize>>1))
+                : (osize >= BASE_SIZE ? (BASE_SIZE*2) : BASE_SIZE);
+
+        if (DEBUG) Log.d(TAG, "put: grow from " + mHashes.length + " to " + n);
+        // 保留扩容前的数据引用，在扩容后，将数据复制到新的数组中。
+        final int[] ohashes = mHashes;
+        final Object[] oarray = mArray;
+        // 指向扩容后的新数组。
+        allocArrays(n);
+
+        // ArrayMap 并非线程安全的类，不允许多线程读写。
+        if (CONCURRENT_MODIFICATION_EXCEPTIONS && osize != mSize) {
+            throw new ConcurrentModificationException();
+        }
+
+        if (mHashes.length > 0) {
+            if (DEBUG) Log.d(TAG, "put: copy 0-" + osize + " to 0");
+            // 将数据拷贝到新数组中。
+            System.arraycopy(ohashes, 0, mHashes, 0, ohashes.length);
+            System.arraycopy(oarray, 0, mArray, 0, oarray.length);
+        }
+
+        // 释放旧的数组到缓存池中。
+        freeArrays(ohashes, oarray, osize);
+    }
+
+    //当需要插入的位置不在数组末尾时，需要将 index 位置后的数据通过拷贝往后移动一位。
+    if (index < osize) {
+        if (DEBUG) Log.d(TAG, "put: move " + index + "-" + (osize-index)
+                + " to " + (index+1));
+        System.arraycopy(mHashes, index, mHashes, index + 1, osize - index);
+        System.arraycopy(mArray, index << 1, mArray, (index + 1) << 1, (mSize - index) << 1);
+    }
+
+    if (CONCURRENT_MODIFICATION_EXCEPTIONS) {
+        if (osize != mSize || index >= mHashes.length) {
+            throw new ConcurrentModificationException();
+        }
+    }
+    mHashes[index] = hash;
+    // 可以看到，key-value 以相邻的形式存储在 mArray 中。
+    mArray[index<<1] = key;
+    mArray[(index<<1)+1] = value;
+    mSize++;
+    return null;
+}
+```
+
+```java
+int indexOf(Object key, int hash) {
+    final int N = mSize;
+
+    // 容器容量为 0，直接返回 1。
+    if (N == 0) {
+        return ~0;
+    }
+
+    int index = binarySearchHashes(mHashes, N, hash);
+
+    // index 小于 0，表示没有找到该 key 对应的 hash 值，直接返回。
+    if (index < 0) {
+        return index;
+    }
+
+    // 如果返回索引处的键匹配，这就是我们想要的。
+    if (key.equals(mArray[index<<1])) {
+        return index;
+    }
+
+    // 走到这里说明「可能」存在 2 个或以上的 key 的 hash 值一致，因此需要遍历比较。
+    int end;
+    for (end = index + 1; end < N && mHashes[end] == hash; end++) {
+        if (key.equals(mArray[end << 1])) return end;
+    }
+
+    // 走到这里说明「可能」存在 2 个或以上的 key 的 hash 值一致，因此需要遍历比较。
+    for (int i = index - 1; i >= 0 && mHashes[i] == hash; i--) {
+        if (key.equals(mArray[i << 1])) return i;
+    }
+
+    // 走到这里，说明新插入的 key 的不存在，但是却和容器内已存在的 key 的 hash 值相等。
+    return ~end;
+}
+```
+
+#### 2.2.2.4 append
+
+append() 是一个轻量级的插入方法，但是用得极少，他需要满足 2 个条件才能体现出他的性能（时间复杂度由 O(LogN) 降为 O(1)）：
+
+1. 明确插入该数据前，也不需要扩容（强制，否则直接抛异常）。
+2. 插入的 key 的 hash 值一定大于容器内的所有 key（非强制，会重新执行 put() 方法）。
+
+```java
+public void append(K key, V value) {
+    int index = mSize;
+    final int hash = key == null ? 0
+            : (mIdentityHashCode ? System.identityHashCode(key) : key.hashCode());
+    if (index >= mHashes.length) {
+        throw new IllegalStateException("Array is full");
+    }
+    if (index > 0 && mHashes[index-1] > hash) {
+        RuntimeException e = new RuntimeException("here");
+        e.fillInStackTrace();
+        Log.w(TAG, "New hash " + hash
+                + " is before end of array hash " + mHashes[index-1]
+                + " at index " + index + " key " + key, e);
+        put(key, value);
+        return;
+    }
+    mSize = index+1;
+    mHashes[index] = hash;
+    index <<= 1;
+    mArray[index] = key;
+    mArray[index+1] = value;
+}
+```
+
+#### 2.2.2.5 remove
+
+```java
+public V remove(Object key) {
+    // 通过二分查找 key 的 index。
+    final int index = indexOfKey(key);
+    if (index >= 0) {
+        return removeAt(index);
+    }
+
+    return null;
+}
+
+public V removeAt(int index) {
+    final Object old = mArray[(index << 1) + 1];
+    final int osize = mSize;
+    final int nsize;
+    if (osize <= 1) {
+        // 当被移除的是 ArrayMap 的最后一个元素，则释放内存。
+        final int[] ohashes = mHashes;
+        final Object[] oarray = mArray;
+        mHashes = EmptyArray.INT;
+        mArray = EmptyArray.OBJECT;
+        freeArrays(ohashes, oarray, osize);
+        nsize = 0;
+    } else {
+        nsize = osize - 1;
+        // 如果移除元素前的容器容量大于 8 且元素数量小于容器容量的 1/3 则进行缩容。
+        if (mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3) {
+            // 若元素数量大于 8，则缩容为元素数量的 1.5 倍，否则缩容为 8。
+            final int n = osize > (BASE_SIZE*2) ? (osize + (osize>>1)) : (BASE_SIZE*2);
+
+            if (DEBUG) Log.d(TAG, "remove: shrink from " + mHashes.length + " to " + n);
+
+            final int[] ohashes = mHashes;
+            final Object[] oarray = mArray;
+            allocArrays(n);
+
+            if (CONCURRENT_MODIFICATION_EXCEPTIONS && osize != mSize) {
+                throw new ConcurrentModificationException();
+            }
+
+            if (index > 0) {
+                if (DEBUG) Log.d(TAG, "remove: copy from 0-" + index + " to 0");
+                System.arraycopy(ohashes, 0, mHashes, 0, index);
+                System.arraycopy(oarray, 0, mArray, 0, index << 1);
+            }
+            if (index < nsize) {
+                if (DEBUG) Log.d(TAG, "remove: copy from " + (index+1) + "-" + nsize
+                        + " to " + index);
+                System.arraycopy(ohashes, index + 1, mHashes, index, nsize - index);
+                System.arraycopy(oarray, (index + 1) << 1, mArray, index << 1,
+                        (nsize - index) << 1);
+            }
+        } else {
+            if (index < nsize) {
+                // 当被移除的元素不是数组最末尾的元素时，则需要将后面的数组往前移动一位。
+                if (DEBUG) Log.d(TAG, "remove: move " + (index+1) + "-" + nsize
+                        + " to " + index);
+                System.arraycopy(mHashes, index + 1, mHashes, index, nsize - index);
+                System.arraycopy(mArray, (index + 1) << 1, mArray, index << 1,
+                        (nsize - index) << 1);
+            }
+            // 再将最后一个位置设置为 null。
+            mArray[nsize << 1] = null;
+            mArray[(nsize << 1) + 1] = null;
+        }
+    }
+    if (CONCURRENT_MODIFICATION_EXCEPTIONS && osize != mSize) {
+        throw new ConcurrentModificationException();
+    }
+    mSize = nsize;
+    return (V)old;
+}
+```
+
+#### 2.2.2.6 clear 和 erase
+
+clear()清理操作会置空 mHashes 和 mArray 并执行 freeArrays()方法尝试回收到缓存池，而 erase() 只会清空数组内的元素，并不会回收内存。
+
+```java
+public void clear() {
+    if (mSize > 0) {
+        final int[] ohashes = mHashes;
+        final Object[] oarray = mArray;
+        final int osize = mSize;
+        mHashes = EmptyArray.INT;
+        mArray = EmptyArray.OBJECT;
+        mSize = 0;
+        freeArrays(ohashes, oarray, osize);
+    }
+    if (CONCURRENT_MODIFICATION_EXCEPTIONS && mSize > 0) {
+        throw new ConcurrentModificationException();
+    }
+}
+
+public void erase() {
+    if (mSize > 0) {
+        final int N = mSize<<1;
+        final Object[] array = mArray;
+        for (int i=0; i<N; i++) {
+            array[i] = null;
+        }
+        mSize = 0;
+    }
+}
+
+```
+
+### 2.2.3 SparseArray
+
+为了更进一步优化 key 是 int 类型的 Map，提供了性能更高的数据结构 SparseArray，可避免自动装箱过程和减少内存消耗，除此之外 SparseArray 另一个优化点是「延迟回收」。
+
+#### 2.2.3.1 成员变量
+
+SparseArray 对应的 key 只能是 int 类型，它不会对 key 进行装箱操作。并且它使用了两个数组，一个保存 key，一个保存 value。从内存使用上来说，SparseArray 不需要保存 key 所对应的哈希值，所以比 ArrayMap 节省了 1/3 的内存。
+
+```java
+public class SparseArray<E> implements Cloneable {
+
+    private boolean mGarbage = false; // 标记是否存在延迟回收的键值对。
+
+    private int[] mKeys;
+    private Object[] mValues;
+    private int mSize;
+
+}
+```
+
+#### 2.2.3.1 delete
+
+```java
+public void delete(int key) {
+    int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+
+    if (i >= 0) {
+        // delete 或者 removeAt 删除数据的操作，只是将相应位置的数据标记为 DELETE，
+        // 并设置 mGarbage=true，不会对容量进行数据拷贝移动或者缩容的操作。
+        if (mValues[i] != DELETED) {
+            mValues[i] = DELETED;
+            mGarbage = true;
+        }
+    }
+}
+```
+
+#### 2.2.3.2 put
+
+```java
+public void put(int key, E value) {
+    int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+
+    if (i >= 0) {
+        // 若存在则直接覆盖值。
+        mValues[i] = value;
+    } else {
+        i = ~i;
+
+        // mValues[i] 若被标记为 DELETED，则直接使用。
+        if (i < mSize && mValues[i] == DELETED) {
+            mKeys[i] = key;
+            mValues[i] = value;
+            return;
+        }
+
+        // 只有元素数量大于等于容器容量才会回收（包括了被标记为 DELETED 的废弃元素）。
+        if (mGarbage && mSize >= mKeys.length) {
+            gc();
+
+            i = ~ContainerHelpers.binarySearch(mKeys, mSize, key);
+        }
+
+        // 插入新的 key-value 对，若容器容量已满，会扩容为当前的 2 倍。
+        mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);
+        mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);
+        mSize++;
+    }
+}
+```
+
+#### 2.2.3.3 gc
+
+从删除和插入的代码可以看出，SparseArray 对于频繁删除和插入的场景，性能很好。
+
+```java
+private void gc() {
+    int n = mSize;
+    int o = 0;
+    int[] keys = mKeys;
+    Object[] values = mValues;
+
+    for (int i = 0; i < n; i++) {
+        Object val = values[i];
+
+        // 将所有没有标记为 DELETE 的 value 移动到队列的头部。
+        if (val != DELETED) {
+            if (i != o) {
+                keys[o] = keys[i];
+                values[o] = val;
+                values[i] = null;
+            }
+
+            o++;
+        }
+    }
+
+    // 回收整理完毕。
+    mGarbage = false;
+    mSize = o;
+}
+```
+
+为了再进一步优化 key 和 value 都是基础数据类型的 Map，提供了 SparseIntArray、SparseLongArray、SparseBooleanArray 等，区别在于 value 数据类型的不同，优化理由同 SparseArray。
+
+### 2.2.4 Map 对比
+
+**（1）数据结构**
+- ArrayMap 和 SparseArray 采用的都是两个数组。
+- HashMap 采用的是数组+链表+红黑树。
+
+**（2）内存优化**
+
+- HashMap 需要创建一个额外的对象管理 key-value，且容量的利用率比 ArrayMap 低。
+- SparseArray 比 ArrayMap 节省 1/3 的内存，但 SparseArray 只能用于 key 为 int 类型的 Map。
+
+**（3）缓存机制**
+
+- ArrayMap 针对容量为 4 和 8 的对象进行缓存，可避免频繁创建对象而分配内存与 GC 操作，这两个缓存池大小为 10 个，防止缓存池无限增大；
+- HashMap 没有缓存机制；
+- SparseArray 有延迟回收机制，提供删除效率，同时减少数组成员来回拷贝的次数。
+
+**（4）扩容机制**
+
+- ArrayMap 在容量满时扩容至原来的 1.5 倍，在容量小于 1/3 时缩容为元素数量的 1.5 倍，对于需要长期使用，且元素数量波动幅度较大时性能较好。
+- HashMap 在容量的 0.75 倍扩容至原来的 2 倍，没有缩容机制。
+- SparseArray 在容量满时扩容至原来的 2 倍，没有缩容机制。
+
+### 2.2.5 ConcurrentHashMap
+
+#### 2.2.5.1 put 
 
 ```java
 public V put(K key, V value) {
@@ -2015,7 +2606,7 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 }
 ```
 
-### 2.4.2 remove
+#### 2.2.5.2 remove
 
 ```java
 public V remove(Object key) {
@@ -2119,7 +2710,7 @@ final V replaceNode(Object key, V value, Object cv) {
 }
 ```
 
-### 2.4.3 get
+#### 2.2.5.3 get
 
 ```java
 public V get(Object key) {
