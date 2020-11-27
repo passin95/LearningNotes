@@ -38,6 +38,7 @@
       - [2.2.3.1 delete](#2231-delete)
       - [2.2.3.2 put](#2232-put)
       - [2.2.3.3 gc](#2233-gc)
+      - [2.2.3.4 get](#2234-get)
     - [2.2.4 Map 对比](#224-map-对比)
     - [2.2.5 ConcurrentHashMap](#225-concurrenthashmap)
       - [2.2.5.1 put](#2251-put)
@@ -1583,7 +1584,7 @@ loadFactor 太大导致查找元素效率低，太小导致数组的利用率低
 
 #### 2.2.1.2 存储结构
 
-JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
+JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 且 table 容量大于等于 MIN_TREEIFY_CAPACITY(64) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
 
 ```java
 // 链表结构
@@ -1660,7 +1661,7 @@ static final int hash(Object key) {
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
     Node<K,V>[] tab; Node<K,V> p; int n, i;
-    // tab 即为 table ，若未初始化或者长度为 0，进行扩容。
+    // tab 即为 table ，若未初始化或者长度为 0，进行扩容，并对扩容阈值 threshold 进行修正。
     if ((tab = table) == null || (n = tab.length) == 0)
         n = (tab = resize()).length;
     // 通过 (n - 1) & hash 计算元素存放在哪个桶中（将结果限制在数组容量内）。
@@ -1789,8 +1790,9 @@ final Node<K,V>[] resize() {
         newCap = DEFAULT_INITIAL_CAPACITY;
         newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
-    // 计算新的数组容量阈值（从上面可得有 2 种情况会 newThr == 0）。
+
     if (newThr == 0) {
+        // 只有指定了容器初始容量，且第一次 put 才会走到这里，需要对容器阈值进行修正。
         float ft = (float)newCap * loadFactor;
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ? (int)ft : Integer.MAX_VALUE);
     }
@@ -2376,6 +2378,8 @@ public void erase() {
 
 为了更进一步优化 key 是 int 类型的 Map，提供了性能更高的数据结构 SparseArray，可避免自动装箱过程和减少内存消耗，除此之外 SparseArray 另一个优化点是「延迟回收」。
 
+为了再进一步优化 key 和 value 都是基础数据类型的 Map，提供了 SparseIntArray、SparseLongArray、SparseBooleanArray 等，区别在于 value 数据类型的不同，优化理由同 SparseArray。
+
 #### 2.2.3.1 成员变量
 
 SparseArray 对应的 key 只能是 int 类型，它不会对 key 进行装箱操作。并且它使用了两个数组，一个保存 key，一个保存 value。从内存使用上来说，SparseArray 不需要保存 key 所对应的哈希值，所以比 ArrayMap 节省了 1/3 的内存。
@@ -2474,30 +2478,52 @@ private void gc() {
     mSize = o;
 }
 ```
+#### 2.2.3.4 get
 
-为了再进一步优化 key 和 value 都是基础数据类型的 Map，提供了 SparseIntArray、SparseLongArray、SparseBooleanArray 等，区别在于 value 数据类型的不同，优化理由同 SparseArray。
+```java
+public E get(int key) {
+    return get(key, null);
+}
+public E get(int key, E valueIfKeyNotFound) {
+    // 由于 key 是 int 类型，直接通过二分查找找到对应的 index。
+    int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
+
+    if (i < 0 || mValues[i] == DELETED) {
+        return valueIfKeyNotFound;
+    } else {
+        return (E) mValues[i];
+    }
+}
+```
 
 ### 2.2.4 Map 对比
 
 **（1）数据结构**
-- ArrayMap 和 SparseArray 采用的都是两个数组。
+
+- ArrayMap 和 SparseArray 采用的都是两个数组；
 - HashMap 采用的是数组+链表+红黑树。
 
 **（2）内存优化**
 
-- HashMap 需要创建一个额外的对象管理 key-value，且容量的利用率比 ArrayMap 低。
+- HashMap 需要创建一个额外的对象管理 key-value，且容量的利用率比 ArrayMap 低；
 - SparseArray 比 ArrayMap 节省 1/3 的内存，但 SparseArray 只能用于 key 为 int 类型的 Map。
+
+**（3）读写性能**
+
+- ArrayMap 查找时间复杂度 O(logN)；ArrayMap 增加、删除操作需要移动成员，速度相对较慢；
+- HashMap 查找、修改的时间复杂度为 O(1)；
+- SparseArray 对于频繁删除和插入来回执行的场景，性能比较好。
 
 **（3）缓存机制**
 
-- ArrayMap 针对容量为 4 和 8 的对象进行缓存，可避免频繁创建对象而分配内存与 GC 操作，这两个缓存池大小为 10 个，防止缓存池无限增大；
+- ArrayMap 对容量为 4 和 8 的数组进行缓存，可避免频繁创建对象而分配内存与 GC 操作，这两个缓存池大小为 10 个，防止缓存池无限增大；
 - HashMap 没有缓存机制；
-- SparseArray 有延迟回收机制，提供删除效率，同时减少数组成员来回拷贝的次数。
+- SparseArray 有延迟回收机制，提供删除效率的同时，减少数组成员来回拷贝的次数。
 
 **（4）扩容机制**
 
-- ArrayMap 在容量满时扩容至原来的 1.5 倍，在容量小于 1/3 时缩容为元素数量的 1.5 倍，对于需要长期使用，且元素数量波动幅度较大时性能较好。
-- HashMap 在容量的 0.75 倍扩容至原来的 2 倍，没有缩容机制。
+- ArrayMap 在容量满时扩容至原来的 1.5 倍，在容量小于 1/3 时缩容为元素数量的 1.5 倍，对于需要长期使用，且元素数量波动幅度较大时性能较好；
+- HashMap 在容量的 0.75 倍扩容至原来的 2 倍，没有缩容机制；
 - SparseArray 在容量满时扩容至原来的 2 倍，没有缩容机制。
 
 ### 2.2.5 ConcurrentHashMap

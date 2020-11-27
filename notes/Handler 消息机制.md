@@ -23,9 +23,14 @@
       - [1.5.1 成员变量](#151-成员变量)
       - [1.5.2 消息池](#152-消息池)
   - [二、Native 篇](#二native-篇)
-    - [2.1 MessageQueue.nativeInit()](#21-messagequeuenativeinit)
-    - [2.2 MessageQueue.nativePollOnce()](#22-messagequeuenativepollonce)
-    - [2.3 MessageQueue.nativeWake()](#23-messagequeuenativewake)
+    - [2.1 epoll 机制](#21-epoll-机制)
+      - [2.1.1 多路复用](#211-多路复用)
+      - [2.1.2 API](#212-api)
+      - [2.1.3 eventfd](#213-eventfd)
+    - [2.2 简介](#22-简介)
+    - [2.3 MessageQueue.nativeInit()](#23-messagequeuenativeinit)
+    - [2.4 MessageQueue.nativePollOnce()](#24-messagequeuenativepollonce)
+    - [2.5 MessageQueue.nativeWake()](#25-messagequeuenativewake)
 
 <!-- /TOC -->
 
@@ -768,6 +773,66 @@ public final class Message {
 
 ## 二、Native 篇
 
+### 2.1 epoll 机制
+
+#### 2.1.1 多路复用
+
+IO 多路复用是一种同步 IO 模型，实现一个线程可以监视多个文件句柄。一旦某个文件句柄就绪，就能够通知应用程序进行相应的读写操作，没有文件句柄就绪时会阻塞应用程序，交出 CPU。
+
+与多进程和多线程技术相比，IO 多路复用技术的最大优势是系统开销小，系统不必为每个 IO 操作都创建进程或线程，也不必维护这些进程或线程，从而大大减小了系统的开销。
+
+select、poll、epoll 就是 IO 多路复用三种实现方式。
+
+- select 最大连接数为进程文件描述符上限，一般为 1024；每次调用 select 拷贝 fd；轮询方式工作时间复杂度为 O(n)；
+- poll 最大连接数无上限；每次调用 poll 拷贝 fd；轮询方式工作时间复杂度为 O(n)；
+- epoll 最大连接数无上限；首次调用 epoll_ctl 拷贝 fd，调用 epoll_wait 时不拷贝；回调方式工作时间复杂度为 O(1)。
+
+#### 2.1.2 API
+
+```java
+// 创建 eventpoll 对象，并将 eventpoll 对象放到 epfd 对应的 file->private_data 上，返回一个 epfd，即 eventpoll 句柄。
+int epoll_create(int size);
+
+/**
+ * 对一个 epfd 进行操作。
+ * @param op 表示要执行的操作，包括 EPOLL_CTL_ADD (添加)、EPOLL_CTL_DEL (删除)、EPOLL_CTL_MOD (修改)。
+ * @param fd 表示被监听的文件描述符。
+ * @param event 表示要被监听的事件，包括：
+ *        - EPOLLIN（表示被监听的 fd 有可以读的数据）
+ *        - EPOLLOUT（表示被监听的 fd 有可以写的数据）
+ *        - EPOLLPRI（表示有可读的紧急数据）
+ *        - EPOLLERR（对应的 fd 发生异常）
+ *        - EPOLLHUP（对应的 fd 被挂断）
+ *        - EPOLLET（设置 EPOLL 为边缘触发）
+ *        - EPOLLONESHOT（只监听一次）
+ * @return 成功 0；失败 -1。
+ */
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+
+/**
+ * 等待 epfd 监听的 fd 所产生对应的事件。
+ * @param epfd 表示 epoll 句柄。
+ * @param events 表示回传处理事件的数组。
+ * @param maxevents 表示每次能处理的最大事件数
+ * @param timeout 等待 IO 的超时时间，等于 0 表示不阻塞，-1 表示一直阻塞直到 IO 被唤醒，大于 0 表示阻塞指定的时间后自动被唤醒。
+ * @return 产生的监听事件数。
+ */
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
+```
+
+#### 2.1.3 eventfd
+
+eventfd 是 Linux 系统中一个用来通知事件的文件描述符，基于内核空间向用户空间应用发送通知的机制，可以有效地被用来实现用户空间事件驱动的应用程序，它只有一个系统调用接口：
+
+```java
+/**
+ * 打开一个 eventfd 文件并返回文件描述符，支持 epoll/poll/select 操作。
+ */
+int eventfd(unsigned int initval, int flags);
+```
+
+### 2.2 简介
+
 除了 MessageQueue 的 native 方法，native 层本身也有一套完整的消息机制，用于处理 native 的消息。
 
 在整个消息机制中，而 MessageQueue 是连接 Java 层和 Native 层的纽带，换言之，Java 层可以向 MessageQueue 消息队列中添加消息，Native 层也可以向 MessageQueue 消息队列中添加消息。
@@ -783,7 +848,7 @@ private native static boolean nativeIsPolling(long ptr);
 private native static void nativeSetFileDescriptorEvents(long ptr, int fd, int events);
 ```
 
-### 2.1 MessageQueue.nativeInit()
+### 2.3 MessageQueue.nativeInit()
 
 （1）new MessageQueue()
 
@@ -841,8 +906,8 @@ Looper::Looper(bool allowNonCallbacks) :
         mAllowNonCallbacks(allowNonCallbacks), mSendingMessage(false),
         mPolling(false), mEpollFd(-1), mEpollRebuildRequired(false),
         mNextRequestSeq(0), mResponseIndex(0), mNextMessageUptime(LLONG_MAX) {
-    // 通过 Linux 创建 eventfd, 进行线程间通信
-    // Android 6.0 之前为 pipe, 6.0 之后为 eventfd.
+    // 通过 eventfd 系统调用返回一个文件描述符，用于内核空间向用户空间（APP）进行事件通知。
+    // Android 6.0 之前为 pipe, 6.0 之后为 eventfd。
     mWakeEventFd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     AutoMutex _l(mLock);
     rebuildEpollLocked();
@@ -863,7 +928,7 @@ void Looper::rebuildEpollLocked() {
 }
 ```
 
-### 2.2 MessageQueue.nativePollOnce()
+### 2.4 MessageQueue.nativePollOnce()
 
 （1）messageQueue.next()
 
@@ -919,7 +984,7 @@ int Looper::pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outDa
             ......
             return result;
         }
-        // 若未读到消息, 则调用 pollInner。
+        // 若未读到消息, 则调用 pollInner（可能会多次执行）。
         result = pollInner(timeoutMillis);
     }
 }
@@ -937,7 +1002,7 @@ int Looper::pollInner(int timeoutMillis) {
     mPolling = true; 
     // fd 最大个数为 16。
     struct epoll_event eventItems[EPOLL_MAX_EVENTS];
-    // 关键点：调用 epoll_wait 阻塞来监听 mEpollFd 中的 IO 事件（nativeWake()）, 或超过一定时间 timeoutMillis 后。
+    // 关键点：调用 epoll_wait 阻塞直到监听到 mEpollFd 中的 IO 事件（nativeWake()）, 或超过一定时间 timeoutMillis 后。
     int eventCount = epoll_wait(mEpollFd, eventItems, EPOLL_MAX_EVENTS, timeoutMillis);
     // 不再处于 idle 状态。
     mPolling = false; 
@@ -946,11 +1011,11 @@ int Looper::pollInner(int timeoutMillis) {
         if (errno == EINTR) {
             goto Done;
         }
-        result = POLL_ERROR; // epoll 事件个数小于 0，发生错误，直接跳转 Done;
+        result = POLL_ERROR; // epoll 监听的事件个数小于 0，发生错误，直接跳转 Done;
         goto Done;
     }
 
-    if (eventCount == 0) {  //epoll 事件个数等于 0，发生超时，直接跳转 Done;
+    if (eventCount == 0) {  //epoll 监听的事件个数等于 0，发生超时，直接跳转 Done;
         result = POLL_TIMEOUT;
         goto Done;
     }
@@ -959,11 +1024,13 @@ int Looper::pollInner(int timeoutMillis) {
     for (int i = 0; i < eventCount; i++) {
         int fd = eventItems[i].data.fd;             
         uint32_t epollEvents = eventItems[i].events;
+        // 重点：mWakeEventFd 用于向应用层 Handler 发送事件通知。
         if (fd == mWakeEventFd) {
             if (epollEvents & EPOLLIN) {
                 // 若已经唤醒了，则读取并清空管道数据。
                 awoken();
             }
+            // 
         } else {
            ......
         }
@@ -974,7 +1041,7 @@ int Looper::pollInner(int timeoutMillis) {
 
 ```
 
-### 2.3 MessageQueue.nativeWake()
+### 2.5 MessageQueue.nativeWake()
 
 （1）MessageQueue.enqueueMessage()
 
@@ -1011,7 +1078,7 @@ void NativeMessageQueue::wake() {
 ```cpp
 // system/core/libutils/Looper.cpp
 void Looper::wake() {
-    // 向 Looper 绑定的线程 mWakeEventFd 管道中写入一个新的数据。
+    // 向 Looper 绑定的线程 mWakeEventFd 管道中写入一个新的数据，从而唤醒通过 epoll_wait 进入休眠的线程。
     // 其中 TEMP_FAILURE_RETRY 是一个宏定义，当执行 write 失败后，会不断重复执行，直到执行成功为止。
     uint64_t inc = 1;
     ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)));

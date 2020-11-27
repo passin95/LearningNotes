@@ -3,27 +3,27 @@
 
 <!-- TOC -->
 
-- [Retrofit 源码分析](#retrofit-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [一、Retrofit 的基本使用](#%E4%B8%80retrofit-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
-  - [二、Retrofit 的构建](#%E4%BA%8Cretrofit-%E7%9A%84%E6%9E%84%E5%BB%BA)
-    - [2.1 Retrofit 的成员变量](#21-retrofit-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+- [Retrofit 源码分析](#retrofit-源码分析)
+  - [一、Retrofit 的基本使用](#一retrofit-的基本使用)
+  - [二、Retrofit 的构建](#二retrofit-的构建)
+    - [2.1 Retrofit 的成员变量](#21-retrofit-的成员变量)
     - [2.2 Retrofit.Builder](#22-retrofitbuilder)
-  - [三、Retrofit.create()](#%E4%B8%89retrofitcreate)
+  - [三、Retrofit.create()](#三retrofitcreate)
     - [3.1 Retrofit.loadServiceMethod()](#31-retrofitloadservicemethod)
-  - [四、ServiceMethod 的构建](#%E5%9B%9Bservicemethod-%E7%9A%84%E6%9E%84%E5%BB%BA)
-    - [4.1 ServiceMethod 的成员变量](#41-servicemethod-%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+  - [四、ServiceMethod 的构建](#四servicemethod-的构建)
+    - [4.1 ServiceMethod 的成员变量](#41-servicemethod-的成员变量)
     - [4.2 ServiceMethod.Builder](#42-servicemethodbuilder)
       - [4.2.1 createCallAdapter()](#421-createcalladapter)
       - [4.2.2 createResponseConverter()](#422-createresponseconverter)
       - [4.2.3 parseParameter()](#423-parseparameter)
-  - [五、CallAdapter](#%E4%BA%94calladapter)
+  - [五、CallAdapter](#五calladapter)
     - [5.1 RxJava2CallAdapterFactory](#51-rxjava2calladapterfactory)
-  - [六、Converter](#%E5%85%ADconverter)
+  - [六、Converter](#六converter)
     - [6.1 BuiltInConverters](#61-builtinconverters)
-  - [七、OkHttpCall](#%E4%B8%83okhttpcall)
+  - [七、OkHttpCall](#七okhttpcall)
     - [7.1 createRawCall()](#71-createrawcall)
     - [7.2 parseResponse()](#72-parseresponse)
-  - [八、serviceMethod.adapt(okHttpCall)](#%E5%85%ABservicemethodadaptokhttpcall)
+  - [八、serviceMethod.adapt(okHttpCall)](#八servicemethodadaptokhttpcall)
     - [8.1 BodyObservable](#81-bodyobservable)
 
 <!-- /TOC -->
@@ -130,7 +130,7 @@ public <T> T create(final Class<T> service) {
     if (validateEagerly) {
       eagerlyValidateMethods(service);
     }
-    // Java 动态代理，Proxy.newProxyInstance 会把 service 类中的所有方法都实现 InvocationHandler 接口中的 invoke() 方法，
+    // Java 动态代理，Proxy.newProxyInstance 会把 service 类中的所有方法都调用 InvocationHandler 接口中的 invoke() 方法，
     // 在调用该类的任何方法，都会回调 invoke()。
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
         new InvocationHandler() {

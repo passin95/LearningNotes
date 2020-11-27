@@ -1,10 +1,18 @@
 
 
+<!-- TOC -->
+
+- [一、NestedScrolling](#一nestedscrolling)
+  - [1.1 嵌套滑动方法](#11-嵌套滑动方法)
+  - [1.2 NestedScrolling 流程](#12-nestedscrolling-流程)
+
+<!-- /TOC -->
+
 # 一、NestedScrolling
 
 ## 1.1 嵌套滑动方法
 
-compileSdk Lollipop（21） 及以上版本的 View 都支持了 NestedScrolling（对应 NestedScrollingChild 和 NestedScrollingParent 的接口实现）。
+compileSdk Lollipop（21）及以上版本的 View 都支持了 NestedScrolling（对应 NestedScrollingChild 和 NestedScrollingParent 的接口实现）。
 
 其中 View 多了以下这些方法：
 
@@ -98,6 +106,9 @@ public boolean dispatchNestedFling(float velocityX, float velocityY, boolean con
  * @return 如果父 View 需要进行嵌套滑动，则返回 true。
  */ 
 public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes);
+/**
+ * onStartNestedScroll() return true 时调用。
+ */ 
 public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes);
 /**
  * 在 dispatchNestedPreScroll() 中调用，dx、dy 表示子 View 所提供的滑动距离，准备用于消费，consumed 用于保存嵌套滑动的父视图滑动的距离。
@@ -107,6 +118,9 @@ public void onNestedPreScroll(View target, int dx, int dy, int[] consumed);
  * 在 dispatchNestedScroll() 中调用，dxConsumed，dyConsumed 子 View 所消耗的距离。
  */ 
 public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed);
+/**
+ * 在 dispatchNestedPreFling() 中调用，dxConsumed，dyConsumed 子 View 所消耗的距离。
+ */ 
 public boolean onNestedPreFling(View target, float velocityX, float velocityY);
 /**
  * 在 dispatchNestedFling() 中调用，consumed 用于保存是否已经消费过 fling。
