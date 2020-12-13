@@ -1,10 +1,17 @@
 
-
-
 <!-- TOC -->
 
 - [一、预备知识](#一预备知识)
     - [1.1 Android APK 打包流程](#11-android-apk-打包流程)
+        - [1.1.1 打包资源文件](#111-打包资源文件)
+            - [1.1.1.1 R.java 和资源 id](#1111-rjava-和资源-id)
+            - [1.1.1.2 资源的合并](#1112-资源的合并)
+        - [1.1.2 处理 aidl files](#112-处理-aidl-files)
+        - [1.1.3 编译项目源代码，生成 .class 文件](#113-编译项目源代码生成-class-文件)
+        - [1.1.4 生成 classes.dex 文件](#114-生成-classesdex-文件)
+        - [1.1.5 打包生成 APK 文件](#115-打包生成-apk-文件)
+        - [1.1.6 对 APK 文件签名](#116-对-apk-文件签名)
+        - [1.1.7 对签名后的 APK 文件进行对齐处理](#117-对签名后的-apk-文件进行对齐处理)
     - [1.2 字节码](#12-字节码)
         - [1.2.1 类型对照表](#121-类型对照表)
         - [1.2.2 JVM 指令集](#122-jvm-指令集)
@@ -31,35 +38,49 @@
 
  <div align="center"> <img src="../pictures//APK%20打包流程图.webp" /> </div>
 
-**（1）** 打包资源文件
+### 1.1.1 打包资源文件
 
-使用 aapt（The Android Asset Packaing Tool）对 res 目录下的资源文件打包生成 **R.java** 文件（资源索引表）以及 **.arsc** 资源文件。该工具位于 android-sdk/platform-tools 目录下。
+使用 aapt（The Android Asset Packaing Tool）对 res 目录下的资源文件打包生成 **R.java** 文件（资源 id）以及 **resources.arsc** 文件（资源索引表，通过 id 映射到文件路径和文件名）。该工具位于 android-sdk/platform-tools 目录下。
 
-**（2）** 处理 aidl files
+#### 1.1.1.1 R.java 和资源 id
+
+一个资源 id 是如何决定的呢？以 0x7f010000 为例：
+
+- packageId：前两位（7f）是 packageId，当于一个命名空间，主要用来区分不同的包空间(不是 module)。在编译 app 的时候，至少会遇到两个包空间：Android 系统资源包和自己添加的 App 资源包，其中以 0x01 开头的就是系统已经内置的资源 id，以 0x7f 开头的是自己添加的 app 资源 id。
+- typeId：第三、四位（01）是 typeId，是指资源的类型 id，android 资源有 anim、color、drawable、layout，string 等等，typeId 就是拿来区分资源类型。
+- entryId：后四位（0000）是 entryId，指每一个资源在其所属的资源类型中所出现的次序。
+
+主模块中的 R.xxx.xxx 可以作为常量直接内联进代码中，而其它模块则是一个变量，这是因为在最终打包成 apk 时候，才能确定非主模块的每个资源 id（资源 id 需要唯一），所以其它模块生成的资源 id 不能是 final 的。
+
+#### 1.1.1.2 资源的合并
+
+主模块、其它模块、aar 包都可能存在资源，如果出现相同的资源，系统会进行合并，低优先级的资源会被覆盖掉。覆盖的优先级如下：build variant > build type > product flavor > main source set > library dependences（主模块先依赖的优先级更高）。
+
+### 1.1.2 处理 aidl files
 
 AIDL 用于方便实现进程间通信。如果有 .aidl 文件，会通过 AIDL（Android Interface Definition Language）工具打包成 java 接口类，如果在没有使用到 .aidl 文件，则可以跳过这一步。该工具位于 android-sdk/platform-tools 目录下。
 
-**（3）** 编译项目源代码，生成 .class 文件
+### 1.1.3 编译项目源代码，生成 .class 文件
 
 将项目中所有的 Java（kotlin） 代码、R.java、aidl.java 通过 Java 编译器（javac）编译成.class 文件。该工具位于 ${JDK_HOME}/javac。
 
 ASM 在就是应用于第（3）步和第（4）步之间。
 
-**（4）** 生成 classes.dex 文件
+### 1.1.4 生成 classes.dex 文件
 
 将源码生成的.class 文件和第三方 jar 包通过 dx 工具打包成 dex 文件。
 
 源码生成的 .class 文件虽然已经可以在 JVM 环境中运行，但是如果要在 Android 运行时环境中执行还需要特殊的处理，那就是 dx 处理，它会将文件进行翻译、重构、解释、压缩等操作，该工具位于 android-sdk/platform-tools 目录下。
 
-**（5）** 打包生成 APK 文件
+### 1.1.5 打包生成 APK 文件
 
 所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）和 .dex 文件都会通过 apkbuilder 工具打包到一个完成的.apk 文件中。该工具位于 android-sdk/tools 目录下。
 
-**（6）** 对 APK 文件进行签名
+### 1.1.6 对 APK 文件签名
 
 一旦 APK 文件生成，它必须被签名才能被安装在设备上。使用 jarsigner 工具对 apk 进行验证签名，得到一个签名后的 apk（signed.apk）。在未指定签名文件时，会使用编译器默认的调试签名文件 debug.keystore。该工具位于 ${JDK_HOME}/jarsigner。
 
-**（7）** 对签名后的 APK 文件进行对齐处理
+### 1.1.7 对签名后的 APK 文件进行对齐处理
 
 如果发布的 APK 是正式版的话，就必须使用 zipalign 对 APK 进行对齐处理，对齐的主要过程是将 APK 包中所有的资源文件距离文件起始偏移为 4 字节整数倍，这样通过内存映射访问 apk 文件时的速度会更快（空间换时间）。该工具位于 android-sdk/tools 目录下。
 
@@ -905,7 +926,7 @@ class MethodConsumedTimeVisitor extends ClassVisitor {
                     mv.visitLdcInsn("ms")
                     mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false)
                     mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false)
-                    // 此时栈中最顶端的2个数值从底到顶为：
+                    // 此时栈中最顶端的 2 个数值从底到顶为：
                     // 1. MethodConsumedTime ; 2. 字符串：方法所处类 -> 方法描述：方法耗时。
                     // 再使用栈顶 2 个数值作为参数调用 Log.d()。
                     mv.visitMethodInsn(INVOKESTATIC, "android/util/Log", "d", "(Ljava/lang/String;Ljava/lang/String;)I", false)

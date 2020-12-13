@@ -130,8 +130,7 @@ public <T> T create(final Class<T> service) {
     if (validateEagerly) {
       eagerlyValidateMethods(service);
     }
-    // Java 动态代理，Proxy.newProxyInstance 会把 service 类中的所有方法都调用 InvocationHandler 接口中的 invoke() 方法，
-    // 在调用该类的任何方法，都会回调 invoke()。
+    // Java 动态代理，本质上是生成一个代理类，代理类对接口的实现中，都会插入 InvocationHandler 接口中的 invoke() 方法。
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
         new InvocationHandler() {
           private final Platform platform = Platform.get();
