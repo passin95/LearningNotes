@@ -10,4 +10,4 @@
 - [Git Commit Template](https://plugins.jetbrains.com/plugin/9861-git-commit-template) - Git commit 模板。
 - [Parcelable](https://github.com/mcharmas/android-parcelable-intellij-plugin) - Parcelable 生成插件。
 - [ASM Bytecode Viewer](https://plugins.jetbrains.com/plugin/10302-asm-bytecode-viewer/) - 查看 Java 文件对应的字节码文件或使用 ASM 生成该类时对应的代码。
-
+- [intellij-postfix-templates](https://github.com/xylo/intellij-postfix-templates) - 自定义后缀模板，支持多种语言，效果和 IDEA 对 Java 支持的 .fori 一样。

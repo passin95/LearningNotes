@@ -192,7 +192,7 @@ RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setVie
 
 ### 2.3.2 detachAndScrapAttachedViews()
 
-detachAndScrapXXX() 用于暂时分离子视图，并将其添加到 Recycler 缓存堆中。一般只用于 onLayoutChildren() 中。
+detachAndScrapXXX() 用于暂时分离子视图，并将其添加到 Recycler 缓存堆中，分离的本质是仅仅将 View 和 RecyclerView 互相之间的引用置空，视图还是显示在屏幕中的。一般只用于 onLayoutChildren() 中。
 
 ```java
 public void detachAndScrapView(View child, Recycler recycler) {
@@ -542,6 +542,12 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
 4. 调用 layoutDecorated() 或 layoutDecoratedWithMargins() 对子 View 进行布局；
 5. RecyclerView 滑动过程的回收复用。
 
+其它配置或功能支持：
+- 实现 generateDefaultLayoutParams() 以确定子视图的默认 LayoutParams。
+- 重写 canScrollHorizontally() 和 canScrollVertically() 方法选择支持哪个方向的滑动。
+- 重写 scrollToPosition() 和 smoothScrollToPosition() 方法支持滑动到指定位置。
+- 按需重写 onMeasure() 或 isAutoMeasureEnabled() 方法以确定测量方式。
+
 ## 2.5 回收复用的实现思路
 
 以竖直线性布局为例，简述回收复用的主要思路：
@@ -569,7 +575,7 @@ ViewHolder tryGetViewHolderForPositionByDeadline(int position,
 
 ## 2.6 技巧
 
-### 2.6.1 getChildDrawingOrder()
+### 2.6.1 改变子 View 的绘制顺序
 
 重写 getChildDrawingOrder() 可改变子 View 的绘制顺序。
 
