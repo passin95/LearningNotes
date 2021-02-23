@@ -1670,15 +1670,15 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
         tab[i] = newNode(hash, key, value, null);
     else {
         // 桶中已经存在元素。
+        
+        // 若 e != null 则表示在桶中找到 key 值、hash 值与插入元素的相等的节点。
         Node<K,V> e; K k;
         if (p.hash == hash &&
             ((k = p.key) == key || (key != null && key.equals(k))))
             // 桶中第一个元素的 key 值以及 key 的 hash 值与新元素相等。
-            // 用 e 暂存当前桶的第一个节点 p。
             e = p;
         else if (p instanceof TreeNode)
             // 第一个节点的 key 与新增的 key 不相等，且节点是 TreeNode（红黑树结构）。
-            // 插入一个新的 TreeNode 节点并赋值给 e。
             e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
         else {
             // 第一个节点的 key 与新增的 key 不相等，且节点是 Node（链表结构）。
@@ -1694,7 +1694,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                     // 跳出循环。
                     break;
                 }
-                // 当前节点的 key 值与插入的元素的 key 值是否相等。即遍历查找 key 相等的节点。
+                // 遍历查找是否存在 key 的节点，若存在跳出循环，重新赋值即可。
                 if (e.hash == hash &&
                     ((k = e.key) == key || (key != null && key.equals(k))))
                     // 相等，跳出循环。
@@ -1703,7 +1703,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                 p = e;
             }
         }
-        // 若 e != null 则表示在桶中找到 key 值、hash 值与插入元素的相等的节点。
+        
         if (e != null) { 
             // 记录 e 的 value。
             V oldValue = e.value;
@@ -1829,6 +1829,7 @@ final Node<K,V>[] resize() {
                         next = e.next;
                         // 新容量等于旧容量乘以 2，所以只需要比较节点 hash 值与新增的一位 bit 是 1 还是 0，
                         // 就可以知道节点所处桶的位置是否变化，因为 & 运算变化的仅仅是新增的一位 bit。
+                        // oladCap 值的二进制是 2 的倍数，为 10000000……。
                         if ((e.hash & oldCap) == 0) {
                             if (loTail == null)
                                 loHead = e;
@@ -1934,7 +1935,7 @@ public V put(K key, V value) {
 
 ### 2.2.2 ArrayMap
 
-ArrayMap 是 Android 专门针对内存优化而设计的，用于在千位数量级以下的数据条件下（时间换空间，但耗时差距极小），取代 HashMap 以节约内存。
+ArrayMap 是 Android 专门针对内存优化而设计的，用于在千位数量级以下的数据条件下（时间换空间，但耗时差距极小），取代 HashMap 以节约内存。
 
 #### 2.2.2.1 成员变量和构造函数
 
@@ -2020,7 +2021,7 @@ public final class ArrayMap<K, V> implements Map<K, V> {
 
 <div align ="center"> <img src ="../pictures//ArrayMap%20缓存结构.webp" /> </div><br>
 
-核心在于当前缓存 mArray 中的 a[0] 指向上一个缓存，a[1] 存的是与当前缓存一起的 mHashes 缓存。
+核心在于当前缓存 mArray 中的 a[0] 指向上一个缓存，a[1] 存的是与当前 mArray 缓存一起的 mHashes 缓存。
 
 ##### 2.2.2.2.1 allocArrays
 
@@ -2067,7 +2068,7 @@ private void allocArrays(final int size) {
         }
     }
 
-    // 若不从缓存拿，则直接实例化创建。
+    // 若从缓存拿不到，则直接实例化创建。
     mHashes = new int[size];
     mArray = new Object[size<<1];
 }
@@ -2077,7 +2078,7 @@ private void allocArrays(final int size) {
 
 ```java
 private static void freeArrays(final int[] hashes, final Object[] array, final int size) {
-    // 若要缓存的容器大小为 8。
+    // 若要缓存的容器大小为 8。
     if (hashes.length == (BASE_SIZE*2)) {
         synchronized (ArrayMap.class) {
             // 缓存链长最长为 10.
@@ -2097,7 +2098,7 @@ private static void freeArrays(final int[] hashes, final Object[] array, final i
             }
         }
     } else if (hashes.length == BASE_SIZE) {
-        // 若要缓存的容器大小为 4，其它逻辑与上面一致。
+        // 若要缓存的容器大小为 4，其它逻辑与上面一致。
         synchronized (ArrayMap.class) {
             if (mBaseCacheSize < CACHE_SIZE) {
                 array[0] = mBaseCache;
@@ -2625,9 +2626,8 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
             }
         }
     }
-    // 成功插入元素，元素个数加 1（是否要扩容也在这个方法里面）。
+    // 成功插入元素且之前不存在旧值，元素个数加 1（是否要扩容也在这个方法里面）。
     addCount(1L, binCount);
-    // 成功插入元素返回 null。
     return null;
 }
 ```
