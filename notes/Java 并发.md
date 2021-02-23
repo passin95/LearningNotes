@@ -122,8 +122,8 @@ Blocked 状态一般在以下几种情况发生：
 
 ## 1.3 并发和并行
 
-并发：单个 CPU 利用线程的概念交替执行不同线程中运行的代码；
-并行：多个 CPU 同时执行不同线程中运行的代码。
+- 并发：单个 CPU 利用线程的概念交替执行不同线程中运行的代码；
+- 并行：多个 CPU 同时执行不同线程中运行的代码。
 
 # 二、Thread
 
@@ -518,7 +518,7 @@ after
 
 Java 内存模型指定了 Java 虚拟机在计算机的软硬件上的工作方式，Java 内存模型是一个抽象的概念，但 JVM 应该遵守这些概念去设计：
 
-- 共享变量储存于主内存中，每个线程皆可访问。
+- 共享变量储存于主内存中，每个线程皆可访问，主内存为 JVM 中的「堆」和「方法区」。
 - 每个线程都有自己私有的工作内存，也称为线程本地内存。
 - 工作内存只储存该线程对共享变量的副本（非引用）。
 - 线程不能直接操作主内存，只有先操作了工作内存后（包含了选择不使用或 CPU Cache 失效）才能写入主内存。
@@ -1222,7 +1222,7 @@ public static class AbortPolicy implements RejectedExecutionHandler {
 public static class CallerRunsPolicy implements RejectedExecutionHandler {
 
     public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-        // 除非线程池已关闭，否则在调用 execute() 方法的线程中执行任务 r，即该 Runable 不再是异步于线程中执行。
+        // 除非线程池已关闭，否则在调用 execute() 方法的线程中执行任务 r，即该 Runnable 不再是异步于线程中执行。
         if (!e.isShutdown()) {
             r.run();
         }

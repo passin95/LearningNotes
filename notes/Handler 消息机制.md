@@ -44,7 +44,7 @@
 
 <img src="../pictures//Handler%20架构图.webp" width="700"/>
 
-- Message：本质上是开发所想执行的动作（Runable 接口）和携带的数据；
+- Message：可以理解为数据类，包含了 Runable 接口。
 - MessageQueue：向消息队列中加入消息(MessageQueue.enqueueMessage)和取走消息队列的消息(MessageQueue.next)；
 - Handler：向消息队列发送、移除事件的拓展支持(Handler.sendMessage)和处理相应消息(Handler.dispatchMessage)，从设计来看，Handler 用于拓展功能以及提供开发者 API，而 MessageQueue 只管消息相关的操作并隐藏实现细节；
 - Looper：不断循环执行(Looper.loop)，从 MessageQueue 中拿到新的消息并分发分发给目标处理者（Handler）。
@@ -434,7 +434,8 @@ Message next() {
             Message prevMsg = null;
             Message msg = mMessages;
             // 正常情况下，message 的 target 都不会为 null，若为 null，则说明开启了同步屏障（postSyncBarrier()）。
-            // 简单点说就是开启的情况下，只执行异步消息(msg.isAsynchronous() == true)，可以把该类消息理解成优先级高的消息，也因此常常用于视图的更新（ViewRootImp#scheduleTraversals()），以尽可能保证 UI 的流畅。
+            // 简单点说就是开启的情况下，只执行异步消息(msg.isAsynchronous() == true)，可以把该类消息理解成优先级高的消息，
+            // 也因此常常用于视图的更新（ViewRootImp#scheduleTraversals()），以尽可能保证 UI 的流畅。
             if (msg != null && msg.target == null) {
                 // 不断尝试寻找异步消息，直到找到或者最终 msg == null。
                 do {
@@ -474,7 +475,8 @@ Message next() {
             // 从概念上来看，mIdleHandlers 是在 Looper 空闲时执行的任务。
             // 从细节来看：
             // 1. 空闲的标准在于消息队列为空，或者是当前时间小于下一条消息的时间。
-            // 2. pendingIdleHandlerCount 字段只在第一次循环时为 -1，在下面的代码中会置为 0，也就是说，每取一次消息（messageQueue.next()），只会尝试一次去处理空闲任务。
+            // 2. pendingIdleHandlerCount 字段只在第一次循环时为 -1，在下面的代码中会置为 0，
+            // 也就是说，每取一次消息（messageQueue.next()），只会尝试一次去处理空闲任务。
             if (pendingIdleHandlerCount < 0
                     && (mMessages == null || now < mMessages.when)) {
                 pendingIdleHandlerCount = mIdleHandlers.size();
@@ -709,7 +711,7 @@ public final class Message implements Parcelable {
 
 #### 1.5.2 消息池
 
-池化技术的思想主要是为了减少每次获取资源的消耗，提高对资源的利用率，还能对资源的管理有一层很好的封装。而 Handler 机制作为 Android 进程内最重要的交互方式，都伴随着大量使用 Message 需求。
+池化技术的思想主要是为了减少每次获取资源的消耗，提高对资源的利用率，还能对资源的管理有一层很好的封装。而 Handler 机制作为 Android 进程内最重要的交互方式，伴随着大量使用 Message 的需求。
 
 ```java
 public final class Message {

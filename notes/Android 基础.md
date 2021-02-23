@@ -113,13 +113,13 @@ FragmentB onAttach -> FragmentB onCreate -> FragmentA onPause -> FragmentA onSto
 
 （3）通过 ViewPager 切换 Fragment。
 
-在 Fragment 没有被销毁的情况切换（需使用 FragmentPagerAdapter），只会回调 setUserVisVleHint(boolean isVisibleToUser) 方法。
+在 Fragment 没有被销毁的情况切换（需使用 FragmentPagerAdapter），只会回调 setUserVisibleHint(boolean isVisibleToUser) 方法。
 
 ## 1.3 onSaveInstanceState() 和 onRestoreInstanceState()
 
 当 Activity 被意外终止时或容易被销毁时，Activity 调用 onSaveInstanceState() 去保存数据，然后 Activity 委托 Window 去保存数据，接着 Window 再委托它上面的顶级容器去保存数据，一般是 DecordView。顶层容器再去一一通知它的子元素保存数据（写在 super 上面先于子元素保存，反之后于）。
 
-onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用, 注意是容易被销毁, 也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause() 之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
+onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用，注意是容易被销毁，也可能没有销毁就调用了。因此一定在 onDestroy() 之前，onPause() 之后（停止与用户交互以正确的保存信息），一般在 onStop() 之后。
 
 例如以下情况皆会调用：
 

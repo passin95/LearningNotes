@@ -125,7 +125,7 @@ public class ContextWrapper extends Context {
 
 ### 2.2 ContextThemeWrapper
 
-ContextThemeWrapper 定义了关于主题（界面显示）相关的功能，由于只有 Activity 显示界面，因此继承的是 ContextThemeWrapper。关于 Activity（包括 Service、） 的实例化、初始化以及设置主题的代码都在 Activity.performLaunchActivity() 方法中。
+ContextThemeWrapper 定义了关于主题（界面显示）相关的功能，由于只有 Activity 显示界面，因此继承的是 ContextThemeWrapper。关于 Activity（包括 Service） 的实例化、初始化以及设置主题的代码都在 ActivityThread.performLaunchActivity() 方法中。
 
 凡是跟 UI 有关的 Context，都应该用 Activity 作为 Context 来处理，否则要么会报错，要么会使用 Application 所设置的默认主题。
 
