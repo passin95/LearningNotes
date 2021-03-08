@@ -58,13 +58,13 @@ public static class MeasureSpec {
     // 限制上限，32 位二进制数值为 10000000000000000000000000000000
     public static final int AT_MOST     = 2 << MODE_SHIFT;
 
-    // 将 size 和 mode 打包成一个 32 位的 int 值，这样做可以就是为了减少内存的使用。
+    // 将 size 和 mode 打包成一个 32 位的 int 值，目的是进行内存优化。
     public static int makeMeasureSpec(int size, @MeasureSpecMode int mode) {
         // 使用旧的方式进行测量（targetSdkVersion<=17 时直接相加）。
         if (sUseBrokenMakeMeasureSpec) {
             return size + mode;
         } else {
-            // 按位与，取 2 位为 mode 后 30 位为 size。
+            // 按位与，前 2 位为 mode，后 30 位为 size。
             return (size & ~MODE_MASK) | (mode & MODE_MASK);
         }
     }
