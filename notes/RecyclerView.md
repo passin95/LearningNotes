@@ -1098,13 +1098,13 @@ super.draw(c) 执行在 View.draw(c) 中，从它的 [绘制内容和流程](./V
 
 # 四、RecyclerView 性能优化
 
-## 4.1 RecyclerView.setHasFixdSize()
+## 4.1 RecyclerView.setHasFixedSize()
 
-若 Adapter 的数据变化不会导致 RecyclerView 的大小变化，则将该方法设置为 true。它可以在 RecyclerView 内容发生变化时不需要调用 requestLayout()，直接对子 View 进行 测量和布局。
+若 Adapter 的数据变化不会导致 RecyclerView 大小的变化，则可将该方法设置为 true。它可以在 RecyclerView 单个 Item 发生变化时不需要调用 requestLayout()，直接对子 View 进行测量和布局。
 
 ## 4.2 RecyclerView.setRecycledViewPool()
 
-多个 RecyclerView 在 viewType 一样（布局文件也一致）的情况下可以共用同一个 RecycledViewPool，例如订单的不同状态使用了多个 RecyclerView。
+多个 RecyclerView 在 viewType 一样（布局文件也一致）的情况下可以共用同一个 RecycledViewPool，例如订单的不同状态使用了多个 RecyclerView，但需要注意的是如果监听事件需要在 onBindViewHolder 重新设置。
 
 ## 4.3 DiffUtil
 
