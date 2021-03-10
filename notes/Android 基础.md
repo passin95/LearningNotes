@@ -42,7 +42,7 @@
 （1）onCreate：
 Activity 正在被创建，一般做一些初始化的操作，如果在该方法调用 **finish()**，下一个生命周期方法会运行 **onDestroy()**。
 
- (2) onAttachFragment()：执行于 Fragment onAttach() 后，即与 Fragment 关联后。
+（2）onAttachFragment()：执行于 Fragment onAttach() 后，即与 Fragment 关联后。
 
 （3）onRestart：Activity 从 **不可见** 重新变为 **可见状态** 时调用。
 
@@ -217,7 +217,7 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 （4）singleInstance：单实例模式。
 
-- 该 Activity（它自身）独自在一个栈内，若不存在则创建一个新的任务栈，且 **所有栈** 都复用这一个 Activity，除非这个任务栈或 Activity 销毁了。
+- 该 Activity（它自身）独自在一个栈内，若不存在则创建一个新的任务栈。
 - 若外部应用调起该启动模式的 Activity，则当前栈会直接叠加到调起方的任务栈上方。
 
 注：以 startActivityForResult 启动目标 activity 时，会忽略目标 activity 的 lanchMode。

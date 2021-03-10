@@ -1026,7 +1026,7 @@ Exception 又分为 **运行时异常（RuntimeException）** 和 **非运行时
 Java 异常又可以分为不受检查异常（Unchecked Exception）和检查异常（Checked Exception）。
 
 - 不受检查异常：编译器不要求强制处理的异常。这些异常包括 RuntimeException（及其子类）以及 Error（及其子类）。
-- 检查异常：则是编译器要求必须处置的异常。当程序中可能出现这类异常，要么使用 try-catch 语句进行捕获，要么用 throws 抛出，否则无法编译通过。这些异常 Exception 及其子类（RuntimeException 及其子类除外）。
+- 检查异常：则是编译器要求必须处置的异常。当程序中可能出现这类异常，要么使用 try-catch 语句进行捕获，要么用 throws 抛出，否则无法编译通过。这些异常包括 Exception 及其子类（RuntimeException 及其子类除外）。
 
 注意：当 try 语句和 finally 语句中都有 return 语句时，在方法返回之前，finally 语句的内容将被执行，并且 finally 语句的返回值将会覆盖原始的返回值。
 

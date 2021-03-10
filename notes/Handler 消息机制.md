@@ -163,7 +163,7 @@ public static void loop() {
 
         final Printer logging = me.mLogging;
         if (logging != null) {
-            // 处理消息前的回调。
+            // 消息处理前的回调。
             // 在消息执行结束后同样有一个回调，因此可通过这 2 个回调去做 Looper 消息的耗时判断，例如主线程消息时差大于 5 秒则认为卡顿，BlockCanary 的原理也是基于此。
             logging.println(">>>>> Dispatching to " + msg.target + " " +
                     msg.callback + ": " + msg.what);
@@ -265,6 +265,7 @@ public class Handler {
         mCallback = callback;
         mAsynchronous = async;
     }
+}
 ```
 
 #### 1.3.2 消息分发和处理
@@ -707,6 +708,7 @@ public final class Message implements Parcelable {
     Handler target; // 该消息所归属的 Handler。
 
     Message next; // 消息队列的数据结构是链表。
+}
 ```
 
 #### 1.5.2 消息池
@@ -1080,7 +1082,7 @@ void NativeMessageQueue::wake() {
 ```cpp
 // system/core/libutils/Looper.cpp
 void Looper::wake() {
-    // 向 Looper 绑定的线程 mWakeEventFd 管道中写入一个新的数据，从而唤醒通过 epoll_wait 进入休眠的线程。
+    // 向文件描述符 mWakeEventFd 写入一个新的数据，从而唤醒通过 epoll_wait 进入休眠的线程。
     // 其中 TEMP_FAILURE_RETRY 是一个宏定义，当执行 write 失败后，会不断重复执行，直到执行成功为止。
     uint64_t inc = 1;
     ssize_t nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &inc, sizeof(uint64_t)));
