@@ -38,11 +38,55 @@
 
  <div align="center"> <img src="../pictures//APK%20打包流程图.webp" /> </div>
 
-### 1.1.1 打包资源文件
+ 而整个打包流程通过「Gradle」来调度，当我们执行打包命名时，Gradle 就会执行一系列约定好的 Task，按照编译打包的顺序，分别调用具体的工具，最终组织起了整个构建流程。
 
-使用 aapt（The Android Asset Packaing Tool）对 res 目录下的资源文件打包生成 **R.java** 文件（资源 id）以及 **resources.arsc** 文件（资源索引表，通过 id 映射到文件路径和文件名）。该工具位于 android-sdk/platform-tools 目录下。
+ 这里重点看一些和打包相关的 Task：
 
-#### 1.1.1.1 R.java 和资源 id
+ ```
+ // aidl 转换 aidl 文件为 java 文件
+> Task :app:compileDebugAidl
+
+// 生成 BuildConfig 文件
+> Task :app:generateDebugBuildConfig
+
+// 获取 gradle 中配置的资源文件
+> Task :app:generateDebugResValues
+
+// merge 资源文件
+> Task :app:mergeDebugResources
+
+// merge assets 文件
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+
+// merge 所有的 manifest 文件
+> Task :app:processDebugManifest
+
+// AAPT 生成 R 文件
+> Task :app:processDebugResources
+
+// 编译 kotlin 文件
+> Task :app:compileDebugKotlin
+
+// javac 编译 java 文件
+> Task :app:compileDebugJavaWithJavac
+
+// 打包 class 文件为 dex 文件
+> Task :app:dexBuilderDebug
+
+// 打包成 apk 并签名
+> Task :app:packageDebug
+ ```
+
+ ### 1.1.1 处理 aidl files
+
+AIDL 用于方便实现进程间通信。如果有 .aidl 文件，会通过 AIDL（Android Interface Definition Language）工具打包成 java 接口类，如果在没有使用到 .aidl 文件，则可以跳过这一步。该工具位于 android-sdk/platform-tools 目录下。
+
+### 1.1.2 打包资源文件
+
+使用 aapt（Android Asset Packaing Tool）对 res 目录下的资源文件打包生成 **R.java** 文件（资源 id）以及 **resources.arsc** 文件（资源索引表，通过 id 映射到文件路径和文件名）。该工具位于 android-sdk/platform-tools 目录下。
+
+#### 1.1.2.1 R.java 和资源 id
 
 一个资源 id 是如何决定的呢？以 0x7f010000 为例：
 
@@ -52,13 +96,9 @@
 
 主模块中的 R.xxx.xxx 可以作为常量直接内联进代码中，而其它模块则是一个变量，这是因为在最终打包成 apk 时候，才能确定非主模块的每个资源 id（资源 id 需要唯一），所以其它模块生成的资源 id 不能是 final 的。
 
-#### 1.1.1.2 资源的合并
+#### 1.1.2.2 资源的合并
 
 主模块、其它模块、aar 包都可能存在资源，如果出现相同的资源，系统会进行合并，低优先级的资源会被覆盖掉。覆盖的优先级如下：build variant > build type > product flavor > main source set > library dependences（主模块先依赖的优先级更高）。
-
-### 1.1.2 处理 aidl files
-
-AIDL 用于方便实现进程间通信。如果有 .aidl 文件，会通过 AIDL（Android Interface Definition Language）工具打包成 java 接口类，如果在没有使用到 .aidl 文件，则可以跳过这一步。该工具位于 android-sdk/platform-tools 目录下。
 
 ### 1.1.3 编译项目源代码，生成 .class 文件
 
@@ -68,13 +108,17 @@ ASM 在就是应用于第（3）步和第（4）步之间。
 
 ### 1.1.4 生成 classes.dex 文件
 
-将源码生成的.class 文件和第三方 jar 包通过 dx 工具打包成 dex 文件。
+将源码生成的.class 文件和第三方 jar 包通过 dx/r8/d8 工具打包成 dex 文件。
 
-源码生成的 .class 文件虽然已经可以在 JVM 环境中运行，但是如果要在 Android 运行时环境中执行还需要特殊的处理，那就是 dx 处理，它会将文件进行翻译、重构、解释、压缩等操作，该工具位于 android-sdk/platform-tools 目录下。
+dx 是最早的转换工具，Android Studio 3.1 之后，引入了 D8 编译器和 R8 工具。
+
+其中 D8 用来代替 dx 的，它的优势在于：编译更快、更小的 dex 文件、更好的性能；而 R8 工具是用来替代 ProGuard 的，用于代码的压缩和混淆。
+
+源码生成的 .class 文件虽然已经可以在 JVM 环境中运行，但是如果要在 Android 运行时环境（Dalvik（ART））中执行还需要特殊的处理，那就是 dx 处理，它会将文件进行翻译、重构、解释、压缩等操作。该工具位于 android-sdk/platform-tools 目录下。
 
 ### 1.1.5 打包生成 APK 文件
 
-所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）和 .dex 文件都会通过 apkbuilder 工具打包到一个完成的.apk 文件中。该工具位于 android-sdk/tools 目录下。
+所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）、.dex 文件、manifest 文件都会通过 apkbuilder(旧)/zipflinger(Android 3.6 后) 工具打包到一个完成的.apk 文件中。该工具位于 android-sdk/tools 目录下。
 
 ### 1.1.6 对 APK 文件签名
 
