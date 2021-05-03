@@ -794,7 +794,7 @@ select、poll、epoll 就是 IO 多路复用三种实现方式。
 #### 2.1.2 API
 
 ```java
-// 创建 eventpoll 对象，并将 eventpoll 对象放到 epfd 对应的 file->private_data 上，返回一个 epfd，即 eventpoll 句柄。
+// 创建 eventpoll 对象，并将 eventpoll 对象放到 epfd 对应的 file->private_data 上，返回一个 epfd，即 eventpoll 文件描述符。
 int epoll_create(int size);
 
 /**
@@ -815,7 +815,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 
 /**
  * 等待 epfd 监听的 fd 所产生对应的事件。
- * @param epfd 表示 epoll 句柄。
+ * @param epfd 表示 epoll 文件描述符。
  * @param events 表示回传处理事件的数组。
  * @param maxevents 表示每次能处理的最大事件数
  * @param timeout 等待 IO 的超时时间，等于 0 表示不阻塞，-1 表示一直阻塞直到 IO 被唤醒，大于 0 表示阻塞指定的时间后自动被唤醒。
