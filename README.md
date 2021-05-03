@@ -76,7 +76,7 @@
 
 - [网络](./notes/网络.md)
 
-  计算器网络结构基础、HTTP、HTTPS、HTTP 的实际应用。
+  计算器网络结构、HTTP、HTTPS、TCP。
 
 - [编码和解码](./notes/编码和解码.md)
 
