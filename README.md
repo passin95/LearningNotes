@@ -1,7 +1,7 @@
   
 | Ⅰ | Ⅱ | Ⅲ | Ⅳ | Ⅴ | Ⅵ | Ⅶ | Ⅷ | Ⅸ |
 | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: | :---------: |
-| Java[:coffee:](#coffee-java) | Android[:computer:](#computer-android) | 网络[:cloud:](#cloud-网络) | 软件设计[:bulb:](#bulb-软件设计) | 算法[:pencil2:](#pencil2-算法) | 归纳与总结[:couple:](#couple-归纳与总结) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio)| 后记[:memo:](#memo-后记) |
+| Java[:coffee:](#coffee-java) | Android[:iphone:](#iphone-android) | 网络[:cloud:](#cloud-网络) | 操作系统[:computer:](#computer-操作系统) | 软件设计[:bulb:](#bulb-软件设计) | 算法[:pencil2:](#pencil2-算法) | 归纳与总结[:couple:](#couple-归纳与总结) | 工具[:hammer:](#hammer-工具) | Android Studio[:speak_no_evil:](#speak_no_evil-android-studio)|
     
 
 <br>
@@ -14,15 +14,15 @@
 
 - [Java 基础](./notes/Java%20基础.md)
 
-  Java 关键字、特性以及 Object 类等。
+  Java 关键字、Java 特性以及 Object 类等。
 
 - [Java 容器](./notes/Java%20容器.md)
 
-  Java 常用容器小结以及源码分析。
+  Java、Android 常用容器小结以及源码分析。
 
 - [Java 并发](./notes/Java%20并发.md)
 
-  线程、Java 内存模型、线程安全、线程锁、线程池。
+  线程、Java 内存模型、线程安全和锁、线程池。
 
 - [Java 虚拟机](./notes/Java%20虚拟机.md)
 
@@ -32,7 +32,7 @@
 
   Java IO、Okio。
 
-### :computer: Android 
+### :iphone: Android 
 
 - [Android 基础](./notes/Android%20基础.md)
 
@@ -81,6 +81,12 @@
 - [编码和解码](./notes/编码和解码.md)
 
   Base64、序列化、Hash。
+
+### :computer: 操作系统
+
+- [操作系统](./notes/操作系统.md)
+
+  硬件结构、操作系统结构、内存管理、进程与线程、文件系统、设备管理、网络系统。
 
 ### :bulb: 软件设计
 
