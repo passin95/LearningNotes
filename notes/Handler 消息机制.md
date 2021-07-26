@@ -44,7 +44,7 @@
 
 <img src="../pictures//Handler%20架构图.webp" width="700"/>
 
-- Message：可以理解为数据类，包含了 Runable 接口。
+- Message：可以理解为数据类，包含了 Runnable 接口；
 - MessageQueue：向消息队列中加入消息(MessageQueue.enqueueMessage)和取走消息队列的消息(MessageQueue.next)；
 - Handler：向消息队列发送、移除事件的拓展支持(Handler.sendMessage)和处理相应消息(Handler.dispatchMessage)，从设计来看，Handler 用于拓展功能以及提供开发者 API，而 MessageQueue 只管消息相关的操作并隐藏实现细节；
 - Looper：不断循环执行(Looper.loop)，从 MessageQueue 中拿到新的消息并分发分发给目标处理者（Handler）。
@@ -53,7 +53,7 @@
 
 Looper 的作用：不断循环(Looper.loop)，从 MessageQueue 中拿到新的消息并分发分发给目标处理者（Handler）。
 
-本文以 Android 进程主线程为例看 Handler 机制：
+以主线程的 Looper 为例看 Handler 机制：
 
 ```java
 public class ActivityThread {
@@ -81,7 +81,7 @@ public class ActivityThread {
 
 Looper.prepare() 主要做的事情其实就 2 件：
 
-- 实例化当前线程所对应的 Looper，并将其存储到线程中（Thread 对象的 ThreadLocalMap 变量）。
+- 实例化当前线程所对应的 Looper，并将其存储到线程中（Thread 对象的 ThreadLocalMap 变量）；
 - 实例化 MessageQueue。
 
 ```java
@@ -478,6 +478,7 @@ Message next() {
             // 1. 空闲的标准在于消息队列为空，或者是当前时间小于下一条消息的时间。
             // 2. pendingIdleHandlerCount 字段只在第一次循环时为 -1，在下面的代码中会置为 0，
             // 也就是说，每取一次消息（messageQueue.next()），只会尝试一次去处理空闲任务。
+            // 3. 当开启同步屏障时，当前时间肯定大于同步屏障的消息（mMessages），因此开启同步屏障时，IdleHandler 不会执行。
             if (pendingIdleHandlerCount < 0
                     && (mMessages == null || now < mMessages.when)) {
                 pendingIdleHandlerCount = mIdleHandlers.size();

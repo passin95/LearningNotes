@@ -88,13 +88,13 @@ Activity 正在被创建，一般做一些初始化的操作，如果在该方�
 
 若 Fragment 在 Activity super.onCreate() 后调用 commitNow() add Fragment，则 Activity onCreate() 到 onContentChanged() 之间的 Fragment 生命周期执行顺序向后顺延，不同在于 onViewCreated 执行在 Activity super.onStart() 期间。
 
-同样的场景，若调用 commit()，则被 Hanlder post 出去，直至 Activity super.onStart()，期间顺延执行所有 Fragment onStart() 之前的生命周期。
+同样的场景，若调用 commit()，则被 Handler post 出去，直至 Activity super.onStart()，期间顺延执行所有 Fragment onStart() 之前的生命周期。
 
 其它时候的调用，同理按照 Fragment action 执行的时机去变化相应 Fragment 的生命周期执行时机。
 
-- isAdded：Fragment 被添加到 Activity 中时，返回 true。
-- isDetached：Fragment 从 UI 中分离，返回 true。（注：此字段只在 commit FragmentTransaction.detach 中被置为 true）。
-- isRemoving：Fragment 从 Activity 中移除，返回 true，（注：此字段只在 commit FragmentTransaction.remove 中被置为 true，源码逻辑和 detach 几乎一模一样）。
+- isAdded：Fragment 被添加到 Activity 中时，返回 true；
+- isDetached：Fragment 从 UI 中分离，返回 true。（注：此字段只在 commit FragmentTransaction.detach 中被置为 true）；
+- isRemoving：Fragment 从 Activity 中移除，返回 true，（注：此字段只在 commit FragmentTransaction.remove 中被置为 true，源码逻辑和 detach 几乎一模一样）；
 - isHidden（onHiddenChanged）：只在 FragmentTransaction.show（hide）修改或回调。
 
 ### 1.2.1 Fragment 之间切换
@@ -123,10 +123,10 @@ onSaveInstanceState() 的调用时机：Activity 容易被销毁的时候调用�
 
 例如以下情况皆会调用：
 
-- 按下 Home 键 : Activity 进入了后台, 此时会调用该方法;
-- 按下电源键 : 屏幕关闭, Activity 进入后台;
-- 启动其它 Activity : Activity 被压入了任务栈的栈底;
-- 横竖屏切换 : 会销毁当前 Activity 并重新创建。
+- 按下 Home 键: Activity 进入了后台, 此时会调用该方法；
+- 按下电源键: 屏幕关闭, Activity 进入后台；
+- 启动其它 Activity: Activity 被压入了任务栈的栈底；
+- 横竖屏切换: 会销毁当前 Activity 并重新创建。
 
 ## 1.4 其余情况补充
 
@@ -144,11 +144,11 @@ onPause -> onStop-> onSaveInstanceState -> onDestroy -> onCreate -> onStart -> o
 
 onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> onRestart -> onStart -> onRestoreInstanceState -> onActivityResult（B）-> onResume
 
-1. 使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理。
-2. 若 Intent 添加 FLAG_ACTIVITY_NEW_TASK ，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity。
-3. 其它正常使用的情况皆为 onActivityResult（B），注意若 Activity 是重建后的 Activity，那么会先初始化 Activity ，再执行 onRestoreInstanceState，再执行 onActivityResult（B），此时应该针对实际业务需求，在 onActivityResult 中进行判断，最后的做法一般有 2 种选择：1.完全恢复正确的数据和 UI；2.不恢复，即不保存销毁前的数据，并在 onActivityResult 中不处理回调的结果，完全保留刚进该界面时的数据和样式。
+1. 使用 startActivityForResult 开启目标 Activity 时，将忽略目标 Activity 设置的启动模式，统一以 standard 处理；
+2. 若 Intent 添加 FLAG_ACTIVITY_NEW_TASK，则 startActivityForResult 后会立即回调 onActivityResult（对应 onActivityResult（A）），并以目标 Activity 的启动模式启动目标 Activity；
+3. 其它正常使用的情况皆为 onActivityResult（B），注意若 Activity 是重建后的 Activity，那么会先初始化 Activity，再执行 onRestoreInstanceState，再执行 onActivityResult（B），此时应该针对实际业务需求，在 onActivityResult 中进行判断，最后的做法一般有 2 种选择：1.完全恢复正确的数据和 UI；2.不恢复，即不保存销毁前的数据，并在 onActivityResult 中不处理回调的结果，完全保留刚进该界面时的数据和样式。
 
-（5） Activity A 跳转到 Activity B（不透明）的生命周期为：onPause（A）-> onCreate(B) -> onStart(B) -> onResume(B) -> onStop(A) ，在 onPause(A) post 出去的 Message 先于 onResume(B) 执行。
+（5） Activity A 跳转到 Activity B（不透明）的生命周期为：onPause(A) -> onCreate(B) -> onStart(B) -> onResume(B) -> onStop(A)，在 onPause(A) post 出去的 Message 先于 onResume(B) 执行。
 
 ## 1.5 Application 的生命周期
 
@@ -164,12 +164,12 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 
 这里重点记录一下 onTrimMemory(int level) 中的 level 含义。
 
-- TRIM_MEMORY_COMPLETE：该进程正处于后台进程 LRU 列表中最容易被杀掉的位置, 你应该释放任何不影响你的 App 运行的资源。
-- TRIM_MEMORY_MODERATE：该进程位于接近 LRU 列表的中部位置，释放内存可以帮助进程存活更久，并获得更好的整体性能。
-- TRIM_MEMORY_BACKGROUND：该过程已进入 LRU 列表的上端。可以释放容易恢复的资源，如果用户返回应用程序，可以高效快速地重建这些资源。
-- TRIM_MEMORY_UI_HIDDEN：该进程的 UI 已经不可见了。即用户点击了 Home 键或者 Back 键导致应用的 UI 界面不可见．这时候可以释放一些资源。
-- TRIM_MEMORY_RUNNING_CRITICAL：该进程本不是一个将被杀死的后台进程，但设备的内存运行极低,无法保持任何后台进程运行。您的运行进程应该释放尽可能多的非关键资源，以便允许在其他地方使用该内存。
-- TRIM_MEMORY_RUNNING_LOW：设备内存不足。您的运行进程应释放不需要的资源，以便在其他地方使用内存。
+- TRIM_MEMORY_COMPLETE：该进程正处于后台进程 LRU 列表中最容易被杀掉的位置, 你应该释放任何不影响你的 App 运行的资源；
+- TRIM_MEMORY_MODERATE：该进程位于接近 LRU 列表的中部位置，释放内存可以帮助进程存活更久，并获得更好的整体性能；
+- TRIM_MEMORY_BACKGROUND：该过程已进入 LRU 列表的上端。可以释放容易恢复的资源，如果用户返回应用程序，可以高效快速地重建这些资源；
+- TRIM_MEMORY_UI_HIDDEN：该进程的 UI 已经不可见了。即用户点击了 Home 键或者 Back 键导致应用的 UI 界面不可见．这时候可以释放一些资源；
+- TRIM_MEMORY_RUNNING_CRITICAL：该进程本不是一个将被杀死的后台进程，但设备的内存运行极低,无法保持任何后台进程运行。您的运行进程应该释放尽可能多的非关键资源，以便允许在其他地方使用该内存；
+- TRIM_MEMORY_RUNNING_LOW：设备内存不足。您的运行进程应释放不需要的资源，以便在其他地方使用内存；
 - TRIM_MEMORY_RUNNING_MODERATE：该设备的内存开始紧缺。您的正在运行的进程可能希望释放一些不需要的资源以便在其他地方使用。
 
 # 二、Activity 标签属性
@@ -228,8 +228,8 @@ onCreate（onConfigurationChanged）-> onActivityResult（A）-> onNewIntent -> 
 - FLAG_ACTIVITY_NEW_TASK：目标 Activity 放入一个新的任务栈。启动模式 singleTask 自带该 FLAG 的效果，反之不然。添加该 FLAG 在不同 taskAffinity 的 Activity 跳转时（没有设置启动模式），若目标 Activity 已在栈内存在，不会创建新实例，但也不会执行 onNewIntent()，而在同属一个 taskAffinity 的 Activity 跳转时（没有设置启动模式），则该 FLAG 没有效果。
 - FLAG_ACTIVITY_CLEAR_TASK：启动 Activity 时，将目标 Activity 所属的的任务栈清空，再启动新的任务栈，并将该 Activity 放入新的任务栈。该 FLAG 需跟 FLAG_ACTIVITY_NEW_TASK 配合使用。
 - FLAG_ACTIVITY_CLEAR_TOP：若目标 Activity 在栈内没有实例，则按照它的启动模式启动；若目标 Activity 在栈内有实例，则分以下三种清空：
-  1. 目标 Activity 的启动模式为 standard，则该 Activity 连同它之上的 Activity 都出栈。
-  2. singleTop 和 singleTask 则按照 singleTask 的逻辑处理。
+  1. 目标 Activity 的启动模式为 standard，则该 Activity 连同它之上的 Activity 都出栈；
+  2. singleTop 和 singleTask 则按照 singleTask 的逻辑处理；
   3. singleInstance 按照 singleInstance 的逻辑处理。
 - FLAG_ACTIVITY_SINGLE_TOP：和启动模式 singleTop 效果一致。
 
@@ -262,6 +262,7 @@ category 是一个字符串，一个 Intent 或过滤规则中可以添加多个
 若要为 Intent 指定完整的 data，必须调用 **setDataAndType()**，单独调用 **setData()** 或 **setType()** 会将对方互相置 null。 
 
 data 标签的结构如下：
+
 ```xml
 <data
     android:scheme="string" 
@@ -282,9 +283,9 @@ URI 也叫统一资源标识符，它在 data 的结构如下：
 <scheme>://<host>:<port>/[<path>|<pathPrefix|<pathPattrin>]
 ```
 
-- scheme：URI 的模式，例如 http、file、content 等;
-- host：URI 的主机域名或 IP 地址;
-- port：端口号;
+- scheme：URI 的模式，例如 http、file、content 等；
+- host：URI 的主机域名或 IP 地址；
+- port：端口号；
 - path：完整的路径信息；
 - pathPattern：完整的路径信息，不过可包含通配符 “*”，它可以表示 0 个或多个任意字符，若想表示真实的字符串需在字符前加 “\\”；
 - pathPrefix：路径的前缀信息。

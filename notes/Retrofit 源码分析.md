@@ -132,7 +132,7 @@ public <T> T create(final Class<T> service) {
     }
     // Java 动态代理，本质上是生成一个代理类，通过反射创建一个代理类的实例。
     // 代理类对接口的实现中，都会插入 InvocationHandler 接口中的 invoke() 方法。
-    // 代理类字节码的生成： Java 是用过 ProxyGenerator#generateProxyClass 运行时生成（按照 Class 文件结构进行动态拼接文本后转成 byte 数组） 生成的；
+    // 代理类字节码的生成： Java 是用过 ProxyGenerator#generateProxyClass 运行时生成（按照 Class 文件结构进行动态拼接文本后转成 byte 数组）生成的；
     // Android 通过 native 方法直接生成 class 代理对象。
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
         new InvocationHandler() {
