@@ -1491,7 +1491,7 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     static final int MAXIMUM_CAPACITY = 1 << 30; 
     // 默认的填充因子。
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    // 当桶 (bucket) 上的结点数大于这个值时为转成红黑树的条件之一。
+    // 当桶 (bucket) 上的结点数大于等于这个值时为转成红黑树的条件之一。
     static final int TREEIFY_THRESHOLD = 8; 
     // 当桶 (bucket) 上的结点数小于等于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
@@ -1536,7 +1536,8 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
         if (loadFactor <= 0 || Float.isNaN(loadFactor))
             throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
         this.loadFactor = loadFactor;
-        this.threshold = tableSizeFor(initialCapacity);
+        // 返回给定目标容量的两个大小的幂。
+        this.threshold  = tableSizeFor(initialCapacity);
     }
 
     /**
@@ -1584,7 +1585,9 @@ loadFactor 太大导致查找元素效率低，太小导致数组的利用率低
 
 #### 2.2.1.2 存储结构
 
-JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于 TREEIFY_THRESHOLD(8) 且 table 容量大于等于 MIN_TREEIFY_CAPACITY(64) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
+JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。
+
+JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 且 table 容量大于等于 MIN_TREEIFY_CAPACITY(64) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
 
 ```java
 // 链表结构
