@@ -31,7 +31,7 @@ ViewGroup content = findViewById(android.R.id.content); // 内容部分
 View childAt = content.getChildAt(0); // 设置的布局
 ```
 
-视图展示的程序人口，由 performTraversals() 开始，在方法中依次调用 performMeasure()、performLayout()、performDraw()，即执行测量流程、执行布局流程、执行绘制流程，完成页面的整个绘制流程，将装饰视图中的内容呈现于手机屏幕之上。
+视图展示的程序入口，由 performTraversals() 开始，在方法中依次调用 performMeasure()、performLayout()、performDraw()，即执行测量流程、执行布局流程、执行绘制流程，完成页面的整个绘制流程，将装饰视图中的内容呈现于手机屏幕之上。
 
 测量和布局流程如下图所示：
 
@@ -86,11 +86,13 @@ public static class MeasureSpec {
 
 测量模式有三种类型：
 
-- UNSPECIFIED：不限制
-- EXACTLY：限制固定值
-- AT_MOST：限制上限
+- UNSPECIFIED：不限制；
+- EXACTLY：限制固定值；
+- AT_MOST：限制上限。
 
-一般情况下，视图的测量尺寸需要根据父布局的 MeasureSpec 属性（父 View 的限制）和自身布局参数（开发者的要求）共同决定。其中，较为特殊的装饰视图属于根视图，没有父视图，则由窗口（Window）尺寸与自身布局决定。
+一般情况下，视图的测量尺寸需要根据父布局的 MeasureSpec 属性（父 View 的限制）和自身布局参数（开发者的要求）共同决定。
+
+其中，较为特殊的装饰视图属于根视图，没有父视图，则由窗口（Window）尺寸与自身布局参数决定。
 
 ## 2.3 View.onMeasure()
 
@@ -166,8 +168,8 @@ public void layout(int l, int t, int r, int b) {
 
 布局过程的自定义一般情况下分为 3 类：
 
-- 重写 onMeasure() 来修改已有的 View 的尺寸。
-- 重写 onMeasure() 来全新计算自定义 View 的尺寸。
+- 重写 onMeasure() 来修改已有的 View 的尺寸；
+- 重写 onMeasure() 来全新计算自定义 View 的尺寸；
 - 重写 onMeasure() 和 onLayout() 来全新计算自定义 ViewGroup 的内部布局。
 
 ## 4.1 SDK 中常用的计算方法
@@ -398,7 +400,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
 
 关于保存子 View 位置的两点说明：
 
-1. 不是所有 ViewGroup 都需要保存子 View 的位置，因为有的 ViewGroup 可以在布局阶段实时推导出子 View 的位置，例如 LinearLayout。
+1. 不是所有 ViewGroup 都需要保存子 View 的位置，因为有的 ViewGroup 可以在布局阶段实时推导出子 View 的位置，例如 LinearLayout；
 2. 有时候对某些子 View 需要重复测量多次才能得到正确的尺寸和位置。
 
 以下举一个重写自定义 ViewGroup onMeasure() 的例子，在重写的过程中可以用 SDK 提供的计算方法（1.3.1 节），也可以自己自定义计算方式。

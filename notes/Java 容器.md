@@ -2743,10 +2743,12 @@ final V replaceNode(Object key, V value, Object cv) {
 
 ```java
 public V get(Object key) {
+    // 对于并发容器来说只要保证拿数据的过程，没有异常和崩溃即可。
     Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
     // 计算 hash 值。
     int h = spread(key.hashCode());
     // 如果 key 所在的桶存在且里面有元素。
+    // 关键点：e 会作为局部变量存下找到的数据，用 CAS 保证找的过程不会出现并发安全问题。
     if ((tab = table) != null && (n = tab.length) > 0 &&
             (e = tabAt(tab, (n - 1) & h)) != null) {
         // 如果第一个元素就是要找的元素，直接返回。
@@ -2767,5 +2769,9 @@ public V get(Object key) {
         }
     }
     return null;
+}
+
+static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
+    return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
 }
 ```

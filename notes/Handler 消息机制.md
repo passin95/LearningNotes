@@ -36,7 +36,7 @@
 
 # Handler 消息机制
 
-在说 Handler 之前，先说一个本质概念：我们所有跑的代码都是在线程中执行的，并且一旦线程中的代码执行完毕，也就代表线程即将死亡，而各种系统是如何设计，能够让主线程一直运行呢（进程未退出的情况下）？答案就是死循环，而 Handler 机制就是围绕这个死循环做文章。
+在说 Handler 之前，先说一个本质概念：我们所有跑的代码都是在线程中执行的，并且一旦线程中的代码执行完毕，也就代表线程即将死亡，而各种系统是如何设计能够让主线程一直运行呢（进程未退出的情况下）？答案就是死循环，而 Handler 机制就是围绕这个死循环做文章。
 
 ## 一、Java 篇
 
@@ -46,7 +46,7 @@
 
 - Message：可以理解为数据类，包含了 Runnable 接口；
 - MessageQueue：向消息队列中加入消息(MessageQueue.enqueueMessage)和取走消息队列的消息(MessageQueue.next)；
-- Handler：向消息队列发送、移除事件的拓展支持(Handler.sendMessage)和处理相应消息(Handler.dispatchMessage)，从设计来看，Handler 用于拓展功能以及提供开发者 API，而 MessageQueue 只管消息相关的操作并隐藏实现细节；
+- Handler：向消息队列发送、移除事件的拓展支持(Handler.sendMessage)和处理相应消息(Handler.dispatchMessage)，从设计来看，Handler 用于拓展功能以及提供开发者 API，而 MessageQueue 负责消息相关的操作并隐藏实现细节；
 - Looper：不断循环执行(Looper.loop)，从 MessageQueue 中拿到新的消息并分发分发给目标处理者（Handler）。
 
 ### 1.2 Looper

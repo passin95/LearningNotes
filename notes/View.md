@@ -4,7 +4,7 @@
 
 - [View 的工作流程](./View%20的工作流程.md)
 
-  View 的工作流程、View 的绘制流程、onMesure()、onLayout()、自定义布局。
+  View 的工作流程、View 的绘制流程、onMeasure()、onLayout()、自定义布局。
 
 - [Paint](./Paint.md)
 

@@ -27,22 +27,22 @@ DSL 的全称是 Domain Specific Language，领域特定语言，即只能用于
 对于 Android 开发者来说，Gradle 的架构可以分为三层：
 
 - 最下层是底层 Gradle 框架，它主要提供一些基础服务，如 Task 的依赖以及有向无环图的构建等；
-- 再上面则是 Google 编译工具团队的 Android Gradle Plugin（即 com.android.tools.build:gradle:+），它在 Gradle 框架的基础上，创建了很多与 Android 项目打包有关的 Task、artifacts。
+- 再上面则是 Google 编译工具团队的 Android Gradle Plugin（即 com.android.tools.build:gradle:+），它在 Gradle 框架的基础上，创建了很多与 Android 项目打包有关的 Task、artifacts；
 - 最上面则是开发者自定义的 Plugin，一般是在 Android Gradle plugin 提供的 Task 的基础上，插入一些自定义的 Task，或者是使用 Transform 在编译期进行字节码修改。
 
 # 二、Gradle 的工作流程
 
 Gradle 的工作流程可以分为 3 个阶段：
 
-- 初始化阶段：setting.gradle 执行，确定主 project 和子 project。 
-- 配置阶段：执行所有在 setting.gradle 中配置的 project 下的 build.gradle（一般会包含很多 plugin），根据每一个的 Task 的依赖关系构建出一个有向无环图。
+- 初始化阶段：setting.gradle 执行，确定主 project 和子 project；
+- 配置阶段：执行所有在 setting.gradle 中配置的 project 下的 build.gradle（一般会包含很多 plugin），根据每一个的 Task 的依赖关系构建出一个有向无环图；
 - 执行阶段：根据确定的有向无环图，按顺序执行 Task（被依赖的 Task 会先于依赖它的 Task 执行，且每一个 Task 只会执行一次）。
 
 <div align="center">  <img src="../pictures//Gradle%20执行时序.webp"/> </div>
 
 因此:
 
-- 若要在初始化阶段和配置阶段间插入执行代码，可写在 setting.gradle 文件的 **include()** 之后。
+- 若要在初始化阶段和配置阶段间插入执行代码，可写在 setting.gradle 文件的 **include()** 之后；
 - 若要在配置阶段和执行阶段间插入执行代码，则写在 Project.afterEvaluate() 方法的闭包回调中。
 
 # 三、Task

@@ -86,9 +86,9 @@ Paint.setShader(Shader shader)
 
 Shader.TileMode 为端点范围之外的着色规则。
 
-- Shader.TileMode.CLAMP -  夹子模式（直译），端点之外延续端点处的颜色。
-- Shader.TileMode.MIRROR - 镜像模式，以任何一个渐变中间或端点为基准都是堆成的。
-- Shader.TileMode.REPEAT - 重复模式
+- Shader.TileMode.CLAMP -  夹子模式（直译），端点之外延续端点处的颜色；
+- Shader.TileMode.MIRROR - 镜像模式，以任何一个渐变中间或端点为基准都是堆成的；
+- Shader.TileMode.REPEAT - 重复模式。
 
 ### 2.2.2 线性渐变 LinearGradient
 
@@ -297,7 +297,9 @@ Paint.setStrokeWidth(float width)
 
 默认情况下，线条宽度为 0，但依然能够画出线，线条的宽度为 1 像素。那么它和线条宽度为 1 有什么区别呢？
 
-其实这个和「几何变换」有关：你可以为 Canvas 设置 Matrix 来实现几何变换（如放大、缩小、平移、旋转），在几何变换之后 Canvas 绘制的内容就会发生相应变化，包括线条也会加粗，例如 2 像素宽度的线条在 Canvas 放大 2 倍后会被以 4 像素宽度来绘制。而当线条宽度被设置为 0 时，它的宽度就被固定为 1 像素，就算 Canvas 通过几何变换被放大，它也依然会被以 1 像素宽度来绘制。Google 在文档中把线条宽度为 0 时称作「hairline mode（发际线模式）」。
+其实这个和「几何变换」有关：你可以为 Canvas 设置 Matrix 来实现几何变换（如放大、缩小、平移、旋转），在几何变换之后 Canvas 绘制的内容就会发生相应变化，包括线条也会加粗，例如 2 像素宽度的线条在 Canvas 放大 2 倍后会被以 4 像素宽度来绘制。
+
+而当线条宽度被设置为 0 时，它的宽度就被固定为 1 像素，就算 Canvas 通过几何变换被放大，它也依然会被以 1 像素宽度来绘制。Google 在文档中把线条宽度为 0 时称作「hairline mode（发际线模式）」。
 
 ## 3.2 线条端点形状 StrokeCap
 

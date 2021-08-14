@@ -169,7 +169,7 @@ RecyclerView 一共有 5 种视图缓存池，按缓存优先级从先到后先�
 
 **（1）mAttachedScrap 和 mChangedScrap**
 
-mAttachedScrap 和 mChangedScrap 不参与滑动过程中的回收复用，主要在布局时（onLayoutChildren()）进行回收复用，缓存的是从 RecyclerView 分离出来的 View，但是又即将添加上去的 ViewHolder。在多次 layout 的情况下，ViewHolder 的位置和数据都是不变的，一般情况下可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
+mAttachedScrap 和 mChangedScrap 存放的是暂时从 RecyclerView 分离的 View（detachAndScrapAttachedViews），但是又即将添加上去的 ViewHolder。例如在 onLayoutChildren() 方法中，多次 layout 的情况下，ViewHolder 的位置和数据都是不变的，一般情况下可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
 
 mAttachedScrap 和 mChangedScrap 的主要区别如下：
 
@@ -178,7 +178,7 @@ mAttachedScrap 和 mChangedScrap 的主要区别如下：
 
 **（2）mCachedView**
 
-保存最新被移除的 ViewHolder（调用 recycleViewHolderInternal(ViewHolder holder))，它的作用是在需要新的 ViewHolder 时，精确匹配是不是 **刚移除** 的那个（通过判断 ViewHolder 的 position）。如果是，就直接返回给 RecyclerView 进行展示；如果不是，那么即使 mCachedViews 中有 ViewHolder，也不会返回给 RecyclerView 使用。除非 ViewHolder 有数据上的更新，否则在正常滑动可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
+保存最近被移除的 ViewHolder（调用 recycleViewHolderInternal(ViewHolder holder))，它的作用是在需要新的 ViewHolder 时，精确匹配是不是 **刚移除** 的那个（通过判断 ViewHolder 的 position）。如果是，就直接返回给 RecyclerView 进行展示；如果不是，那么即使 mCachedViews 中有 ViewHolder，也不会返回给 RecyclerView 使用。除非 ViewHolder 有数据上的更新，否则在正常滑动可以直接复用从而不需要重新调用 onBindViewHolder() 从而提高性能。
 
 mCachedViews 的默认大小为 2，可通过 RecyclerView.setItemViewCacheSize() 修改该值大小。当 mCachedViews 满了以后，会利用先进先出原则，将出的 ViewHoloder 存放在 mRecyclerPool 中。
 
@@ -192,7 +192,7 @@ RecyclerView 允许我们自己扩展回收池，我们可以通过调用 setVie
 
 ### 2.3.2 detachAndScrapAttachedViews()
 
-detachAndScrapXXX() 用于暂时分离子视图，并将其添加到 Recycler 缓存堆中，分离的本质是仅仅将 View 和 RecyclerView 互相之间的引用置空，视图还是显示在屏幕中的。一般只用于 onLayoutChildren() 中。
+detachAndScrapXXX() 用于暂时分离子视图，并将其添加到 Recycler 缓存堆中，分离的本质是仅仅将 View 和 RecyclerView 互相之间的引用置空，**视图并没有脱离 Window**。
 
 ```java
 public void detachAndScrapView(View child, Recycler recycler) {
@@ -613,13 +613,13 @@ public static class State {
 }
 ```
 
-- dispatchLayoutStep1：mLayoutStep 处于 STEP_START 状态，在方法执行要结束时状态置为 STEP_LAYOUT。本方法的作用主要有四点：
+- dispatchLayoutStep1：mLayoutStep 处于 State.STEP_START 状态，在方法执行要结束时状态置为 STEP_LAYOUT。本方法的作用主要有四点：
   1. 处理 Adapter 更新;
   2. 决定应运行哪个动画;
-  3. 保存布局前的视图信息。
+  3. 保存布局前的视图信息；
   4. 如果有必要，进行预布局并保存布局后的视图信息。
 - dispatchLayoutStep2：一般情况下处于 State.STEP_LAYOUT 状态，也可能由于二次测量的原因处于 State.STEP_ANIMATIONS 状态，在方法执行要结束时置为 State.STEP_ANIMATIONS。该方法主要作用是进行子视图的测量和布局。
-- dispatchLayoutStep3：处于 STEP_ANIMATIONS 状态。在方法执行要结束时状态重新置为 STEP_START， 这个方法的作用执行在 dispatchLayoutStep1 方法里面保存的动画信息。本方法不是本文的介绍重点，后面在介绍 ItemAnimator 时，会重点分析这个方法。
+- dispatchLayoutStep3：处于 STEP_ANIMATIONS 状态。在方法执行要结束时状态重新置为 STEP_START，此时可以拿到布局前后的视图坐标，从而去执行 ItemAnimation 动画。
 
 接下来开始正文，下文中变量 mLayout 的类型都是 RecyclerView.LayoutManager。
 

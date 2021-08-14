@@ -90,8 +90,8 @@ AIDL 用于方便实现进程间通信。如果有 .aidl 文件，会通过 AIDL
 
 一个资源 id 是如何决定的呢？以 0x7f010000 为例：
 
-- packageId：前两位（7f）是 packageId，当于一个命名空间，主要用来区分不同的包空间(不是 module)。在编译 app 的时候，至少会遇到两个包空间：Android 系统资源包和自己添加的 App 资源包，其中以 0x01 开头的就是系统已经内置的资源 id，以 0x7f 开头的是自己添加的 app 资源 id。
-- typeId：第三、四位（01）是 typeId，是指资源的类型 id，android 资源有 anim、color、drawable、layout，string 等等，typeId 就是拿来区分资源类型。
+- packageId：前两位（7f）是 packageId，当于一个命名空间，主要用来区分不同的包空间(不是 module)。在编译 app 的时候，至少会遇到两个包空间：Android 系统资源包和自己添加的 App 资源包，其中以 0x01 开头的就是系统已经内置的资源 id，以 0x7f 开头的是自己添加的 app 资源 id；
+- typeId：第三、四位（01）是 typeId，是指资源的类型 id，android 资源有 anim、color、drawable、layout，string 等等，typeId 就是拿来区分这些资源的类型；
 - entryId：后四位（0000）是 entryId，指每一个资源在其所属的资源类型中所出现的次序。
 
 主模块中的 R.xxx.xxx 可以作为常量直接内联进代码中，而其它模块则是一个变量，这是因为在最终打包成 apk 时候，才能确定非主模块的每个资源 id（资源 id 需要唯一），所以其它模块生成的资源 id 不能是 final 的。
@@ -118,21 +118,21 @@ dx 是最早的转换工具，Android Studio 3.1 之后，引入了 D8 编译器
 
 ### 1.1.5 打包生成 APK 文件
 
-所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）、.dex 文件、manifest 文件都会通过 apkbuilder(旧)/zipflinger(Android 3.6 后) 工具打包到一个完成的.apk 文件中。该工具位于 android-sdk/tools 目录下。
+所有没有编译的资源（assets 文件下的文件）、编译过的资源（.arsc）、.dex 文件、manifest 文件都会通过 apkbuilder(旧)/zipflinger(Android 3.6 后) 工具打包到一个完成的 .apk 文件中。该工具位于 android-sdk/tools 目录下。
 
 ### 1.1.6 对 APK 文件签名
 
-一旦 APK 文件生成，它必须被签名才能被安装在设备上。使用 jarsigner 工具对 apk 进行验证签名，得到一个签名后的 apk（signed.apk）。在未指定签名文件时，会使用编译器默认的调试签名文件 debug.keystore。该工具位于 ${JDK_HOME}/jarsigner。
+出于系统安全方面的设计，APK 文件它必须被签名才能被安装在设备上。使用 jarsigner 工具对 apk 进行验证签名，得到一个签名后的 apk（signed.apk）。在未指定签名文件时，会使用编译器默认的调试签名文件 debug.keystore。该工具位于 ${JDK_HOME}/jarsigner。
 
 ### 1.1.7 对签名后的 APK 文件进行对齐处理
 
-如果发布的 APK 是正式版的话，就必须使用 zipalign 对 APK 进行对齐处理，对齐的主要过程是将 APK 包中所有的资源文件距离文件起始偏移为 4 字节整数倍，这样通过内存映射访问 apk 文件时的速度会更快（空间换时间）。该工具位于 android-sdk/tools 目录下。
+如果发布的是正式版的  APK，就需要使用 zipalign 对 APK 进行对齐处理，对齐的主要过程是将 APK 包中所有的资源文件距离文件起始偏移为 4 字节整数倍，这样通过内存映射访问 apk 文件时的速度会更快（空间换时间）。该工具位于 android-sdk/tools 目录下。
 
 ## 1.2 字节码
 
 ASM 是对字节码文件进行操作，并且需要操作具体的 **JVM 指令**，因此需要对字节码以及 [Java 虚拟机栈](../notes/Java%20虚拟机.md#22-java-虚拟机栈) 相关知识有所了解。这里将简述几个关键的概念。
 
-1. 首先编译好的字节码文件本质上是一堆 16 进制的字节，平常用 IDE 打开 .class 文件，看到的是已经被反编译后所熟悉的 Java 代码。 
+1. 首先编译好的字节码文件本质上是一堆 16 进制的字节，平常用 IDE 打开 .class 文件，看到的是已经被反编译后所熟悉的 Java 代码；
 
 2. 每一个方法从调用开始到执行完成的过程，就对应着一个栈帧在虚拟机栈里面从入栈到出栈的过程。对于执行引擎来说，活动线程中只有栈顶的栈帧是有效的，称为当前栈帧，这个栈帧所关联的方法称为当前方法。执行引擎所运行的所有字节码指令都只针对当前栈帧进行操作。
 
@@ -404,28 +404,28 @@ ASM Javadoc：https://asm.ow2.io/javadoc/overview-summary.html
 
 ASM 主要有以下几个核心的类、接口：
 
-- ClassReader：用来读取并解析字节码文件并将相关的事件传递给注册的 ClassVisitor。
-- ClassVisitor：定义在读取 Class 字节码时会触发的事件方法，如类头解析完成、注解解析、字段解析、方法解析等，方法皆以 visitXXX() 打头。
-- AnnotationVisitor：定义在解析注解时会触发的事件，如解析到一个基本值类型的注解、enum 值类型的注解、Array 值类型的注解、注解值类型的注解等。
-- FieldVisitor：定义在解析字段时触发的事件，如解析到字段上的注解、解析到字段相关的属性等。
+- ClassReader：用来读取并解析字节码文件并将相关的事件传递给注册的 ClassVisitor；
+- ClassVisitor：定义在读取 Class 字节码时会触发的事件方法，如类头解析完成、注解解析、字段解析、方法解析等，方法皆以 visitXXX() 打头；
+- AnnotationVisitor：定义在解析注解时会触发的事件，如解析到一个基本值类型的注解、enum 值类型的注解、Array 值类型的注解、注解值类型的注解等；
+- FieldVisitor：定义在解析字段时触发的事件，如解析到字段上的注解、解析到字段相关的属性等；
 - MethodVisitor：定义在解析方法时触发的事件，如方法上的注解、属性、代码等。
 
 ----------------------------------------------------------------------
 
-- ClassWriter 类：继承于 ClassVisitor，重写了相关 visitXXX() 方法，用于拼接字节码，即开发者若对 ClassWriter 没有任何修改，则调用 toByteArray() 时相当于拷贝了一份 ClassReader 传入的字节码文件，换句话说 ClassWriter 不会影响原字节码文件。
-- AnnotationWriter 类：继承于 AnnotationVisitor，用于拼接注解相关字节码。
-- FieldWriter 类：继承于 FieldVisitor，用于拼接字段相关字节码。
+- ClassWriter 类：继承于 ClassVisitor，重写了相关 visitXXX() 方法，用于拼接字节码，即开发者若对 ClassWriter 没有任何修改，则调用 toByteArray() 时相当于拷贝了一份 ClassReader 传入的字节码文件，换句话说 ClassWriter 不会影响原字节码文件；
+- AnnotationWriter 类：继承于 AnnotationVisitor，用于拼接注解相关字节码；
+- FieldWriter 类：继承于 FieldVisitor，用于拼接字段相关字节码；
 - MethodWriter 类：继承于 MethodVisitor，用于拼接方法相关字节码。
 
 ----------------------------------------------------------------------
 
-- SignatureReader 类：对类定义、字段定义、方法定义、本地变量定义的签名的解析。Signature 因范型引入，用于存储范型定义时的元数据（因为这些元数据在运行时会被擦除）。
-- SignatureVisitor 接口：定义在解析泛型时会触发的事件。
+- SignatureReader 类：对类定义、字段定义、方法定义、本地变量定义的签名的解析。Signature 因范型引入，用于存储范型定义时的元数据（因为这些元数据在运行时会被擦除）；
+- SignatureVisitor 接口：定义在解析泛型时会触发的事件；
 - SignatureWriter 类：继承于 SignatureVisitor，用于拼接泛型相关字节码。
 
 ----------------------------------------------------------------------
 
-- Opcodes：包括很多常量定义，包括 ASM API 版本号、访问标识（包含了所有修饰符）、JVM 指令、处理标签、数组类型代码等。
+- Opcodes：包括很多常量定义，包括 ASM API 版本号、访问标识（包含了所有修饰符）、JVM 指令、处理标签、数组类型代码等；
 - Type 类：类型相关的常量定义。
 
 ## 3.1 Visitor

@@ -37,8 +37,8 @@
 
 ## 1.1 @Retention
 
-- RetentionPolicy.SOURCE：在 javac 编译之后丢弃，因此它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解，APT 也可使用该注解。
-- RetentionPolicy.CLASS：注释将由编译器记录在字节码文件中，但不会加载到 JVM 中。注解默认使用这种方式。与 SOURCE 的作用区别在于，CLASS 修饰的注解可以作为字节码修改或插桩的依据。
+- RetentionPolicy.SOURCE：在 javac 编译之后丢弃，因此它们不会写入字节码。@Override, @SuppressWarnings 都属于这类注解，APT 也可使用该注解；
+- RetentionPolicy.CLASS：注释将由编译器记录在字节码文件中，但不会加载到 JVM 中。注解默认使用这种方式。与 SOURCE 的作用区别在于，CLASS 修饰的注解可以作为字节码修改或插桩的依据；
 - RetentionPolicy.RUNTIME：注释将由编译器记录在字节码文件中，并在运行时也加载到 JVM 中，因此使用在需要反射机制读取该注解信息的时候。
 
 ## 1.2 @Target
@@ -60,8 +60,8 @@ APT（Annotation Processing Tool） 即为编译时注解处理器，可以用�
 
 ## 2.1 Module 结构
 
-- x-annotation：存放自定义注解。
-- x-compiler：用于编写注解处理器，里面的代码不会被打包进 apk。
+- x-annotation：存放自定义注解；
+- x-compiler：用于编写注解处理器，里面的代码不会被打包进 apk；
 - x-api：对用户提供的 API，就是正常编写的代码以及 APT 生成的代码。
 
 一般情况下 x-compiler 和 x-api 都会依赖 x-annotation。
@@ -515,7 +515,7 @@ public class HelloWorld<K extends String> extends Test implements TestInterface 
 - 在实际的 APT 开发过程中，我们可以先手写生成类的具体实现，然后再对照着具体的代码从上往下一步一步写生成代码。
 - 对于不确定的方法或类型时可以通过查询 [Java 文档](http://www.matools.com/api/java8) 或调试解决。
 
-本小节将实现 ButterKnife 的 @BindView。除了示例模块，整个实现分为 3 个模块：[butterknife-annotations](#31-butterknife-annotations)、butterknife-api、butterknife-compiler。项目地址：https://github.com/passin95/APT_butterknife。
+本小节将实现 ButterKnife 的 @BindView。除了示例模块，整个实现分为 3 个模块：[butterknife-annotations](#31-butterknife-annotations)、butterknife-api、butterknife-compiler。项目地址：https://github.com/passin95/APT_butterknife 。
 
 DemoActivity：开发者使用示例。
 DemoActivity_ViewBinding：通过 APT 生成的代码文件。
