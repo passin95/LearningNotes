@@ -9,7 +9,7 @@
 
 例如：
 
-<img src ="../pictures//悬浮窗问题示例1.webp"/> <img src ="../pictures//悬浮窗问题示例 2.webp"/>
+<img src ="../pictures//悬浮窗问题示例1.webp"/> <img src ="../pictures//悬浮窗问题示例2.webp"/>
 
 因此对直播悬浮窗进行重构，并入悬浮窗组件进行统一管理去解决上述问题。
 
@@ -52,7 +52,7 @@ Window：作为一个单独的 Window，类型为系统 Window。
 View：悬浮控件添加到 Activity 所属 Window 的顶级视图 DecorView 上。在 Activity.onResume
 （页面处于前台）时，将悬浮控件从上一个页面 remove 掉，add 到当前页面的 DecorView 上。
 
-缺点：①可能被页面其他元素遮挡 ②页面跳转会消失再显示 ③不支持 pip
+缺点：①可能被页面其他元素遮挡 ②页面跳转会消失再显示 ③不支持 pip。
 
 ## 播放器控制类与秒开
 
@@ -119,5 +119,4 @@ CTFloatWindow.newLiveConfig(LiveWindowConfig.PLAY_URL_TYPE_LIVE) // 指定直播
 **支持单个页面的 floatView**
 
 - 现在直播小窗的 Bus 接入方，需求暂时都是希望在单个页面出现。支持单页面 FloatView，可以减少接入方的接入成本和出现问题的可能；
-
 - 方便实现新需求，例如直播 Icon 单页面悬浮控件，可复用 show、hide、close、拖拽等基础支持的代码。

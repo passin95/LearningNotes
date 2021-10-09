@@ -5,7 +5,7 @@
 - [二、解决思路](#二解决思路)
 - [三、方案实现](#三方案实现)
     - [3.1 LayoutInflater.inflate()](#31-layoutinflaterinflate)
-- [3.2 LayoutInflater.from(context)](#32-layoutinflaterfromcontext)
+    - [3.2 LayoutInflater.from(context)](#32-layoutinflaterfromcontext)
 - [四、使用方式](#四使用方式)
 - [五、注意事项](#五注意事项)
 
