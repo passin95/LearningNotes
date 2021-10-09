@@ -71,10 +71,10 @@ public abstract class Context {
 
 Context 的作用可以总结为以下几个方面：
 
-1. 与四大组件的交互。
-2. 获取系统、应用资源。
-3. 获取应用相关的文件目录。
-4. 官方存储相关，例如数据库、SharedPreference。
+1. 与四大组件的交互；
+2. 获取系统、应用资源；
+3. 获取应用相关的文件目录；
+4. 官方存储相关，例如数据库、SharedPreference；
 5. 其它功能，例如设置 ComponentCallbacks。
 
 ## 二、Context 继承结构
@@ -87,7 +87,7 @@ Context 的作用可以总结为以下几个方面：
 
 Context 有两个子类 ContextWrapper 和 ContextImpl，这里主要说明一下 ContextWrapper。
 
-ContextWrapper 实际上只是 Context 的一个包装类，所实现的所有方法都是通过内部成员 mBase 完成的，因此 ContextWrapper 的关键点在于成员变量 mBase 的赋值，对于 Application、Service、Activity 来说 mBase 的实现都是 ConttextImpl（源码在 ActivityThread 可查看，本文不做详细说明）。
+ContextWrapper 实际上只是 Context 的一个包装类，所实现的所有方法都是通过内部成员 mBase 完成的，因此 ContextWrapper 的关键点在于成员变量 mBase 的赋值，对于 Application、Service、Activity 来说 mBase 的实现都是 ContextImpl（源码在 ActivityThread 可查看，本文不做详细说明）。
 
 ```java
 public class ContextWrapper extends Context {

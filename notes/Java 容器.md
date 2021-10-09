@@ -2748,7 +2748,7 @@ public V get(Object key) {
     // 计算 hash 值。
     int h = spread(key.hashCode());
     // 如果 key 所在的桶存在且里面有元素。
-    // 关键点：e 会作为局部变量存下找到的数据，用 CAS 保证找的过程不会出现并发安全问题。
+    // 关键点：e 会作为局部变量存下找到的数据。
     if ((tab = table) != null && (n = tab.length) > 0 &&
             (e = tabAt(tab, (n - 1) & h)) != null) {
         // 如果第一个元素就是要找的元素，直接返回。
