@@ -756,13 +756,12 @@ public void add(int index, E element) {
 
 **（4）小结**
 
-1. 扩容方面：Vector 扩容为原来容量的 2 倍，ArrayList 扩容为原来容量 1.5 倍，CopyOnWriteArrayList 每次添加元素都是一个新的数组。
+1. 扩容方面：Vector 扩容为原来容量的 2 倍，ArrayList 扩容为原来容量 1.5 倍，CopyOnWriteArrayList 每次增删改元素都是一个新的数组。
 2. 性能方面：没有并发需求的情况下，优先使用 ArrayList。有并发需求的情况下：
-   - Collections.synchronizedList() 和 Vector 的读写性能几乎一致，理论 Vector 比 Collections.synchronizedList() 还快一些，因为后者对方法多包了一层。
-   - 仅在读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，大大提高了读操作的性能，但是在写操作时需要复制一个新的数组，会频繁消耗内存。
-   - 其余情况推荐自己控制并发，硬性需求才使用 Collections.synchronizedList() 或 Vector。
+   - Collections.synchronizedList() 和 Vector 的读写性能几乎一致，前者对方法仅仅多包了一层。
+   - 仅在拥有「高并发」需求，且读多写少的应用场景，推荐使用 CopyOnWriteArrayList，它在写操作的同时允许读操作，提高了读操作的性能，但是在写操作时需要复制一个新的数组，会频繁消耗内存。
 3. 拓展性：Collections.synchronizedList() 支持设置锁对象，因此拓展性更好。
-2. Vector 和 Collections.synchronizedList() 看似已经线程安全，但使用 Iterator 例外，因为在使用 Iterator 的时候，需要对整个迭代过程加锁，否则在迭代过程使用非迭代器修改数据会抛 ConcurrentModificationException 异常。
+4. Vector 和 Collections.synchronizedList() 看似已经线程安全，但使用 Iterator 例外，因为在使用 Iterator 的时候，需要对整个迭代过程加锁（锁同一个对象），否则在迭代过程使用非迭代器修改数据会抛 ConcurrentModificationException 异常。
 
 ### 2.1.2 LinkedList
 
@@ -829,7 +828,7 @@ public class LinkedList<E>
     private void linkFirst(E e) {
         // 临时变量存下当前的第一个节点。
         final Node<E> f = first;
-        // 生成一个新节点，且后继节点为当前的第一个节点
+        // 生成一个新节点，且后继节点为当前的第一个节点。
         final Node<E> newNode = new Node<>(null, e, f);
         // 首节点指向新节点。
         first = newNode;
@@ -854,7 +853,7 @@ public class LinkedList<E>
         final Node<E> newNode = new Node<>(l, e, null);
         // 尾节点指向新节点。
         last = newNode;
-        // 如果 l == null，说明列表一个节点都没有。
+        // 如果 l == null，说明链表一个节点都没有。
         if (l == null)
         // 则首节点也指向新节点。
             first = newNode;
@@ -1492,6 +1491,8 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
     // 默认的填充因子。
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     // 当桶 (bucket) 上的结点数大于等于这个值时为转成红黑树的条件之一。
+    // 为什么不直接用红黑树：树节点所用的指针是链表的两倍，而在个位数的数量级时，时间复杂度都是 o(1)。
+    // 为什么是 8：链表长度符合泊松分布，当长度为 8 的时候，概率仅为 0.00000006（转红黑树仅仅是为了兜底一些情况，例如 hash 算法写得不好）。
     static final int TREEIFY_THRESHOLD = 8; 
     // 当桶 (bucket) 上的结点数小于等于这个值时树转为链表。
     static final int UNTREEIFY_THRESHOLD = 6;
@@ -1577,17 +1578,17 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
 }
 ```
 
-loadFactor：控制数组存放数据的疏密程度，loadFactor 越趋近于 1，那么数组中存放的数据 (entry) 也就越多，也就越密，也就是会让链表的长度增加，loadFactor 越小，越趋近于 0，数组中存放的数据 (entry) 也就越少，也就越稀疏。
+loadFactor：控制数组存放数据的疏密程度，loadFactor 越趋近于 1，那么数组中存放的链表也就可能越多，链表也可能越长，loadFactor 越小，越趋近于 0，数组中存放的链表也就越少。
 
-loadFactor 太大导致查找元素效率低，太小导致数组的利用率低，存放的数据会很分散。loadFactor 的默认值为 0.75f ，是官方给出的一个比较好的临界值。
+loadFactor 太大导致查找元素效率变低，太小导致数组的利用率低，因此将 loadFactor 的默认值设为 0.75f，是官方给出的一个比较好的临界值。
 
-以给定的默认容量为 16，负载因子为 0.75 举例。 不断的往 Map 存储数据，当元素数量达到了 16 * 0.75 = 12 时就需要进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以比较消耗性能，因此应当尽量减少扩容的次数。
+以给定的默认容量为 16，负载因子为 0.75f 举例。当元素数量达到了 16 * 0.75 = 12 时就会进行扩容。而扩容这个过程涉及到 rehash、复制数据等操作，比较消耗性能，因此应当尽量减少扩容的次数。
 
 #### 2.2.1.2 存储结构
 
 JDK1.8 之前 HashMap 由 **数组+链表** 组成，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的，遇到哈希冲突，则将冲突的元素链到链表中即可。
 
-JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 且 table 容量大于等于 MIN_TREEIFY_CAPACITY(64) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少搜索时间。
+JDK1.8 及以后在解决哈希冲突时有了较大的变化，当链表长度大于等于 TREEIFY_THRESHOLD(8) 且 table 容量大于等于 MIN_TREEIFY_CAPACITY(64) 时，将链表转化为 [红黑树](https://www.jianshu.com/p/e136ec79235c)，以减少查看时间。
 
 ```java
 // 链表结构
@@ -1802,7 +1803,7 @@ final Node<K,V>[] resize() {
     // 赋值新的数组容量阈值。
     threshold = newThr;
 
-    // 每次扩容都会复制原来的数据到新数组，部分节点还需要重新计算 hash，因此应该尽量减少扩容的次数。
+    // 每次扩容都会复制原来的数据到新数组，且需要重新计算和构建数据所处的链表，因此应该尽量减少扩容的次数。
     @SuppressWarnings({"rawtypes","unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
     table = newTab;
@@ -1818,9 +1819,7 @@ final Node<K,V>[] resize() {
                     newTab[e.hash & (newCap - 1)] = e;
                 else if (e instanceof TreeNode)
                     ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
-                else { 
-                    // jdk 1.8 不需要重新计算所有节点的 hash 值。
-                    
+                else {                     
                     // 按原始链表顺序，过滤出扩容后位置不变的元素，放在一起。
                     // loHead 是过滤后桶位置不变的头节点，loTail 用于不断链接节点。
                     Node<K,V> loHead = null, loTail = null;
@@ -1869,7 +1868,7 @@ final Node<K,V>[] resize() {
 
 **（1）HashTable**
 
-HashTable 也是使用的 **数组+链表** 的数据结构，同时对所有和元素相关的方法使用 synchronized 来保证线程安全，效率相对低下。
+HashTable 也是使用的 **数组+链表** 的数据结构，同时对所有和元素相关的方法使用 synchronized 来保证线程安全。
 
 ```java
 public synchronized V put(K key, V value) {
@@ -1911,7 +1910,7 @@ public synchronized V get(Object key) {
 
 **（2）ConcurrentHashMap**
 
-在 JDK 1.7 的时候，ConcurrentHashMap（分段锁）对整个桶数组进行了分割分段 (Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，会大大减少锁竞争的可能性，提高并发访问率。 
+在 JDK 1.7 的时候，ConcurrentHashMap（分段锁）对数组进行了分割分段 (Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，会大大减少锁竞争的可能性，提高并发访问率。 
 
 到了 JDK1.8 的时候采用 **数组+ Node 链表+红黑树** 的数据结构实现。并发情况下，依靠 volatile 保持容器元素的可见性，当数组中的元素 Node 节点不存在时，使用 CAS 来确保并发写入的安全；当数组中的元素存在 Node 节点时，则以链表或红黑二叉树的首节点作为 synchronized 的 monitor（即一个数组元素对应一把锁），从而在多并发环境下有更高的效率。
 
@@ -1938,7 +1937,7 @@ public V put(K key, V value) {
 
 ### 2.2.2 ArrayMap
 
-ArrayMap 是 Android 专门针对内存优化而设计的，用于在千位数量级以下的数据条件下（时间换空间，但耗时差距极小），取代 HashMap 以节约内存。
+ArrayMap 是 Android 专门针对内存优化而设计的，用于千位数量级以下的场景（时间换空间，但耗时差距极小），以节约内存。
 
 #### 2.2.2.1 成员变量和构造函数
 
@@ -2520,13 +2519,13 @@ public E get(int key, E valueIfKeyNotFound) {
 
 **（3）缓存机制**
 
-- ArrayMap 对容量为 4 和 8 的数组进行缓存，可避免频繁创建对象而分配内存与 GC 操作，这两个缓存池大小为 10 个，防止缓存池无限增大；
+- ArrayMap 对容量为 4 和 8 的数组进行缓存，通过减少频繁创建对象从而减少 GC 操作，这两个缓存池大小为 10 个，防止缓存池无限增大；
 - HashMap 没有缓存机制；
 - SparseArray 有延迟回收机制，提供删除效率的同时，减少数组成员来回拷贝的次数。
 
 **（4）扩容机制**
 
-- ArrayMap 在容量满时扩容至原来的 1.5 倍，在容量小于 1/3 时缩容为元素数量的 1.5 倍，对于需要长期使用，且元素数量波动幅度较大时性能较好；
+- ArrayMap 在容量满时扩容至原来的 1.5 倍，在元素数量小于容量 1/3 时缩容为元素数量的 1.5 倍，对于需要长期使用，且元素数量波动幅度较大时性能较好；
 - HashMap 在容量的 0.75 倍扩容至原来的 2 倍，没有缩容机制；
 - SparseArray 在容量满时扩容至原来的 2 倍，没有缩容机制。
 
@@ -2748,7 +2747,7 @@ public V get(Object key) {
     // 计算 hash 值。
     int h = spread(key.hashCode());
     // 如果 key 所在的桶存在且里面有元素。
-    // 关键点：e 会作为局部变量存下找到的数据。
+    // 关键点：tab、e 会作为局部变量存下找到的数据。
     if ((tab = table) != null && (n = tab.length) > 0 &&
             (e = tabAt(tab, (n - 1) & h)) != null) {
         // 如果第一个元素就是要找的元素，直接返回。
