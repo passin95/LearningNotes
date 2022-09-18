@@ -126,7 +126,7 @@ System.out.println(n);// 1.235
 
 String 被声明为 final，因此它不可被继承。
 
-在 Java 8 中，内部使用 char 数组存储数据，该数组被申明为 final，也就是说 String 不可变。
+在 Java 8 中，内部使用 char 数组存储数据，使用 UTF-8 编码表示，该数组被申明为 final，也就是说 String 不可变。
 
 ```java
 public final class String
@@ -136,7 +136,9 @@ public final class String
 }
 ```
 
-在 Java 9 之后，String 类的实现改用 byte 数组存储字符串，同时使用 coder 来标识使用了哪种编码， byte[] 和 coder 被申明为 final，也就是说 String 同样不可变。
+在 Java 9 之后，String 类的实现改用 byte 数组存储字符串，同时使用 coder 来标识使用了哪种编码，其目的是为了减少内存的占用。
+
+当所有字符都能用 Latin-1 编码表示时（一个字符只占用一个字节），则切换成 Latin-1 编码，能够减少一半的内存占用。
 
 ```java
 public final class String
