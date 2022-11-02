@@ -43,7 +43,7 @@ View childAt = content.getChildAt(0); // 设置的布局
 
 MeasureSpec 用于决定 View 和 ViewGroup 之间的尺寸规则，因此我们先看一下 MeasureSpec 的常用方法及其原理。
 
-结论：前 2 位标识 mode，后 24 位标识具体的 size，中间 6 位标识数据的 state（例如是否超过了父 View 的大小限制、自定义的状态等）。
+结论：前 2 位标识 mode，后 30 位标识具体的 size。
 
 ```java
 public static class MeasureSpec {
@@ -75,7 +75,7 @@ public static class MeasureSpec {
     }
 
     public static int getSize(int measureSpec) {
-        // 提取后 30 位的数值。即获取大小和状态。
+        // 提取后 30 位的数值。即获取大小。
         // ~MODE_MASK 为对 MODE_MASK 按位取反。
         return (measureSpec & ~MODE_MASK);
     }
